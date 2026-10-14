@@ -1,0 +1,3033 @@
+{
+  "registry": {
+    "qa": {
+      "id": "qa",
+      "name": "W_QA",
+      "shape": [
+        5120,
+        1280
+      ],
+      "storedShape": [
+        1280,
+        5120
+      ],
+      "count": 6553600,
+      "role": "压缩当前输入",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 641,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+        "symbol": "Attention.wq_a"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "qnorm": {
+      "id": "qnorm",
+      "name": "RMSNorm γ",
+      "shape": [
+        1280
+      ],
+      "storedShape": [
+        1280
+      ],
+      "count": 1280,
+      "role": "逐特征缩放 Query 中间向量",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 642,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L642",
+        "symbol": "Attention.q_norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "qb": {
+      "id": "qb",
+      "name": "W_QB",
+      "shape": [
+        1280,
+        32768
+      ],
+      "storedShape": [
+        32768,
+        1280
+      ],
+      "count": 41943040,
+      "role": "展开当前 Query 为 64 个 Head",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 643,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L643",
+        "symbol": "Attention.wq_b"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "kv": {
+      "id": "kv",
+      "name": "W_KV (Local)",
+      "shape": [
+        5120,
+        512
+      ],
+      "storedShape": [
+        512,
+        5120
+      ],
+      "count": 2621440,
+      "role": "生成该层 Local KV；64 个 Head 读取同一向量",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 644,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L644",
+        "symbol": "Attention.wkv"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "kvnorm": {
+      "id": "kvnorm",
+      "name": "KV RMSNorm γ",
+      "shape": [
+        512
+      ],
+      "storedShape": [
+        512
+      ],
+      "count": 512,
+      "role": "逐特征缩放 Local KV",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 645,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L645",
+        "symbol": "Attention.kv_norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "oa": {
+      "id": "oa",
+      "name": "W_OA · 8 组",
+      "shape": [
+        8,
+        4096,
+        1024
+      ],
+      "storedShape": [
+        8192,
+        4096
+      ],
+      "count": 33554432,
+      "role": "每组独立压缩注意力结果",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 646,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L646",
+        "symbol": "Attention.wo_a"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "ob": {
+      "id": "ob",
+      "name": "W_OB",
+      "shape": [
+        8192,
+        5120
+      ],
+      "storedShape": [
+        5120,
+        8192
+      ],
+      "count": 41943040,
+      "role": "返回模型特征宽度",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 651,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L651",
+        "symbol": "Attention.wo_b"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "sink": {
+      "id": "sink",
+      "name": "Attention Sink",
+      "shape": [
+        64
+      ],
+      "storedShape": [
+        64
+      ],
+      "count": 64,
+      "role": "每个 Head 一个分母项，不提供 Value",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 640,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L640",
+        "symbol": "Attention.attn_sink"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "anorm": {
+      "id": "anorm",
+      "name": "Attention RMSNorm γ",
+      "shape": [
+        5120
+      ],
+      "storedShape": [
+        5120
+      ],
+      "count": 5120,
+      "role": "缩放合并后的 Attention 输入",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 935,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L935",
+        "symbol": "Block.attn_norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "fnorm": {
+      "id": "fnorm",
+      "name": "FFN RMSNorm γ",
+      "shape": [
+        5120
+      ],
+      "storedShape": [
+        5120
+      ],
+      "count": 5120,
+      "role": "缩放合并后的 FFN 输入",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 936,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L936",
+        "symbol": "Block.ffn_norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "hc_fn": {
+      "id": "hc_fn",
+      "name": "W_HC",
+      "shape": [
+        20480,
+        24
+      ],
+      "storedShape": [
+        24,
+        20480
+      ],
+      "count": 491520,
+      "role": "生成混合比例的原始分数",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 943,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L943",
+        "symbol": "Block.hc_attn_fn"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "hc_base": {
+      "id": "hc_base",
+      "name": "HC base",
+      "shape": [
+        24
+      ],
+      "storedShape": [
+        24
+      ],
+      "count": 24,
+      "role": "调整混合分数的偏置",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 945,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L945",
+        "symbol": "Block.hc_attn_base"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "hc_scale": {
+      "id": "hc_scale",
+      "name": "HC scale",
+      "shape": [
+        3
+      ],
+      "storedShape": [
+        3
+      ],
+      "count": 3,
+      "role": "调整 pre / post / comb 三类分数",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 947,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L947",
+        "symbol": "Block.hc_attn_scale"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "router": {
+      "id": "router",
+      "name": "W_R",
+      "shape": [
+        5120,
+        384
+      ],
+      "storedShape": [
+        384,
+        5120
+      ],
+      "count": 1966080,
+      "role": "为候选专家打分",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 807,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L807",
+        "symbol": "Gate.weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "bias": {
+      "id": "bias",
+      "name": "Router selection bias",
+      "shape": [
+        384
+      ],
+      "storedShape": [
+        384
+      ],
+      "count": 384,
+      "role": "只用于选择专家；不是线性层输出 Bias",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 808,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L808",
+        "symbol": "Gate.bias"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "bias_vl": {
+      "id": "bias_vl",
+      "name": "Router image bias",
+      "shape": [
+        384
+      ],
+      "storedShape": [
+        384
+      ],
+      "count": 384,
+      "role": "图像 token 的选择偏置",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 809,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L809",
+        "symbol": "Gate.bias_vl"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "router_draft": {
+      "id": "router_draft",
+      "name": "W_R",
+      "shape": [
+        5120,
+        128
+      ],
+      "storedShape": [
+        128,
+        5120
+      ],
+      "count": 655360,
+      "role": "为候选专家打分",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 807,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L807",
+        "symbol": "Gate.weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "bias_draft": {
+      "id": "bias_draft",
+      "name": "Router selection bias",
+      "shape": [
+        128
+      ],
+      "storedShape": [
+        128
+      ],
+      "count": 128,
+      "role": "只用于选择专家；不是线性层输出 Bias",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 808,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L808",
+        "symbol": "Gate.bias"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "bias_vl_draft": {
+      "id": "bias_vl_draft",
+      "name": "Router image bias",
+      "shape": [
+        128
+      ],
+      "storedShape": [
+        128
+      ],
+      "count": 128,
+      "role": "图像 token 的选择偏置",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 809,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L809",
+        "symbol": "Gate.bias_vl"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "w1": {
+      "id": "w1",
+      "name": "W₁ (Gate)",
+      "shape": [
+        5120,
+        2304
+      ],
+      "storedShape": [
+        2304,
+        5120
+      ],
+      "count": 11796480,
+      "role": "生成门控分支",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 838,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L838",
+        "symbol": "Expert.w1"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "w3": {
+      "id": "w3",
+      "name": "W₃ (Up)",
+      "shape": [
+        5120,
+        2304
+      ],
+      "storedShape": [
+        2304,
+        5120
+      ],
+      "count": 11796480,
+      "role": "生成内容分支",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 840,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L840",
+        "symbol": "Expert.w3"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "w2": {
+      "id": "w2",
+      "name": "W₂ (Down)",
+      "shape": [
+        2304,
+        5120
+      ],
+      "storedShape": [
+        5120,
+        2304
+      ],
+      "count": 11796480,
+      "role": "把门控结果变回 5120 维",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 839,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L839",
+        "symbol": "Expert.w2"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "ckv": {
+      "id": "ckv",
+      "name": "W_KV (Global)",
+      "shape": [
+        5120,
+        512
+      ],
+      "storedShape": [
+        512,
+        5120
+      ],
+      "count": 2621440,
+      "role": "源层生成可供后续层读取的 KV",
+      "sharing": "layer 20 生成、20–39 读取；ratio=2 源层分别为 2 / 8 / 14，不计为消费者的额外权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 446,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L446",
+        "symbol": "Compressor.wkv"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "cgate": {
+      "id": "cgate",
+      "name": "W_gate",
+      "shape": [
+        5120,
+        512
+      ],
+      "storedShape": [
+        512,
+        5120
+      ],
+      "count": 2621440,
+      "role": "ratio>1 时生成逐特征分组权重",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 448,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L448",
+        "symbol": "Compressor.wgate"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "cnorm": {
+      "id": "cnorm",
+      "name": "Compressor RMSNorm γ",
+      "shape": [
+        512
+      ],
+      "storedShape": [
+        512
+      ],
+      "count": 512,
+      "role": "缩放压缩向量",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 443,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L443",
+        "symbol": "Compressor.norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "iq": {
+      "id": "iq",
+      "name": "W_IQ",
+      "shape": [
+        1280,
+        4096
+      ],
+      "storedShape": [
+        4096,
+        1280
+      ],
+      "count": 5242880,
+      "role": "生成较小的索引 Query",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 514,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L514",
+        "symbol": "Indexer.wq_b"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "ih": {
+      "id": "ih",
+      "name": "W_IH",
+      "shape": [
+        5120,
+        32
+      ],
+      "storedShape": [
+        32,
+        5120
+      ],
+      "count": 163840,
+      "role": "生成各索引 Head 的混合比例",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 515,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L515",
+        "symbol": "Indexer.weights_proj"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "ik": {
+      "id": "ik",
+      "name": "W_IK",
+      "shape": [
+        512,
+        128
+      ],
+      "storedShape": [
+        128,
+        512
+      ],
+      "count": 65536,
+      "role": "仅 KV 源层生成新的索引 Key",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 518,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L518",
+        "symbol": "Indexer.wk"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "inorm": {
+      "id": "inorm",
+      "name": "Indexer RMSNorm γ",
+      "shape": [
+        128
+      ],
+      "storedShape": [
+        128
+      ],
+      "count": 128,
+      "role": "只在新索引 Key 所有者创建",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 519,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L519",
+        "symbol": "Indexer.k_norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "embedding": {
+      "id": "embedding",
+      "name": "Token Embedding E",
+      "shape": [
+        129280,
+        5120
+      ],
+      "storedShape": [
+        129280,
+        5120
+      ],
+      "count": 661913600,
+      "role": "按整数 token 编号查表",
+      "sharing": "所有 token 复用；三个 DSpark 阶段引用同一张主词表，统计一次",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 166,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L166",
+        "symbol": "ParallelEmbedding.weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "head": {
+      "id": "head",
+      "name": "W_head",
+      "shape": [
+        5120,
+        129280
+      ],
+      "storedShape": [
+        129280,
+        5120
+      ],
+      "count": 661913600,
+      "role": "生成词表分数",
+      "sharing": "与 Token Embedding 不绑权；DSpark 引用同一 LM Head，统计一次",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1008,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1008",
+        "symbol": "ParallelHead.weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "finalnorm": {
+      "id": "finalnorm",
+      "name": "Final RMSNorm γ",
+      "shape": [
+        5120
+      ],
+      "storedShape": [
+        5120
+      ],
+      "count": 5120,
+      "role": "最终四路合并后缩放",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1208,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1208",
+        "symbol": "Transformer.norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "etable1": {
+      "id": "etable1",
+      "name": "Engram E · layer 1",
+      "shape": [
+        384006168,
+        256
+      ],
+      "storedShape": [
+        384006168,
+        256
+      ],
+      "count": 98305579008,
+      "role": "根据 N-gram 地址查表",
+      "sharing": "同一表可重复取行；layer 1 和 layer 14 是两张不同表",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 309,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L309",
+        "symbol": "ParallelEngramEmbedding.weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "etable14": {
+      "id": "etable14",
+      "name": "Engram E · layer 14",
+      "shape": [
+        384016682,
+        256
+      ],
+      "storedShape": [
+        384016682,
+        256
+      ],
+      "count": 98308270592,
+      "role": "根据 N-gram 地址查表",
+      "sharing": "同一表可重复取行；layer 1 和 layer 14 是两张不同表",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 309,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L309",
+        "symbol": "ParallelEngramEmbedding.weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "ew": {
+      "id": "ew",
+      "name": "W_E",
+      "shape": [
+        6144,
+        25600
+      ],
+      "storedShape": [
+        25600,
+        6144
+      ],
+      "count": 157286400,
+      "role": "产生每路 Key 和一个共享 Value",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 345,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L345",
+        "symbol": "Engram.wkv"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "eq": {
+      "id": "eq",
+      "name": "Engram q_weight",
+      "shape": [
+        4,
+        5120
+      ],
+      "storedShape": [
+        4,
+        5120
+      ],
+      "count": 20480,
+      "role": "调整残差侧匹配权重",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 347,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L347",
+        "symbol": "Engram.q_weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "ek": {
+      "id": "ek",
+      "name": "Engram k_weight",
+      "shape": [
+        4,
+        5120
+      ],
+      "storedShape": [
+        4,
+        5120
+      ],
+      "count": 20480,
+      "role": "调整记忆侧匹配权重",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 348,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L348",
+        "symbol": "Engram.k_weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "dmain": {
+      "id": "dmain",
+      "name": "DSpark main_proj",
+      "shape": [
+        15360,
+        5120
+      ],
+      "storedShape": [
+        5120,
+        15360
+      ],
+      "count": 78643200,
+      "role": "仅第一个草稿阶段投影主干特征",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1116,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1116",
+        "symbol": "DSparkBlock.main_proj"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "dmainnorm": {
+      "id": "dmainnorm",
+      "name": "DSpark main_norm γ",
+      "shape": [
+        5120
+      ],
+      "storedShape": [
+        5120
+      ],
+      "count": 5120,
+      "role": "首阶段主干投影归一化",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1117,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1117",
+        "symbol": "DSparkBlock.main_norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "dfinalnorm": {
+      "id": "dfinalnorm",
+      "name": "DSpark final norm γ",
+      "shape": [
+        5120
+      ],
+      "storedShape": [
+        5120
+      ],
+      "count": 5120,
+      "role": "仅最后草稿阶段最终归一化",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1119,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1119",
+        "symbol": "DSparkBlock.norm"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "markovembed": {
+      "id": "markovembed",
+      "name": "Markov Embedding",
+      "shape": [
+        129280,
+        256
+      ],
+      "storedShape": [
+        129280,
+        256
+      ],
+      "count": 33095680,
+      "role": "草稿 Markov 输入查表",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1083,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1083",
+        "symbol": "DSparkMarkovHead.embed"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "markovhead": {
+      "id": "markovhead",
+      "name": "Markov Head",
+      "shape": [
+        256,
+        129280
+      ],
+      "storedShape": [
+        129280,
+        256
+      ],
+      "count": 33095680,
+      "role": "草稿 Markov 打分",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1084,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1084",
+        "symbol": "DSparkMarkovHead.head"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "confidence": {
+      "id": "confidence",
+      "name": "Confidence projection",
+      "shape": [
+        5376,
+        1
+      ],
+      "storedShape": [
+        1,
+        5376
+      ],
+      "count": 5376,
+      "role": "计算草稿置信度",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1096,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1096",
+        "symbol": "DSparkConfidenceHead.proj"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "patch": {
+      "id": "patch",
+      "name": "Vision patch projection",
+      "shape": [
+        588,
+        1024
+      ],
+      "storedShape": [
+        1024,
+        588
+      ],
+      "count": 602112,
+      "role": "图像 patch 映射",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 40,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L40",
+        "symbol": "PatchEmbed.proj"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "patchbias": {
+      "id": "patchbias",
+      "name": "Vision patch bias",
+      "shape": [
+        1024
+      ],
+      "storedShape": [
+        1024
+      ],
+      "count": 1024,
+      "role": "patch 投影偏置",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 40,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L40",
+        "symbol": "PatchEmbed.proj"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "vqkv": {
+      "id": "vqkv",
+      "name": "Vision W_QKV",
+      "shape": [
+        1024,
+        3072
+      ],
+      "storedShape": [
+        3072,
+        1024
+      ],
+      "count": 3145728,
+      "role": "图像 Query / Key / Value",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 51,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L51",
+        "symbol": "Attention.wqkv"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "vqkvbias": {
+      "id": "vqkvbias",
+      "name": "Vision QKV bias",
+      "shape": [
+        3072
+      ],
+      "storedShape": [
+        3072
+      ],
+      "count": 3072,
+      "role": "QKV 输出偏置",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 51,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L51",
+        "symbol": "Attention.wqkv"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "vo": {
+      "id": "vo",
+      "name": "Vision W_O",
+      "shape": [
+        1024,
+        1024
+      ],
+      "storedShape": [
+        1024,
+        1024
+      ],
+      "count": 1048576,
+      "role": "图像 Attention 输出",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 52,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L52",
+        "symbol": "Attention.wo"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "vobias": {
+      "id": "vobias",
+      "name": "Vision output bias",
+      "shape": [
+        1024
+      ],
+      "storedShape": [
+        1024
+      ],
+      "count": 1024,
+      "role": "图像输出偏置",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 52,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L52",
+        "symbol": "Attention.wo"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "vup": {
+      "id": "vup",
+      "name": "Vision Gate + Up",
+      "shape": [
+        1024,
+        5632
+      ],
+      "storedShape": [
+        5632,
+        1024
+      ],
+      "count": 5767168,
+      "role": "图像两条激活分支",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 66,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L66",
+        "symbol": "MLP.w1"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "vdown": {
+      "id": "vdown",
+      "name": "Vision Down",
+      "shape": [
+        2816,
+        1024
+      ],
+      "storedShape": [
+        1024,
+        2816
+      ],
+      "count": 2883584,
+      "role": "图像 MLP 输出",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 67,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L67",
+        "symbol": "MLP.w2"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "vnorm": {
+      "id": "vnorm",
+      "name": "Vision RMSNorm γ",
+      "shape": [
+        1024
+      ],
+      "storedShape": [
+        1024
+      ],
+      "count": 1024,
+      "role": "图像层归一化",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 28,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L28",
+        "symbol": "RMSNorm.weight"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "align1": {
+      "id": "align1",
+      "name": "Aligner W₁",
+      "shape": [
+        9216,
+        5120
+      ],
+      "storedShape": [
+        5120,
+        9216
+      ],
+      "count": 47185920,
+      "role": "下采样图像映射到文本宽度",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 111,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L111",
+        "symbol": "Aligner.w1"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "align1bias": {
+      "id": "align1bias",
+      "name": "Aligner bias₁",
+      "shape": [
+        5120
+      ],
+      "storedShape": [
+        5120
+      ],
+      "count": 5120,
+      "role": "第一层对齐偏置",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 111,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L111",
+        "symbol": "Aligner.w1"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "align2": {
+      "id": "align2",
+      "name": "Aligner W₂",
+      "shape": [
+        5120,
+        5120
+      ],
+      "storedShape": [
+        5120,
+        5120
+      ],
+      "count": 26214400,
+      "role": "第二层对齐",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 112,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L112",
+        "symbol": "Aligner.w2"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "align2bias": {
+      "id": "align2bias",
+      "name": "Aligner bias₂",
+      "shape": [
+        5120
+      ],
+      "storedShape": [
+        5120
+      ],
+      "count": 5120,
+      "role": "第二层对齐偏置",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/vision.py",
+        "line": 112,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py#L112",
+        "symbol": "Aligner.w2"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    },
+    "image_delimiter": {
+      "id": "image_delimiter",
+      "name": "Image delimiter embedding",
+      "shape": [
+        5120
+      ],
+      "storedShape": [
+        5120
+      ],
+      "count": 5120,
+      "role": "图像 start / end / newline 三种边界向量",
+      "sharing": "同一模块在不同 token 上复用；各主干层有自己的权重",
+      "evidence": {
+        "file": "inference/model.py",
+        "line": 1223,
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1223",
+        "symbol": "Transformer.image_start"
+      },
+      "status": "Verified",
+      "requiresGrad": "结构参数；本推理实现未提供训练冻结策略，不能据此判断某次训练是否更新"
+    }
+  },
+  "assumptions": {
+    "Configuration": [
+      [
+        "Model",
+        "DeepSeek-V4.1-Flash；正式 config 与 inference/config 32 项逐项对应"
+      ],
+      [
+        "Hidden / Layers",
+        "5120；文本主干 40 层，CED 教学分段 0–19 / 20–39"
+      ],
+      [
+        "Query / KV",
+        "64 个 Query Head × 512；KV 一份 512 维向量"
+      ],
+      [
+        "MoE",
+        "每层存 384 个路由专家 + 1 个共享专家；当前选择 6 个路由专家"
+      ],
+      [
+        "KV / Index source",
+        "KV 源层 2 / 8 / 14 / 20；Indexer 层 2 / 8 / 14 / 20 / 24 / 28 / 32 / 36"
+      ],
+      [
+        "窗口 / 选址上限",
+        "Local 窗口 128；Indexer 最多选择 512 个 Global 位置"
+      ],
+      [
+        "绑定与偏置",
+        "Token Embedding 与 LM Head 不绑权；文本 Linear 无加性 Bias；Router 选择偏置及 Vision 的真实 Bias 单独计数"
+      ],
+      [
+        "额外分支",
+        "3 个 DSpark 草稿阶段；32 层 Vision + Aligner；主图没有新增这些模块"
+      ]
+    ],
+    "Scenario": [
+      [
+        "当前 token",
+        "Batch Size 1；一次 Decode 更新 1 个 token，不是 Prefill 整段输入"
+      ],
+      [
+        "历史",
+        "演示固定此前 1024 个 token；当前为第 1025 个。128 / 512 是此场景实际读取数，不能与配置上限混为一谈"
+      ],
+      [
+        "主计算范围",
+        "文本 40 层 + 两次 Engram + 最终 LM Head；不执行 Vision 或 DSpark"
+      ],
+      [
+        "缓存",
+        "历史 KV 已存在；本次新的 Local KV 每层生成，Global KV 只在源层生成。ratio=2 当前半组等待，ratio=1 当前产生一行"
+      ],
+      [
+        "反向",
+        "实数数学的局部梯度示例；不代表整批训练、历史缓存的完整反向、优化器更新或官方训练内核"
+      ],
+      [
+        "共享",
+        "重用一个权重或缓存不会增加存储参数；草稿引用的主 Embedding / LM Head 统计一次"
+      ]
+    ],
+    "Approximation": [
+      [
+        "矩阵 FLOPs",
+        "主结果采用 2MKN 近似：乘、加各 1 次；单 token 的 M=1。展开审计另列精确乘加 MN(2K−1)"
+      ],
+      [
+        "线性反向",
+        "dX 与 dW 分别计算；近似分别 2MNK 和 2KMN。精确分别 MK(2N−1) 和 KN(2M−1)，因此单 token 外积不应称作精确 2KN"
+      ],
+      [
+        "非矩阵操作",
+        "加、减、乘各 1 次；rsqrt、exp、sigmoid、softplus、sqrt、除法各简化计 1 次；比较、Top-K、索引、abs/copysign 的符号处理和类型转换不计为浮点 FLOPs"
+      ],
+      [
+        "Attention",
+        "矩阵小计按实际读取位置；在线 Softmax 的展开估计按源码 64 位置分块，含 sink。它不是 GPU 实测指令数"
+      ],
+      [
+        "量化与内存",
+        "仅显式计 Engram 查表反量化的逐项乘法；其他 FP4/FP8 量化、GEMM 内部反量化、缓存搬运、通信和分词耗时不计"
+      ],
+      [
+        "参数与字节",
+        "统计逻辑权重数字；FP4 两值打包、FP8/FP4 scale、缓存和整数哈希 buffer 不无条件当作新增数学学习权重，字节数另算"
+      ]
+    ],
+    "Unverified": [
+      [
+        "完整反向",
+        "参考实现为推理，不含训练反向；非线性总量、量化权重训练规则、选择偏置的更新方式未验证"
+      ],
+      [
+        "训练状态",
+        "技术报告 §2.5 说明预训练早期冻结 Vision 主体，保留最终归一化与对齐层可训练；本页面仍不能确定用户当前任务的 requires_grad 或量化权重更新规则"
+      ],
+      [
+        "完整 Prefill / Draft / Vision FLOPs",
+        "未运行完整图片、Prefill、DSpark 调度，当前未给出这些场景的精确 FLOPs"
+      ],
+      [
+        "本地差异",
+        "本地 model.py 落后于固定官方 revision：共享索引缓存发布条件、输出投影前量化有差异。参数维度不变；证据以官方固定版本为准"
+      ]
+    ]
+  },
+  "summary": {
+    "Verified": 63,
+    "Estimated": 82,
+    "Unverified": 44,
+    "Mismatch": 0,
+    "historicalMismatchesCorrected": 38
+  },
+  "totals": {
+    "Text Backbone": 551566180464,
+    "Engram": 196928504320,
+    "Draft": 14225362530,
+    "Vision": 485268480,
+    "Text + Engram": 748494684784,
+    "All logical weights": 763205315794
+  },
+  "revision": "5254448103b6254fc646dacbca1cbbf20e9216c1",
+  "changes": [
+    {
+      "module": "indexer",
+      "mode": "forward",
+      "item": "索引 Key 和 Head 汇合",
+      "previous": "只展示 Query×Key 点积",
+      "corrected": "补齐 W_IK / γ、新 latent 的条件、ReLU 与加权求和",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "源码 Indexer.forward 明确执行这些阶段；选址与主 Attention 分别统计。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 527,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L527",
+          "symbol": "Indexer.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 514,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L514",
+          "symbol": "Indexer.wq_b"
+        }
+      ]
+    },
+    {
+      "module": "compressor",
+      "mode": "forward",
+      "item": "归一化权重的使用阶段",
+      "previous": "γ 只列数量，流程未显示",
+      "corrected": "补齐完整分组产生后才执行的归一化",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "半组 Decode 不执行该阶段；不能误认 γ 不学习或每步都执行。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 458,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L458",
+          "symbol": "Compressor.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 446,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L446",
+          "symbol": "Compressor.wkv"
+        }
+      ]
+    },
+    {
+      "module": "hc",
+      "mode": "forward",
+      "item": "base / scale 的明确用途",
+      "previous": "只在文字中列出 base / scale",
+      "corrected": "补齐 pre / post / comb 的参数变换",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "核对 hc_split_sinkhorn 的缩放、偏置、epsilon 与先行后列次序。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 950,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L950",
+          "symbol": "Block.hc_mixes"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 964,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L964",
+          "symbol": "Block.hc_post"
+        },
+        {
+          "file": "inference/kernel.py",
+          "line": 407,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L407",
+          "symbol": "hc_split_sinkhorn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 943,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L943",
+          "symbol": "Block.hc_attn_fn"
+        }
+      ]
+    },
+    {
+      "module": "qnorm",
+      "mode": "forward",
+      "item": "RMSNorm 4d+2 的解释",
+      "previous": "平方、求和、两次逐项缩放共约 4×1280 次乘加；求均值的除法和开平方倒数各简化计 1 次。",
+      "corrected": "平方 d 次、求和 d−1 次、两次逐项缩放 2d 次；均值除法、加 ε、rsqrt 共 3 次，合计 4d+2。特殊函数简化记 1 次。",
+      "status": "Estimated",
+      "previousStatus": "Mismatch",
+      "reason": "所有五类 RMSNorm 面板保留正确数值；说明独立列出 d−1 求和、均值除法、epsilon 与 rsqrt，避免口头漏数。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 288,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L288",
+          "symbol": "RMSNorm.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 642,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L642",
+          "symbol": "Attention.q_norm"
+        }
+      ]
+    },
+    {
+      "module": "sliding",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 640,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L640",
+          "symbol": "Attention.attn_sink"
+        }
+      ]
+    },
+    {
+      "module": "sparse",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 640,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L640",
+          "symbol": "Attention.attn_sink"
+        }
+      ]
+    },
+    {
+      "module": "multi",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 640,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L640",
+          "symbol": "Attention.attn_sink"
+        }
+      ]
+    },
+    {
+      "module": "encoderattn",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "decoderattn",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "engram",
+      "mode": "forward",
+      "item": "Engram 门控权重",
+      "previous": "仅文字概括门值",
+      "corrected": "补齐 q_weight / k_weight 的加权归一化点积与 signed sqrt",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "实际 Engram.forward 使用这两组学习权重；不是普通 RMSNorm γ。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 350,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L350",
+          "symbol": "Engram.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 309,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L309",
+          "symbol": "ParallelEngramEmbedding.weight"
+        }
+      ]
+    },
+    {
+      "module": "engram1",
+      "mode": "forward",
+      "item": "Engram 门控权重",
+      "previous": "仅文字概括门值",
+      "corrected": "补齐 q_weight / k_weight 的加权归一化点积与 signed sqrt",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "实际 Engram.forward 使用这两组学习权重；不是普通 RMSNorm γ。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 350,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L350",
+          "symbol": "Engram.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 309,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L309",
+          "symbol": "ParallelEngramEmbedding.weight"
+        }
+      ]
+    },
+    {
+      "module": "engram14",
+      "mode": "forward",
+      "item": "Engram 门控权重",
+      "previous": "仅文字概括门值",
+      "corrected": "补齐 q_weight / k_weight 的加权归一化点积与 signed sqrt",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "实际 Engram.forward 使用这两组学习权重；不是普通 RMSNorm γ。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 350,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L350",
+          "symbol": "Engram.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 309,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L309",
+          "symbol": "ParallelEngramEmbedding.weight"
+        }
+      ]
+    },
+    {
+      "module": "enggate",
+      "mode": "forward",
+      "item": "Engram 门控权重",
+      "previous": "仅文字概括门值",
+      "corrected": "补齐 q_weight / k_weight 的加权归一化点积与 signed sqrt",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "实际 Engram.forward 使用这两组学习权重；不是普通 RMSNorm γ。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 350,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L350",
+          "symbol": "Engram.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 345,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L345",
+          "symbol": "Engram.wkv"
+        }
+      ]
+    },
+    {
+      "module": "hidden",
+      "mode": "forward",
+      "item": "状态与投影的区别",
+      "previous": "状态面板直接展示 KV 投影",
+      "corrected": "状态合并、归一化；KV 分支独立统计",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "防止将 512 维 KV 当成 Encoder 隐藏状态。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 935,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L935",
+          "symbol": "Block.attn_norm"
+        }
+      ]
+    },
+    {
+      "module": "query",
+      "mode": "parameter",
+      "item": "Query 含 RMSNorm",
+      "previous": [
+        [
+          "本模块存储",
+          "48,496,640 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "本模块存储",
+          "48,497,920 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "模块包含的 1,280 个 γ 原本只在子面板计数，主模块总量漏列；正确每层 48,497,920。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "hc",
+      "mode": "forward",
+      "item": "comb 方向与 pre 使用次序",
+      "previous": [
+        {
+          "title": "① 为这一个 token 生成混合系数",
+          "formulas": [
+            "L=R_{flat}\\times W_{HC}"
+          ],
+          "dimensions": [
+            "[1,20480]\\times[20480,24]=[1,24]"
+          ],
+          "symbols": [
+            [
+              "R_flat",
+              "当前 token 的 4 路向量拼成一行，4×5120=20480"
+            ],
+            [
+              "W_HC",
+              "学习得到的 20480×24 权重"
+            ],
+            [
+              "L",
+              "24 个数字，后续调整成 4 个输入比例、4 个输出比例与 16 个路间混合比例"
+            ]
+          ],
+          "note": "还会稳定这些数字的大小，并使用 base、scale 调整；16 个路间比例反复按行、列调整。"
+        },
+        {
+          "title": "② 合成一行，送入 Attention 或 FFN",
+          "formulas": [
+            "X=a_1R_1+a_2R_2+a_3R_3+a_4R_4"
+          ],
+          "dimensions": [
+            "4\\text{ vectors }[1,5120]\\longrightarrow[1,5120]"
+          ],
+          "symbols": [
+            [
+              "R₁…R₄",
+              "同一个 token 的四路向量"
+            ],
+            [
+              "a₁…a₄",
+              "四个输入混合比例"
+            ],
+            [
+              "X",
+              "送入当前子模块的一行向量"
+            ]
+          ],
+          "note": ""
+        },
+        {
+          "title": "③ 将子模块结果送回四路",
+          "formulas": [
+            "Y_j=b_jU+\\sum_{i=1}^{4}C_{ji}R_i"
+          ],
+          "dimensions": [
+            "[1,5120]+[1,4,5120]\\longrightarrow[1,4,5120]"
+          ],
+          "symbols": [
+            [
+              "U",
+              "Attention 或 FFN 刚算出的结果"
+            ],
+            [
+              "bⱼ",
+              "这一结果送给第 j 路的比例"
+            ],
+            [
+              "Cⱼᵢ",
+              "第 i 路旧状态送给第 j 路的比例"
+            ],
+            [
+              "Σᵢ",
+              "把四路的贡献相加；Yⱼ 是第 j 路的新状态"
+            ]
+          ],
+          "note": ""
+        }
+      ],
+      "corrected": [
+        {
+          "title": "① 为这一个 token 生成混合系数",
+          "formulas": [
+            "r=\\operatorname{rsqrt}(\\operatorname{mean}(R_{flat}^2)+\\epsilon)",
+            "L=(R_{flat}\\times W_{HC})r"
+          ],
+          "dimensions": [
+            "[1,20480]\\times[20480,24]=[1,24]"
+          ],
+          "symbols": [
+            [
+              "R_flat",
+              "当前 token 的 4 路向量拼成一行，4×5120=20480"
+            ],
+            [
+              "W_HC",
+              "学习得到的 20480×24 权重"
+            ],
+            [
+              "r、ε",
+              "该拼接向量算出的缩放比例 / 稳定小数，没有额外 γ"
+            ],
+            [
+              "L",
+              "24 个分数，经过 base、scale 及 Sinkhorn 调整后产生 4+4+16 个比例"
+            ]
+          ],
+          "note": "本次生成的 pre 比例交给下一子模块；当前子模块的输入合并使用前一子模块传来的 pre_mix。",
+          "parameterRefs": [
+            "hc_fn-0"
+          ],
+          "tensorKind": "activation"
+        },
+        {
+          "title": "base / scale 将分数转为混合比例",
+          "formulas": [
+            "a_i^{next}=\\sigma(scale_0 L_i+base_i)+\\epsilon",
+            "b_i=2\\sigma(scale_1 L_{4+i}+base_{4+i})",
+            "C_0=\\operatorname{Softmax}_{row}(scale_2 L_{8:24}+base_{8:24})+\\epsilon",
+            "C=\\operatorname{AltNorm}_{19}(\\operatorname{ColNorm}_{\\epsilon}(C_0))"
+          ],
+          "dimensions": [
+            "L:[1,24]\\longrightarrow a^{next},b:[1,4],C:[1,4,4]"
+          ],
+          "symbols": [
+            [
+              "base / scale",
+              "24 个学习偏置 / 3 个学习缩放系数"
+            ],
+            [
+              "σ / ε",
+              "sigmoid / 10⁻⁶ 稳定数"
+            ],
+            [
+              "a_next",
+              "本次生成、交给下一子模块的 pre 比例"
+            ],
+            [
+              "b / C",
+              "本次使用的 post / comb；与参数不同，是运行时比例"
+            ],
+            [
+              "Softmax_row / Sinkhorn₂₀",
+              "先逐行 Softmax，加 ε，再交替列/行归一化；分母也加 ε"
+            ],
+            [
+              "i",
+              "索引从 0 到 3；L 的 0…3 / 4…7 / 8…23 三段分别供 pre / post / comb"
+            ],
+            [
+              "ColNorm_ε / AltNorm₁₉",
+              "先除以列和加 ε；再重复 19 轮行和 / 列和归一化，分母各加 ε"
+            ]
+          ],
+          "note": "比例都是当前 token 的中间数据；不是新增的 24 个可学习权重。",
+          "parameterRefs": [
+            "hc_base-1",
+            "hc_scale-2"
+          ],
+          "tensorKind": "activation"
+        },
+        {
+          "title": "② 合成一行，送入 Attention 或 FFN",
+          "formulas": [
+            "X=a_1R_1+a_2R_2+a_3R_3+a_4R_4"
+          ],
+          "dimensions": [
+            "4\\text{ vectors }[1,5120]\\longrightarrow[1,5120]"
+          ],
+          "symbols": [
+            [
+              "R₁…R₄",
+              "同一个 token 的四路向量"
+            ],
+            [
+              "a₁…a₄",
+              "前一子模块产生的输入比例；模型开头使用固定 one-hot"
+            ],
+            [
+              "X",
+              "送入当前子模块的一行向量"
+            ]
+          ],
+          "note": "",
+          "parameterRefs": [],
+          "tensorKind": "activation"
+        },
+        {
+          "title": "③ 将子模块结果送回四路",
+          "formulas": [
+            "Y_j=b_jU+\\sum_{i=1}^{4}R_i C_{ij}"
+          ],
+          "dimensions": [
+            "Y:[1,4,5120],\\quad U:[1,5120]"
+          ],
+          "symbols": [
+            [
+              "U",
+              "Attention 或 FFN 刚算出的结果"
+            ],
+            [
+              "bⱼ",
+              "这一结果送给第 j 路的比例"
+            ],
+            [
+              "Cᵢⱼ",
+              "第 i 路旧状态送给第 j 路；行是输入路、列是输出路"
+            ],
+            [
+              "Σᵢ",
+              "把四路的贡献相加；Yⱼ 是第 j 路的新状态"
+            ]
+          ],
+          "note": "",
+          "parameterRefs": [],
+          "tensorKind": "activation"
+        }
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "hc_post 对 comb 的输入路求和，正确 Σ_i R_i C_ij；本次 pre 交给下一子模块。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 950,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L950",
+          "symbol": "Block.hc_mixes"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 964,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L964",
+          "symbol": "Block.hc_post"
+        },
+        {
+          "file": "inference/kernel.py",
+          "line": 407,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L407",
+          "symbol": "hc_split_sinkhorn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 943,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L943",
+          "symbol": "Block.hc_attn_fn"
+        }
+      ]
+    },
+    {
+      "module": "hc",
+      "mode": "backward",
+      "item": "路间梯度与归一化路径",
+      "previous": [
+        {
+          "title": "① 梯度分回子模块和四路旧状态",
+          "formulas": [
+            "dU=\\sum_{j=1}^{4}b_jdY_j",
+            "dR_i=\\sum_{j=1}^{4}C_{ji}dY_j"
+          ],
+          "dimensions": [
+            "dY:[1,4,5120]\\longrightarrow dU:[1,5120]",
+            "dR:[1,4,5120]"
+          ],
+          "symbols": [
+            [
+              "dYⱼ",
+              "第 j 路新状态传来的梯度"
+            ],
+            [
+              "bⱼ / Cⱼᵢ",
+              "前向的子模块比例 / 路间比例"
+            ],
+            [
+              "dU / dRᵢ",
+              "子模块输出的梯度 / 第 i 路旧状态的梯度"
+            ],
+            [
+              "Σⱼ",
+              "合并四路的贡献"
+            ]
+          ],
+          "note": ""
+        },
+        {
+          "title": "② 混合权重也需要梯度",
+          "formulas": [
+            "dW_{HC}=R_{flat}^{\\mathsf T}dL",
+            "dR_{flat}=dLW_{HC}^{\\mathsf T}"
+          ],
+          "dimensions": [
+            "[20480,1]\\times[1,24]=[20480,24]",
+            "[1,24]\\times[24,20480]=[1,20480]"
+          ],
+          "symbols": [
+            [
+              "dL",
+              "经过比例变换和数值调整后，回到 L 的梯度"
+            ],
+            [
+              "R_flat / W_HC",
+              "前向的四路拼接输入 / 混合矩阵"
+            ],
+            [
+              "dW_HC / dR_flat",
+              "混合矩阵的梯度 / 额外传回四路的梯度"
+            ],
+            [
+              "ᵀ",
+              "转置"
+            ]
+          ],
+          "note": ""
+        }
+      ],
+      "corrected": [
+        {
+          "title": "① 梯度分回子模块和四路旧状态",
+          "formulas": [
+            "dU=\\sum_{j=1}^{4}b_jdY_j",
+            "dR_i=\\sum_{j=1}^{4}C_{ij}dY_j"
+          ],
+          "dimensions": [
+            "dY:[1,4,5120]\\longrightarrow dU:[1,5120]",
+            "dR:[1,4,5120]"
+          ],
+          "symbols": [
+            [
+              "dYⱼ",
+              "第 j 路新状态传来的梯度"
+            ],
+            [
+              "bⱼ / Cᵢⱼ",
+              "前向的子模块比例 / 输入路 i 到输出路 j 的比例"
+            ],
+            [
+              "dU / dRᵢ",
+              "子模块输出的梯度 / 第 i 路旧状态的直接梯度"
+            ],
+            [
+              "Σⱼ",
+              "合并四路的贡献；生成比例的间接路径仍要另算"
+            ]
+          ],
+          "note": "",
+          "parameterRefs": [],
+          "tensorKind": "gradient"
+        },
+        {
+          "title": "② 混合权重也需要梯度",
+          "formulas": [
+            "dW_{HC}=R_{flat}^{\\mathsf T}dL",
+            "dR_{flat}=dLW_{HC}^{\\mathsf T}"
+          ],
+          "dimensions": [
+            "[20480,1]\\times[1,24]=[20480,24]",
+            "[1,24]\\times[24,20480]=[1,20480]"
+          ],
+          "symbols": [
+            [
+              "dL",
+              "经过比例变换、反复归一化和 r 缩放后，回到线性投影的梯度"
+            ],
+            [
+              "R_flat / W_HC",
+              "前向的四路拼接输入 / 混合矩阵"
+            ],
+            [
+              "dW_HC / dR_flat",
+              "混合矩阵的梯度 / 投影路径传回四路的梯度，r 的路径需另加"
+            ],
+            [
+              "ᵀ",
+              "转置"
+            ]
+          ],
+          "note": "",
+          "parameterRefs": [
+            "hc_fn-0"
+          ],
+          "tensorKind": "gradient"
+        }
+      ],
+      "status": "Estimated",
+      "previousStatus": "Mismatch",
+      "reason": "改为 dR_i=Σ_j C_ij dY_j；投影小计不代表全部 HC 梯度。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 950,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L950",
+          "symbol": "Block.hc_mixes"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 964,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L964",
+          "symbol": "Block.hc_post"
+        },
+        {
+          "file": "inference/kernel.py",
+          "line": 407,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L407",
+          "symbol": "hc_split_sinkhorn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 943,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L943",
+          "symbol": "Block.hc_attn_fn"
+        }
+      ]
+    },
+    {
+      "module": "moe",
+      "mode": "parameter",
+      "item": "一层 MoE 边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,624,934,400 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "一层 MoE · 全部逻辑权重",
+          "13,626,901,248 个参数"
+        ],
+        [
+          "当前 token · 激活权重",
+          "249,692,544 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "旧主结果只计专家；新增明确含 Router 的 Total / Activated，专家小计仍可在表中查看。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 891,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L891",
+          "symbol": "MoE.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 807,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L807",
+          "symbol": "Gate.weight"
+        }
+      ]
+    },
+    {
+      "module": "encoder",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 0 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "decoder",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 20 层实际拥有的权重",
+          "13,762,606,326 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer0",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 0 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer1",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 1 层实际拥有的权重",
+          "112,217,418,358 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer2",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 2 层实际拥有的权重",
+          "13,765,227,766 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer13",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 13 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer14",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 14 层实际拥有的权重",
+          "112,230,825,718 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer19",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 19 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer20",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 20 层实际拥有的权重",
+          "13,762,606,326 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer21",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 21 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer22",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 22 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer33",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 33 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer34",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 34 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer39",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 39 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "encoderblock",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 0 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "decoderblock",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 20 层实际拥有的权重",
+          "13,762,606,326 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "encoderattn",
+      "mode": "parameter",
+      "item": "完整 Attention 与读取子操作",
+      "previous": [
+        [
+          "比较与汇总",
+          "不新增投影权重"
+        ],
+        [
+          "每层的 64 个 sink 数字",
+          "64 个可学习参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "代表层完整 Attention 权重",
+          "126,617,408 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "旧标题指整个 Attention，统计却只显示 kernel 的 sink；现在明确完整参数、读取 FLOPs 的不同边界。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "decoderattn",
+      "mode": "parameter",
+      "item": "完整 Attention 与读取子操作",
+      "previous": [
+        [
+          "比较与汇总",
+          "不新增投影权重"
+        ],
+        [
+          "每层的 64 个 sink 数字",
+          "64 个可学习参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "代表层完整 Attention 权重",
+          "134,711,744 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "旧标题指整个 Attention，统计却只显示 kernel 的 sink；现在明确完整参数、读取 FLOPs 的不同边界。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "overview",
+      "mode": "parameter",
+      "item": "全模型范围",
+      "previous": [
+        [
+          "完整主模型存储",
+          "748,494,684,784 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "Text Backbone",
+          "551,566,180,464 个逻辑参数"
+        ],
+        [
+          "Engram",
+          "196,928,504,320 个逻辑参数"
+        ],
+        [
+          "Draft",
+          "14,225,362,530 个逻辑参数"
+        ],
+        [
+          "Vision",
+          "485,268,480 个逻辑参数"
+        ],
+        [
+          "Text + Engram",
+          "748,494,684,784 个逻辑参数"
+        ],
+        [
+          "All logical weights",
+          "763,205,315,794 个逻辑参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "原 748,494,684,784 只为 Text + Engram；补齐 Draft、Vision、完整逻辑权重范围。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 1245,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1245",
+          "symbol": "Transformer.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "overview",
+      "mode": "forward",
+      "item": "当前一步的统计范围",
+      "previous": [
+        [
+          "此处已有 1024 个历史 token 时，全模型当前一步",
+          "约 35,584,521,265 次操作"
+        ]
+      ],
+      "corrected": [
+        [
+          "Text + Engram · 当前一步简化估计",
+          "35,584,521,265 次操作"
+        ]
+      ],
+      "status": "Estimated",
+      "previousStatus": "Mismatch",
+      "reason": "独立按 kernel 逐项核对，原操作总数一致；修正“全模型”边界：这里只是 Text + Engram，未执行 Vision / Draft。64 位块归约为 63 次加法，分母更新另有乘、加两次。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 1245,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1245",
+          "symbol": "Transformer.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    }
+  ],
+  "officialSources": {
+    "revision": "5254448103b6254fc646dacbca1cbbf20e9216c1",
+    "files": [
+      {
+        "path": "config.json",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/5254448103b6254fc646dacbca1cbbf20e9216c1/config.json",
+        "sha256": "8be45ce0476004a3f529fd896115a4a2e800a129ad2d3ec05b16050f52e21879",
+        "localExists": true,
+        "matchesLocalNormalized": false
+      },
+      {
+        "path": "README.md",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/5254448103b6254fc646dacbca1cbbf20e9216c1/README.md",
+        "sha256": "347c9db4e5506acb531cbc3b724407ab88e9af8781679152f0823d7bac16d251",
+        "localExists": false,
+        "matchesLocalNormalized": false
+      },
+      {
+        "path": "inference/config.json",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/config.json",
+        "sha256": "2e84f45cf1dac8c7fcbb200e96667d4b913275690668ed496f24c7747207a809",
+        "localExists": true,
+        "matchesLocalNormalized": true
+      },
+      {
+        "path": "inference/model.py",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py",
+        "sha256": "e5decd76fe70fd56ef2f10124d245c6f64fb6a0003cc9068a1d3182a168b8d2d",
+        "localExists": true,
+        "matchesLocalNormalized": false
+      },
+      {
+        "path": "inference/kernel.py",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py",
+        "sha256": "1236c3507019ed176f5dba5e04bcea58867cf654818c6cf138ed4845398c2455",
+        "localExists": true,
+        "matchesLocalNormalized": true
+      },
+      {
+        "path": "inference/engram.py",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/engram.py",
+        "sha256": "11f35ecbead8150c35aa002b3d180ef290b05a25afe883a11884f94d476d3897",
+        "localExists": true,
+        "matchesLocalNormalized": true
+      },
+      {
+        "path": "inference/vision.py",
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/resolve/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/vision.py",
+        "sha256": "5d49edc196a4ef22384abe76d35a40098cbe1e74b586c8f66a2edff4f076b26c",
+        "localExists": false,
+        "matchesLocalNormalized": false
+      }
+    ]
+  }
+}

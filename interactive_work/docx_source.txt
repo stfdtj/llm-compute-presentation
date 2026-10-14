@@ -1,0 +1,1928 @@
+Transformer Forward Pass: it is raining
+A detailed forward-pass guide to low-rank latent attention, sparse KV compression, Hyper-Connections, and Mixture of Experts
+Reorganized from params_decomposition.docx • Technical review: 9 October 2026
+This document traces the exact text “it is raining” from tokenizer input through all 40 backbone layers to vocabulary logits and next-token selection. The real-model walkthrough uses symbolic sequence length T and the actual local configuration. Separate Toy Numerical Example panels demonstrate arithmetic with explicitly hypothetical small weights. No toy value is an observed result of the configured model.
+Validation is based on static inspection of the local DeepSeek-V4.1-Flash/config.json and model.py. These files identify the local implementation; the folder name alone is not evidence of official model provenance. No checkpoint inference or GPU-kernel execution was performed. Kernel-level behavior that cannot be established from the available files is explicitly marked Needs Verification.
+Reading convention: mathematical matrices use row vectors multiplied by a weight matrix on the right. Batch dimensions are omitted from the worked example; distributed shapes are global unless stated otherwise. Code identifiers name configuration values or modules, whereas equations describe mathematical quantities. Projection parameter counts exclude quantization scale storage unless stated otherwise.
+Contents
+TOC \o "1-2" \h \z \uChapter 1 — Input Tokens and Embedding PAGEREF _Toc242460446 \h 4
+1.1 Configuration and notation PAGEREF _Toc242460447 \h 4
+1.2 Embedding lookup PAGEREF _Toc242460448 \h 5
+1.3 Initialize the parallel residual stream PAGEREF _Toc242460449 \h 5
+1.4 Toy Numerical Example — embedding and initial normalized input PAGEREF _Toc242460450 \h 5
+Chapter 2 — Query and Shared KV Projection PAGEREF _Toc242460451 \h 6
+2.1 Low-rank Query construction PAGEREF _Toc242460452 \h 6
+2.2 RMSNorm in detail PAGEREF _Toc242460453 \h 7
+2.3 Shared KV construction PAGEREF _Toc242460454 \h 7
+2.4 Parameter-count correction and projection tradeoff PAGEREF _Toc242460455 \h 8
+2.5 Toy Numerical Example — both Query factors and shared KV PAGEREF _Toc242460456 \h 8
+Chapter 3 — Rotary Positional Embedding (RoPE) PAGEREF _Toc242460457 \h 9
+3.1 Selected dimensions and angles PAGEREF _Toc242460458 \h 9
+3.2 Pair rotation and the full rotary matrix PAGEREF _Toc242460459 \h 10
+3.3 Why the dot product contains relative position PAGEREF _Toc242460460 \h 10
+3.4 Compressed-attention frequency schedule PAGEREF _Toc242460461 \h 10
+3.5 Toy Numerical Example — position-by-position rotations PAGEREF _Toc242460462 \h 11
+Chapter 4 — Self-Attention Computation PAGEREF _Toc242460463 \h 12
+4.1 Similarity for one head and all heads PAGEREF _Toc242460464 \h 12
+4.2 Causal sliding-window access PAGEREF _Toc242460465 \h 12
+4.3 Toy Numerical Example — scalar-score softmax PAGEREF _Toc242460466 \h 13
+4.4 Attention sink: verified interface and unresolved kernel detail PAGEREF _Toc242460467 \h 13
+4.5 Weighted aggregation and tensor dimensions PAGEREF _Toc242460468 \h 14
+4.6 Toy Numerical Example — compute actual dot products within the miniature PAGEREF _Toc242460469 \h 14
+4.7 Toy Numerical Example — softmax and weighted values PAGEREF _Toc242460470 \h 14
+Chapter 5 — Compressed KV Sparse Attention PAGEREF _Toc242460471 \h 15
+5.1 Layer selection and complete compression groups PAGEREF _Toc242460472 \h 15
+5.2 Feature-wise learned compression PAGEREF _Toc242460473 \h 16
+5.3 Indexer Query, key, and head weights PAGEREF _Toc242460474 \h 16
+5.4 Index-score equation and Top-K PAGEREF _Toc242460475 \h 17
+5.5 One attention normalization over local and compressed KV PAGEREF _Toc242460476 \h 17
+5.6 Cross-layer reuse and later candidate filtering PAGEREF _Toc242460477 \h 17
+5.7 Toy Numerical Example — feature-wise compression arithmetic PAGEREF _Toc242460478 \h 18
+5.8 Toy Numerical Example — index selection and combined attention PAGEREF _Toc242460479 \h 18
+Chapter 6 — Attention Output Projection PAGEREF _Toc242460480 \h 19
+6.1 Inverse RoPE PAGEREF _Toc242460481 \h 19
+6.2 First projection: independent head groups PAGEREF _Toc242460482 \h 20
+6.3 Second projection and parameter count PAGEREF _Toc242460483 \h 20
+6.4 Toy Numerical Example — inverse rotation and both output factors PAGEREF _Toc242460484 \h 21
+Chapter 7 — Hyper-Connection (HC) PAGEREF _Toc242460485 \h 22
+7.1 Residual streams and dynamic coefficients PAGEREF _Toc242460486 \h 22
+7.2 Computing mixing logits PAGEREF _Toc242460487 \h 22
+7.3 HC post-mixing after attention PAGEREF _Toc242460488 \h 23
+7.4 Preparing the next sublayer input PAGEREF _Toc242460489 \h 23
+7.5 Toy Numerical Example — four-stream residual update PAGEREF _Toc242460490 \h 23
+Chapter 8 — Mixture of Experts (MoE) PAGEREF _Toc242460491 \h 25
+8.1 Collapse and normalize the MoE input PAGEREF _Toc242460492 \h 25
+8.2 Router projection and sqrtsoftplus PAGEREF _Toc242460493 \h 25
+8.3 Select experts using biased scores PAGEREF _Toc242460494 \h 26
+8.4 Normalize selected scores and apply route scale PAGEREF _Toc242460495 \h 26
+8.5 Routed and shared experts PAGEREF _Toc242460496 \h 26
+8.6 Toy Numerical Example — router logits, biased selection, unbiased weights PAGEREF _Toc242460497 \h 27
+Chapter 9 — Expert Feed-Forward Network PAGEREF _Toc242460498 \h 28
+9.1 Gate and up branches PAGEREF _Toc242460499 \h 28
+9.2 Model-specific activation clipping PAGEREF _Toc242460500 \h 28
+9.3 SwiGLU activation PAGEREF _Toc242460501 \h 29
+9.4 Routing weight and down projection PAGEREF _Toc242460502 \h 29
+9.5 Combine expert outputs and count logical weights PAGEREF _Toc242460503 \h 29
+9.6 Toy Numerical Example — SwiGLU arithmetic and expert summation PAGEREF _Toc242460504 \h 30
+Chapter 10 — Completing a Transformer Layer PAGEREF _Toc242460505 \h 31
+10.1 Post-MoE HC mixing PAGEREF _Toc242460506 \h 31
+10.2 Complete block equations in code order PAGEREF _Toc242460507 \h 31
+10.3 Parameters reused across tokens and across layers PAGEREF _Toc242460508 \h 32
+10.4 Overall shape progression PAGEREF _Toc242460509 \h 32
+10.5 Toy Numerical Example — complete one block and hand off to the next PAGEREF _Toc242460510 \h 33
+10.6 Layer schedule for the entire configured backbone PAGEREF _Toc242460511 \h 33
+10.7 Cross-token interactions and independent calculations PAGEREF _Toc242460512 \h 34
+Chapter 11 — Engram — N-gram Memory Lookup and Gated Residual Injection PAGEREF _Toc242460513 \h 35
+11.1 Architectural role and execution workflow PAGEREF _Toc242460514 \h 35
+11.2 Configured Engram updates before layers 1 and 14 PAGEREF _Toc242460515 \h 36
+11.3 Worked example and placement before Attention PAGEREF _Toc242460516 \h 37
+11.4 Step A — N-gram construction, padding, and hashing PAGEREF _Toc242460517 \h 37
+11.5 Step B — Engram embedding lookup and dequantization PAGEREF _Toc242460518 \h 38
+11.6 Step C — Project the retrieved features into four Keys and one Value PAGEREF _Toc242460519 \h 38
+11.7 Step D — Calculate a gate independently for each HC copy PAGEREF _Toc242460520 \h 39
+11.8 Step E — Add the gated Value and continue the existing workflow PAGEREF _Toc242460521 \h 39
+11.9 Parameter decomposition, precision, and weight memory PAGEREF _Toc242460522 \h 40
+Chapter 12 — Final Hidden Representations, Logits, and Next-Token Prediction PAGEREF _Toc242460523 \h 42
+12.1 Collapse the final residual and normalize PAGEREF _Toc242460524 \h 42
+12.2 Vocabulary output projection and logits PAGEREF _Toc242460525 \h 42
+12.3 Next-token probabilities and the implemented selection rule PAGEREF _Toc242460526 \h 43
+12.4 Toy Numerical Example — final logits are not probabilities PAGEREF _Toc242460527 \h 43
+12.5 Other configured paths and the scope of this text forward call PAGEREF _Toc242460528 \h 44
+Appendix A — Technical Review PAGEREF _Toc242460529 \h 44
+A.1 Established corrections and clarifications PAGEREF _Toc242460530 \h 44
+A.2 Needs Verification PAGEREF _Toc242460531 \h 45
+A.3 Model-specific assumptions PAGEREF _Toc242460532 \h 46
+A.4 Image formula reconstruction ledger PAGEREF _Toc242460533 \h 46
+A.5 Typed-formula and derivation coverage PAGEREF _Toc242460534 \h 47
+A.6a Revision audit and numerical-example boundaries PAGEREF _Toc242460535 \h 47
+A.6 Notation glossary PAGEREF _Toc242460536 \h 48
+A.7 Validation sources and limits PAGEREF _Toc242460537 \h 49
+
+The contents and page numbers are Word fields. Update fields in Word after changing the document.
+Chapter 1 — Input Tokens and Embedding
+1.1 Configuration and notation
+The exact input is text = “it is raining”. No matching tokenizer.json, vocabulary, merges, tokenizer configuration, special-token map, or checkpoint was found in the workspace. The tokenizer and special-token policy are therefore unknown. Word boundaries need not be token boundaries: spaces, subwords, beginning-of-sequence tokens, or a chat template can change sequence length. Define the actual encoding symbolically:
+input_ids=Tokenizer(it is raining;S)=[u0,…,uT-1],p∈{0,…,T-1}
+The setting set S stands for the missing tokenizer and prompt-format settings. The exact string has lowercase letters and single spaces between words; this guide does not silently prepend a chat template or a special token. Tokenization is unavailable, so its resulting IDs and length remain unknown.
+Illustrative three-token assumption — for word-level diagrams and the miniature arithmetic only, assume exactly one token per word and no special tokens. The symbols below are placeholders, not fabricated numeric tokenizer IDs.
+it↦u0,is↦u1,raining↦u2,Ttoy=3
+Figure 1. Complete forward-pass pipeline for the exact input text
+Input / source
+Calculation / connection
+Output / destination
+text = “it is raining”
+↓ tokenizer and special-token settings are unavailable
+Symbolic IDs u0…uT-1
+Token IDs
+↓ learned embedding lookup; expand to four copies
+T×5120→T×4×5120
+Residual stream
+↓ repeat attention → HC → MoE → HC
+Backbone layers 0,…,39
+Before layers 1 and 14
+→ configured Engram lookup and gated update; detailed calculations in Chapter 11
+Updated residual enters that layer
+Final residual + last pre-mix
+↓ collapse copies; final RMSNorm
+T×5120 final representations
+Last-position hidden vector
+↓ vocabulary output projection
+1×129280 logits
+Logits
+↓ greedy or temperature sampling
+Selected next-token ID; decoding unavailable
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Configuration
+Meaning
+Value
+vocab_size
+Number of vocabulary rows
+V=129280
+dim
+Model hidden width
+D=5120
+q_lora_rank
+Query bottleneck width
+rq=1280
+n_heads / head_dim
+Query heads / width per head
+H=64, dh=512
+rope_head_dim
+Rotated tail width
+dR=64
+norm_eps
+RMS normalization stability constant
+ϵ=10-20
+window_size
+Maximum local causal window
+W=128
+o_groups / o_lora_rank
+Output groups / bottleneck per group
+Go=8, ro=1024
+hc_mult
+Residual-stream count
+C=4
+moe_inter_dim
+Expert intermediate width
+M=2304
+
+Configuration values specify dimensions and algorithms; they are not activations or learned matrix entries. The example below assumes text-only input and the initial prefill call, whose first token has position zero.
+1.2 Embedding lookup
+Purpose: Convert discrete IDs into continuous token features.
+Inputs: The symbolic token sequence and learned vocabulary table; no actual numeric IDs are available.
+Learnable parameters: E∈R129280×5120.
+Formula: The calculation is
+Xp,:=Eup,:,X=Eu0,:⋮EuT-1,:
+Shape calculation: The dimensions are
+Ei,:∈R1×5120,X∈RT×5120
+Explanation: Lookup copies the selected rows; it is not a multiplication by the numeric IDs. All positions use the same embedding table. Its entries are learned, although the local inference implementation only allocates parameter tensors and does not demonstrate their training.
+Output: A sequence of T vectors, one per actual token position, ready to initialize the residual stream.
+NE=129280·5120=661913600
+The embedding count is a logical element count, not a memory estimate. Distributed ParallelEmbedding partitions vocabulary rows and combines masked lookups; the global lookup is still the equation above.
+1.3 Initialize the parallel residual stream
+The actual implementation expands embeddings into four copies before the first attention operation. These copies start equal, but later HC updates can make them different. The source discusses this expansion only after attention; placing it here makes the layer input well defined.
+Rp,c,:0=Xp,:,c∈{0,1,2,3};(T×5120)⟶(T×4×5120)
+ap,:in=[1,0,0,0],Xattn=RMSNormattnc=03ap,cinRp,c,:0
+This initial one-hot pre-mix selects the first copy. Later attention inputs use coefficients supplied by the preceding block. Chapter 7 derives the HC collapse and expansion. In Chapters 2–6, the symbol X denotes this normalized attention input, not necessarily the original embedding values.
+1.4 Toy Numerical Example — embedding and initial normalized input
+Status: Toy Numerical Example — The following rows are hypothetical two-feature embeddings for the symbolic word positions. They are not checkpoint entries. The miniature uses one block, one Query head, four HC copies, no Engram, no quantization, and zero normalization epsilon for nonzero rows. All normalization scales are one. Values are calculated in NumPy float64 and displayed to four decimals.
+Dtoy=2, Htoy=1, dh,toy=2, rq,toy=1, Ctoy=4
+Eu0,:toy=[1,0],Eu1,:toy=[0,1],Eu2,:toy=[1,1]
+Xtoy≈100111
+RMS([1,0])=(12+02)/2=1/2,RMSNorm([1,0])=[2,0]
+Xatoy=RMSNorm(Xtoy)≈1.4142001.414211
+Rp,c,:toy=Xp,:toy,(3×2)→(3×4×2),ain=[1,0,0,0]
+The incoming one-hot HC collapse picks a copy equal to the embedding. Attention-input RMSNorm then gives the displayed normalized rows. The model’s real row width and epsilon remain those in Sections 1.1–1.3; only this miniature has two features and the stated arithmetic simplifications.
+Figure 2. Tokenization assumption and embedding lookup
+Input / source
+Calculation / connection
+Output / destination
+“it” | “is” | “raining”
+→ illustrative word-level segmentation only
+u0∣u1∣u2
+Actual symbolic ID up
+→ select row of learned embedding matrix
+Eup,:∈R5120
+Stack rows in position order
+→ initialize parallel residual copies
+T×5120→T×4×5120
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Input IDs
+T integers
+Tokenizer-dependent segmentation
+Embedding
+T×5120
+Independent lookup per position
+Initial residual
+T×4×5120
+Copy within each position
+Attention input
+T×5120
+HC collapse and norm per position
+
+Chapter 2 — Query and Shared KV Projection
+2.1 Low-rank Query construction
+Purpose: Produce a separate query vector for every head while reducing projection parameters.
+Inputs: X∈RT×5120.
+Learnable parameters: AQ∈R5120×1280, BQ∈R1280×32768, and the Query RMSNorm scale vector.
+Formula: The calculation is
+Qrraw=XAQ,Qr=RMSNormq(Qrraw),Qflat=QrBQ
+Shape calculation: The dimensions are
+T×5120)(5120×1280)→(T×1280);(T×1280)(1280×32768)→(T×32768
+Explanation: The first projection produces a bottleneck representation. Normalization controls its feature scale before the second projection expands it into all Query heads. This is a low-rank architectural factorization, rather than a standard LoRA fine-tuning adapter added to a frozen dense weight.
+Output: Qr also feeds the sparse indexer when that layer computes index scores.
+64·512=32768,Q=reshape(Qflat,T,64,512)
+A reshape changes organization without adding parameters or changing the number of elements. Different heads receive different feature slices. PyTorch Linear stores the transpose of the matrices shown here: output features precede input features.
+2.2 RMSNorm in detail
+Purpose: Normalize each row’s root mean square without subtracting its mean.
+Inputs: A row x∈Rd and a positive stability constant ϵ.
+Learnable parameters: A feature-wise scale γ∈Rd; there is no additive offset in the local RMSNorm class.
+Formula: The calculation is
+RMSNorm(x)=x1di=1dxi2+ϵ⊙γ
+Shape calculation: The dimensions are
+T×d)⟶(T×d
+Explanation: Square each component, average over the last dimension, add epsilon, take an inverse square root, and multiply every component by that row’s inverse RMS and its learned feature scale. The local code computes these statistics in floating point with 32-bit precision, then returns the original activation dtype.
+Output: A normalized row with the same feature count.
+vpq=11280i=11280(Qr,p,iraw)2,Qr,p,i=γiqQr,p,irawvpq+10-20
+There are no learned projection entries or checkpoint activations in the supplied material, so the actual token activations cannot be computed. The expression above gives their full row-wise calculation without inventing numbers. The class constructor’s fallback epsilon differs from the configuration; the attention and block instances explicitly receive norm_eps.
+2.3 Shared KV construction
+Purpose: Create one compact representation used as both the attention key and the value.
+Inputs: X∈RT×5120.
+Learnable parameters: WKV∈R5120×512 and a KV RMSNorm scale γKV∈R512.
+Formula: The calculation is
+Lraw=XWKV,L=RMSNormKV(Lraw)
+Shape calculation: The dimensions are
+T×5120)(5120×512)→(T×512
+Explanation: All Query heads compare with the same latent sequence. The model does not construct separate head-specific keys and values inside this attention module. Broadcasting the shared latent for computation does not require storing a separate copy for every head.
+Output: L is the unrotated shared KV latent.
+vpKV=1512i=1512(Lp,iraw)2,Lp,i=γiKVLp,irawvpKV+10-20
+The KV tensor remains T×512, rather than T×64×512. Replacing standard independent projections with this shared representation is a model-specific assumption, not a rule for all Transformers.
+2.4 Parameter-count correction and projection tradeoff
+NQ,dense=5120·32768=167772160
+NQ,factorized=5120·1280+1280·32768=48496640
+NQ,factorizedNQ,dense=0.2890625,NQ,norm=1280,NKV=5120·512=2621440
+The projection matrices use about 28.9 percent of the dense Query projection’s elements, a reduction of about 71.1 percent before normalization scales. The source’s count mixes an activation size with a parameter size and uses an incorrect square dense matrix; Appendix A records the correction.
+rank(AQBQ)≤1280
+A smaller bottleneck restricts available feature directions and can trade expressiveness for efficiency. Because RMSNorm lies between the two matrices, the full operation is input dependent and is not a single linear map with weight AQBQ. The rank statement applies to the product of the two linear factors.
+Stage
+Shape
+Tensor role
+Attention input
+T×5120
+Intermediate
+Raw / normalized Query bottleneck
+T×1280
+Intermediate
+Flattened Query
+T×32768
+Intermediate
+Headed Query
+T×64×512
+Intermediate
+Shared KV latent
+T×512
+Intermediate
+
+2.5 Toy Numerical Example — both Query factors and shared KV
+Status: Toy Numerical Example — Continue the same miniature using the normalized input from Section 1.4. Its low-rank Query has one bottleneck feature and one two-feature head. Its shared KV projection is identity.
+AQtoy=12,BQtoy=10.5,WKVtoy=I2
+Qrraw,toy=XatoyAQtoy≈1.41422.82843
+Qr,2raw,toy=1·1+1·2=3,RMSNorm([3])=3/32=1
+Qrtoy≈111
+Qtoy=QrtoyBQtoy≈10.510.510.5
+Ltoy=RMSNorm(XatoyI2)≈1.4142001.414211
+(3×2)(2×1)→3×1,(3×1)(1×2)→3×2→3×1×2
+Every toy Query row happens to be equal because one-feature RMSNorm turns these positive bottleneck values into one. KV rows remain distinct. This deliberate miniature is easy to calculate and should not be interpreted as typical behavior of the real rank-1280 Query.
+Figure 3. Parallel Query and shared-KV projection branches
+Input / source
+Calculation / connection
+Output / destination
+X:T×5120
+→ Query factor A; Query RMSNorm
+Qr:T×1280
+Qr:T×1280
+→ Query factor B; reshape heads
+Q:T×64×512
+X:T×5120
+→ single shared KV projection; KV RMSNorm
+L:T×512
+Qr:T×1280
+→ separate indexer Query expansion when enabled
+qI:T×32×128
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Normalized attention input
+T×5120
+Per token
+Query bottleneck
+T×1280
+Per token
+Main Query
+T×64×512
+Per token; separate head slices
+Shared KV
+T×512
+Per token; shared across heads
+
+Chapter 3 — Rotary Positional Embedding (RoPE)
+3.1 Selected dimensions and angles
+RoPE encodes position by rotating feature pairs. This local implementation rotates adjacent pairs within the last 64 features of each Query head and each shared KV latent. The first 448 features are unchanged. For zero-based feature indexing, the rotated range begins at feature 448.
+dR=64,dh-dR=448,i∈{0,…,31}
+ωi=b-2i/64,θp,i=pωi,b=10000
+This base-frequency expression applies directly to layers 0 and 1, whose compression ratio is zero. Position zero produces identity rotations. A different pair index gives a different angular frequency, letting the positional features operate at different distance scales.
+3.2 Pair rotation and the full rotary matrix
+Purpose: Insert position information into the selected feature subspace.
+Inputs: One adjacent feature pair u,vT, token position p, and pair index i.
+Learnable parameters: No learned rotation matrix; frequencies come from configuration.
+Formula: The calculation is
+u'v'=R(θp,i)uv,R(θ)=cosθ-sinθsinθcosθ
+Shape calculation: The dimensions are
+2×2)(2×1)→(2×1
+Explanation: The two features behave like the real and imaginary parts of a complex number. Multiplying by a unit complex exponential rotates them and preserves their Euclidean norm. The code explicitly reshapes adjacent features into complex pairs.
+Output: Rotated pairs, assembled back into the 64-feature tail.
+Rp=diag(R(θp,0),R(θp,1),…,R(θp,31))∈R64×64
+Rp=cosθp,0-sinθp,000⋯sinθp,0cosθp,000⋯00cosθp,1-sinθp,1⋯00sinθp,1cosθp,1⋯⋮⋮⋮⋮⋱
+The source image uses a schematic final block for the last pair. The block-diagonal equation explicitly includes all 32 pair blocks and resolves that shorthand. The small column-vector formula above defines the rotation; row-vector storage applies its transpose on the right.
+R~p=diag(I448,Rp),Qp,h,:'=Qp,h,:R~pT,Lp,:'=Lp,:R~pT
+Q'∈RT×64×512,L'∈RT×512
+3.3 Why the dot product contains relative position
+(Rpq)T(Rjk)=qTRpTRjk=qTRj-pk
+For a fixed frequency schedule, the rotation portion of similarity depends on the difference between key and query positions. The unrotated features still contribute content similarity. This is the relative-position mechanism described by RoFormer; the example below is a pedagogical pair, not a checkpoint activation. Reference: https://arxiv.org/abs/2104.09864.
+q=k=10,qTk=1,(R(pω)q)T(R(jω)k)=cos((j-p)ω)
+ω0=1:cos(0)=1,cos(1)≈0.5403,cos(2)≈-0.4161
+Without rotation, these identical content pairs score identically at every distance. With rotation, their contribution changes with distance. No claim is made that a complete learned attention score must decrease monotonically with distance.
+3.4 Compressed-attention frequency schedule
+Code inspection shows that a compression-enabled layer uses compress_rope_theta for all of its Query, local KV, compressed KV, and indexer rotations, with YaRN enabled by original_seq_len. Thus the source’s base of ten thousand must not be applied unchanged to the layer-2 example.
+b=160000,L0=65536,f=16,βfast=32,βslow=1
+c(β)=64ln(L0/(2πβ))2lnb,l=max(⌊c(32)⌋,0),u=min(⌈c(1)⌉,63)
+ρi=clipi-lmax(u-l,10-3)01,ω^i=(1-ρi)ωi+ρiωi16
+θp,i=pω^i
+These equations follow precompute_freqs_cis, including its bounds and interpolation. Low pair indices keep the base frequency; high pair indices can be slowed for context extension. Partial rotation reduces direct positional-rotation work while leaving most features unrotated; it does not remove positional effects propagated by previous layers.
+3.5 Toy Numerical Example — position-by-position rotations
+Status: Toy Numerical Example — The miniature rotates its entire two-feature vector with one frequency equal to one. This illustrates the first rotary pair of a local-attention layer; the real model rotates only its last 64 of 512 features.
+θ0=0,θ1=1,θ2=2radians
+R(1)≈0.5403-0.84150.84150.5403
+Q1',toy=[1,0.5]R(1)T=[cos1-0.5sin1, sin1+0.5cos1]
+Q',toy≈10.50.11961.1116-0.87080.7012
+L',toy≈1.41420-1.190.7641-1.32540.4932
+Use the row at each position’s own angle; do not rotate the entire sequence with one angle. Rotation preserves each row norm. A Query–key dot product of two rotated pairs reduces to a relative-angle expression, as derived in Section 3.3.
+Figure 4. Partial rotary transformation without a shape change
+Input / source
+Calculation / connection
+Output / destination
+Query head 512=448+64 features
+→ keep content prefix; rotate 32 adjacent tail pairs
+Q':T×64×512
+Shared KV 512=448+64 features
+→ same position frequency schedule
+L':T×512
+Positions p=0,…,T-1
+→ compute angle for each pair
+Relative position enters dot products
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Query before / after RoPE
+T×64×512
+Position-dependent per row
+Local KV before / after RoPE
+T×512
+Position-dependent per row
+Rotary tail
+64=32·2
+Adjacent pairs
+Unrotated prefix
+448 features
+No direct rotary operation
+
+Chapter 4 — Self-Attention Computation
+4.1 Similarity for one head and all heads
+Purpose: Measure how strongly a Query matches each accessible key representation.
+Inputs: A head-specific Query Qh' and the shared rotated latent L'.
+Learnable parameters: The Query and KV projections already introduced; no extra similarity matrix.
+Formula: The calculation is
+Sh=Qh'(L')Tdh,dh=512
+Shape calculation: The dimensions are
+T×512)(512×T)→(T×T
+Explanation: Each row corresponds to a query position and each column to a KV position. Dividing by the square root of the dot-product width controls score scale. Self-attention uses representations of the same sequence; cross-attention would obtain keys and values from a separate sequence or encoder.
+Output: One raw score matrix per head.
+Symbol
+Meaning
+Example
+Sh
+Raw attention score matrix
+T×T
+h
+Query-head index
+0≤h≤63
+Qh'
+Query sequence for one head
+T×512
+L'
+Rotated shared KV
+T×512
+L'T
+Transposed shared KV
+512×T
+dh
+Dot-product feature width
+512
+dh
+Scaling denominator
+512≈22.627
+
+sp,h,j=a=0511Qp,h,a'Lj,a'512,S∈R64×T×T
+The dense score matrix is an explanatory representation. The implementation passes sparse indices into a specialized attention kernel and need not materialize a dense square matrix for long sequences.
+4.2 Causal sliding-window access
+Wp={j:max(0,p-127)≤j≤p}
+Illustrative three-token assumption only: the following index table applies to “it”, “is”, and “raining” when each word is one content token and no special tokens are inserted.
+Ilocal=0-1-101-1012
+The sentinel minus one denotes an invalid cache slot. In the clearly labeled illustrative three-token assumption, the window includes every available past token and the current token. The excluded future tokens are a consequence of causality; they are not excluded because the 128-token window is too small. During decoding, the local cache is a ring buffer, so its slot numbers differ from absolute positions.
+sp,h,j=sp,h,j,j∈Wp-∞,j∉Wp
+4.3 Toy Numerical Example — scalar-score softmax
+αp,h,j=exp(sp,h,j)k∈Wpexp(sp,h,k),j∈Wp
+Toy Numerical Example — a separate scalar-score exercise retained from the source. The following scores are hypothetical and sink-free. They are not derived from “it is raining” or from the miniature matrices introduced later. Query positions are consistently zero-based. Sections 4.6–4.7 provide dot-product scores derived from explicit toy Query and KV vectors.
+s0,h,:=[1],s1,h,:=[1,2],s2,h,:=[1,2,3]
+α0,h,:=[1],α1,h,:≈[0.268941,0.731059],α2,h,:≈[0.090031,0.244728,0.665241]
+O0,h,:=L0,:'
+O1,h,:=0.268941L0,:'+0.731059L1,:'
+O2,h,:=0.090031L0,:'+0.244728L1,:'+0.665241L2,:'
+Softmax turns accessible scores into nonnegative weights summing to one in this simplified calculation. The weighted sum preserves the 512-feature width. There is no reduction over feature dimensions in the value aggregation.
+4.4 Attention sink: verified interface and unresolved kernel detail
+Attention allocates one learned attn_sink scalar per local Query head and passes it to sparse_attn. This is part of the code path, so the sink-free example must be labeled as a simplification. The kernel implementation is absent from the workspace. Needs Verification: its exact normalization, precision, and sink treatment cannot be verified from model.py alone.
+αp,h,jsink=esp,h,jeah+k∈Apesp,h,k
+The displayed equation describes the conventional zero-value sink interpretation, where ah is a learned extra logit and Ap is the accessible KV set. It is a conditional educational model, not a code-level claim about the missing kernel. Under that interpretation, a single visible KV generally has weight below one, and the visible KV weights need not sum to one.
+4.5 Weighted aggregation and tensor dimensions
+Purpose: Collect information from accessible tokens for each Query head.
+Inputs: Queries, shared KV vectors, access indices, and normalized attention weights.
+Learnable parameters: No additional learned weighted-sum matrix; the learned sink may affect normalization.
+Formula: The calculation is
+Op,h,:=j∈Apαp,h,jLj,:'
+Shape calculation: The dimensions are
+Oh∈RT×512,O∈RT×64×512
+Explanation: All 64 heads use the same value sequence but different Query-dependent weights, so their outputs can differ. Layers 0 and 1 use only the local accessible set; compression-enabled layers add selected compressed positions into the same attention call.
+Output: Headed attention output, to be inverse-rotated and projected.
+4.6 Toy Numerical Example — compute actual dot products within the miniature
+Status: Toy Numerical Example — Continue the explicit Query and KV matrices from Section 3.5. Here “actual” arithmetic refers only to the hypothetical miniature. The sink is omitted, the local window covers all three positions, and future positions are causally masked.
+Stoy=Q',toy(L',toy)T/2≈1-0.5713-0.76290.11960.50.2756-0.87081.11161.0607
+s2,1toy=-0.8708)(-1.19)+(0.7012)(0.76412≈1.1116
+Query / assumed word
+Key: “it”
+Key: “is”
+Key: “raining”
+“it”, position 0
+1
+Masked: future
+Masked: future
+“is”, position 1
+0.1196
+0.5
+Masked: future
+“raining”, position 2
+-0.8708
+1.1116
+1.0607
+
+The word labels in this table are conditional on the illustrative tokenization. An actual tokenizer might split or combine them, or insert special-token positions. The symbols and causal rule for general T remain valid in that case.
+4.7 Toy Numerical Example — softmax and weighted values
+α2,:toy=e-0.8708e1.1116e1.0607e-0.8708+e1.1116+e1.0607≈[0.066,0.4789,0.4551]
+αtoy≈1000.4060.59400.0660.47890.4551
+O2,:toy=0.066[1.4142,0]+0.4789[-1.19,0.7641]+0.4551[-1.3254,0.4932]≈[-1.0799,0.5904]
+Otoy=αtoyL',toy≈1.41420-0.13260.4539-1.07990.5904
+Query zero receives its own value only. Query one mixes the first two rotated values; query two mixes all three. Each output is a two-feature vector, and stacking positions and the single miniature head gives the miniature headed output. These calculations demonstrate interaction between tokens, unlike the preceding projections and row norms.
+Figure 5. Attention score matrix, causal mask, and value aggregation
+Input / source
+Calculation / connection
+Output / destination
+Qh':T×512 and L':T×512
+→ dot products and scaling
+Sh:T×T conceptual matrix
+Conceptual score matrix
+→ causal window indices; invalidate future slots
+Accessible scores per query
+Accessible scores
+→ one softmax normalization; sink caveat in Section 4.4
+Attention weights
+Attention weights + shared values
+→ weighted sum over accessible positions
+O:T×64×512
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Score matrix per head
+T×T conceptual
+Cross-token comparisons
+Accessible local positions
+min(128,p+1)
+Causal local window
+Output per head
+T×512
+Cross-token weighted sum
+All heads
+T×64×512
+Stack head outputs
+
+Chapter 5 — Compressed KV Sparse Attention
+5.1 Layer selection and complete compression groups
+Setting
+Role
+Value
+compress_ratios
+Layer 0 / layer 1 / layer 2
+0, 0, 2
+index_topk
+Maximum compressed positions selected
+512
+index_n_heads
+Indexer heads
+32
+index_head_dim
+Width per index head
+128
+kv_source_layers
+Compressed KV producers
+281420
+index_source_layers
+Top-K index producers
+28142024283236
+
+Switch to zero-based layer 2 to illustrate compression. Its input is the current normalized attention input for that layer; it is not reused numerically from layer 0. A compression ratio of two forms non-overlapping groups of two tokens. Only complete groups produce a compressed latent.
+r=2,nC=T2,Gj={2j,2j+1}
+Under the illustrative three-token assumption, nC is one and the last “raining” position remains in the compressor’s partial state until a fourth token arrives. For general T, a tail of length T modulo two waits for completion. It still participates in local attention. Importantly, the compressor has its own projections from the attention input: it does not simply average the already rotated local KV tensors.
+5.2 Feature-wise learned compression
+Purpose: Pool a complete group into one compact vector while learning which group members matter.
+Inputs: Layer input X∈RT×5120 and grouping ratio two.
+Learnable parameters: Compressor matrices WC,WF∈R5120×512 and a 512-feature RMSNorm scale.
+Formula: The calculation is
+Craw=XWC,F=XWF,πj,t,a=eFt,au∈GjeFu,a,Cj,:=RMSNormCt∈Gjπj,t,:Ct,:raw
+Shape calculation: The dimensions are
+T×5120)→(T×512),(nC×2×512)→(nC×512
+Explanation: Softmax is over the token axis within each group separately for every feature. The gate therefore has a feature-wise weight, rather than one scalar per token for all 512 features. RMSNorm follows pooling. When the ratio is one, the code uses only a projection and RMSNorm without the pooling gate.
+Output: One unrotated compressed latent per complete two-token group.
+C0,apooled=eF0,aC0,araw+eF1,aC1,araweF0,a+eF1,a
+The compressed latent’s rotary position is the first position in its group, zero in this example. Its causal availability is determined by the last member’s position, one. The indexer derives its key before the latent is rotated and quantized for the attention cache.
+5.3 Indexer Query, key, and head weights
+Purpose: Score compressed positions more cheaply than full-width attention before selecting a sparse subset.
+Inputs: The normalized Query bottleneck Qr, layer attention input X, and the unrotated compressed latent C.
+Learnable parameters: Indexer Query matrix BI∈R1280×4096, key matrix WI∈R512×128, weights matrix Ww∈R5120×32, and index-key RMSNorm scale.
+Formula: The calculation is
+qI=reshape(QrBI,T,32,128),kI=RMSNormI(CWI),w=XWw12832
+Shape calculation: The dimensions are
+T×1280)(1280×4096)→(T×32×128),(nC×512)(512×128)→(nC×128
+Explanation: The indexer is a separate small scoring operation. Its Query uses the same normalized bottleneck as main attention, then a different expansion matrix. Its keys come from the compressor’s pre-RoPE latent. The last 64 of 128 features are rotated for both index Queries and keys. Head weights are projected from the attention input; the code does not apply a softmax to these weights.
+Output: Rotated index Queries and keys plus token-dependent head weights.
+12832=64,wp,h=XWwp,h64
+The implementation quantizes index Queries and keys with fp4_act_quant. The equations describe their logical dequantized values; exact quantization rounding and kernel arithmetic need the missing kernel source. Projected index head weights can be signed.
+5.4 Index-score equation and Top-K
+sp,h,jI=a=0127(qp,h,aI')(kj,aI')
+IndexScorep,j=h=031wp,hReLU(sp,h,jI)
+ReLU(z)=max(z,0),j<p+12
+A positive index similarity contributes through its projected head weight; a negative similarity is rectified to zero. The width scaling is already included in the head weights. With the Query, key, and weight shapes above, the score tensor has one entry for each query and compressed position. No numerical index scores can be derived without learned weights.
+IndexScore∈RT×nC,Keffective=min(512,nC)
+For the illustrative three-token assumption only, one complete group exists and per-query compressed access is:
+C0=∅,C1={0},C2={0}
+The complete group is invisible to query zero because it includes a future token. It is visible to queries one and two, and each selects the only available group. The implementation sorts selected indices into position order, marks inaccessible selections with the sentinel, and adds the local-cache offset. This makes sparse selection compatible with causality even during full-sequence prefill.
+5.5 One attention normalization over local and compressed KV
+The following four-row bank and index table are the illustrative three-token case. For general sequence length, the prefill bank has T plus nC rows, with separate causal access for each query. Slot offsets follow the local bank length.
+Lbank=L0,:'L1,:'L2,:'C0,:'∈R4×512
+Icombined=0-1-1-101-130123
+s2,h,:accessible=Q2,h,:'(L0,:')T, Q2,h,:'(L1,:')T, Q2,h,:'(L2,:')T, Q2,h,:'(C0,:')T512
+The combined bank has four rows, but the first query accesses one row, the second accesses three, and the third accesses four. Local and compressed representations can overlap in token content; the code concatenates them as distinct entries. It does not separately normalize local and compressed attention and then add two outputs.
+Op,h,:=j∈Apαp,h,jLbank,j,:,O∈RT×64×512
+5.6 Cross-layer reuse and later candidate filtering
+A positive compression ratio does not mean every layer computes its own compressed KV or indexer. Producer layers update shared runtime tensors; intervening consumers reuse compressed KV, index keys, or Top-K indices. Their local KV and Query projections remain layer-specific. Layer 2 is both a KV producer and an index producer, so the full calculation above applies there.
+The supplied configuration also enables later candidate filtering at layer 20. It groups compressed positions into blocks of eight, scores each block by its maximum index score, keeps up to 2048 blocks, and pins the newest reachable block. Subsequent index-source layers apply their own index scores within that candidate mask. This extension is absent from the original notes and does not affect the layer-2 example.
+bp,B=maxj∈BIndexScorep,j,|B|=8
+Needs Verification: in the missing kernels and full inference environment, confirm candidate-mask handling when a requested Top-K exceeds the number of retained finite scores. Static inspection of the wrapper is not sufficient to claim end-to-end kernel correctness.
+5.7 Toy Numerical Example — feature-wise compression arithmetic
+Status: Toy Numerical Example — This is a compression side branch using the same miniature normalized rows as inputs. It illustrates layer-2 mechanisms without claiming those rows equal the actual layer-2 activations. In the real model, preceding layers and the layer-1 Engram update change the input first.
+WFtoy≈00.776800
+WCtoy=I2,F0,:toy=[0,ln3],F1,:toy=[0,0]
+π0,:,0=[1/2,1/2],π0,:,1=[3/4,1/4]
+C0,:pooled,toy=[122+12·0, 34·0+142]=[2/2,2/4]
+C0toy=RMSNorm(C0pooled,toy)≈1.26490.6325
+The weights differ between the two features. Group members “it” and “is” form the completed group, while “raining” remains local and pending. The completed group is assigned position zero for rotation, but it becomes visible only after position one is available.
+5.8 Toy Numerical Example — index selection and combined attention
+Status: Toy Numerical Example — Use one miniature index head of width two. Its Query equals the miniature Query, its key is the normalized compressed vector, and its head weights come from an explicit hypothetical projection with the same width and head-count scaling rule as the real indexer. Only the completed group can be selected.
+BItoy=[1,0.5],WItoy=I2,Wwtoy=0.50.5
+wI,toy=XatoyWwtoy/2≈[0.5,0.5,0.7071]
+IndexScorep,0toy=wpI,toymax(qpI'·k0I',0)
+s:,0I,toy≈1.58110.8543-0.658
+IndexScore:,0toy≈0.79060.42710
+Query zero’s group score is invalid despite being arithmetically computable. Queries one and two select the only completed group; selection has no competition in this short example. At long sequence lengths Top-K ranks many groups, without changing their causal availability.
+αcombinedtoy≈10000.24470.35800.39730.060.43580.41410.09
+Ocombinedtoy≈1.414200.42260.5248-0.86870.5942
+O2,:combined,toy=0.06L0'+0.4358L1'+0.4141L2'+0.09C0'
+All local and selected compressed scores share one softmax denominator. The compression side-branch output above is not substituted into the local-only miniature block used in Chapters 6–11; keeping those branches distinct avoids silently treating layer 0 as compressed.
+Figure 6. Local sliding-window attention versus completed compressed groups
+Input / source
+Calculation / connection
+Output / destination
+Layer 0 / layer 1
+→ causal local KV only
+Window max(0,p-127),…,p
+Layer 2 input
+→ separate compressor; complete groups of two
+nC=⌊T/2⌋ vectors
+Layer 2 Query bottleneck
+→ index heads; score completed groups
+Top-K compressed indices
+Local KV + selected compressed KV
+→ concatenate indices and bank; one attention call
+O:T×64×512
+Illustrative “it” query
+→ first group still includes a future member
+No compressed group available
+Illustrative “is” / “raining” queries
+→ first group is now complete
+May access compressed “it + is”
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Local bank in prefill
+T×512
+Per-layer local KV
+Complete groups at layer 2
+nC×512
+Pool two positions per group
+Index Query / keys
+T×32×128; nC×128
+Cross-token compressed comparisons
+Combined prefill bank
+(T+nC)×512
+Per-query accessible subset
+Attention output
+T×64×512
+One normalization across sources
+
+Chapter 6 — Attention Output Projection
+6.1 Inverse RoPE
+Purpose: Return the rotated value contribution to the query-relative coordinate frame.
+Inputs: Headed output O∈RT×64×512 and the same query-position frequencies used before attention.
+Learnable parameters: No learned inverse rotation.
+Formula: The calculation is
+R(-θ)=R(θ)-1=R(θ)T=cosθsinθ-sinθcosθ
+Shape calculation: The dimensions are
+T×64×512)⟶(T×64×512
+Explanation: Only the last 64 features are inverse-rotated. Because the shared latent is used as both key and value, the weighted output includes rotated value features. Inverse rotation uses the negative query-position angle and retains relative key-to-query rotations.
+Output: Inverse-rotated head output Oinv.
+Rp-1jαp,h,jRjvj=jαp,h,jRj-pvj
+This identity concerns the rotated feature subspace with a common frequency schedule. The first 448 features are unaffected. Standard RoPE attention commonly rotates only Queries and keys, so this output inverse rotation is specific to the shared rotated KV design here.
+6.2 First projection: independent head groups
+Purpose: Reduce the headed output through a separate bottleneck for each group.
+Inputs: Inverse-rotated output; eight groups, eight heads per group.
+Learnable parameters: Eight matrices AO,g∈R4096×1024.
+Formula: The calculation is
+Ogroup=reshape(Oinv,T,8,4096),Zp,g,:=Op,g,:groupAO,g
+Shape calculation: The dimensions are
+64/8=8,8·512=4096,(T×4096)(4096×1024)→(T×1024)
+Explanation: Each group operates on its own eight heads. The first grouped operation is block diagonal across groups, so a generic dense multiplication across all heads would not implement the same mapping. The local code views wo_a weights as group-specific matrices and uses einsum.
+Output: Z∈RT×8×1024.
+The source calls the headed attention output a “lower dimension.” Its flattened width is actually larger than the hidden width; the grouped bottlenecks reduce that large intermediate width before returning to the hidden dimension.
+6.3 Second projection and parameter count
+Purpose: Combine all groups and restore the model hidden width.
+Inputs: Z∈RT×8×1024.
+Learnable parameters: BO∈R8192×5120.
+Formula: The calculation is
+Zflat=reshape(Z,T,8192),Ofinal=ZflatBO
+Shape calculation: The dimensions are
+8·1024=8192,(T×8192)(8192×5120)→(T×5120)
+Explanation: The second matrix mixes features across groups. It returns one attention update per token, ready for HC expansion. No RMSNorm is inserted between these two output factors in Attention.forward.
+Output: Ofinal∈RT×5120.
+NO,A=8·4096·1024=33554432,NO,B=8192·5120=41943040
+NO,grouped=75497472,NO,dense=32768·5120=167772160
+These counts describe the logical grouped matrices and exclude quantization metadata. On multiple ranks, heads and groups are partitioned, and the row-parallel second projection reduces partial outputs to obtain the global hidden vector.
+6.4 Toy Numerical Example — inverse rotation and both output factors
+Status: Toy Numerical Example — Resume the local-only miniature block from Section 4.7, not the compression side branch. There is one output group, two input features, a rank-one group bottleneck, and a two-feature hidden output.
+O2,:inv,toy=[-1.0799,0.5904]R(-2)T≈[0.9862,0.7362]
+Oinv,toy≈1.414200.31020.35680.98620.7362
+AOtoy≈10.5
+BOtoy≈0.51
+ZOtoy=Oinv,toyAOtoy≈1.41420.48871.3543
+Ofinaltoy=ZOtoyBOtoy≈0.70711.41420.24430.48870.67721.3543
+3×1×2)→(3×1×1)→(3×1)→(3×2
+Figure 7. Real grouped output dimension transformations
+Input / source
+Calculation / connection
+Output / destination
+O:T×64×512
+→ inverse RoPE on query-position tail
+Same headed shape
+Inverse-rotated heads
+→ group eight heads together
+T×8×4096
+T×8×4096
+→ eight independent low-rank group matrices
+T×8×1024
+Group bottlenecks
+→ flatten; second matrix combines groups
+T×8192→T×5120
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Inverse-rotated output
+T×64×512
+Per query-position and head
+Grouped heads
+T×8×4096
+Reorganization only
+Group bottlenecks
+T×8×1024
+Separate learned matrix per group
+Projected update
+T×5120
+Combine groups within each token
+
+Chapter 7 — Hyper-Connection (HC)
+7.1 Residual streams and dynamic coefficients
+A residual stream carries each token’s evolving features between sublayers: identity information, contextual features, and representations useful for prediction. These are interpretations of learned features, not fixed named fields in a tensor. Hyper-Connections maintain four parallel streams and learn how to collapse, update, and mix them.
+R∈RT×4×5120,a,b∈RT×4,Amix∈RT×4×4
+Here a denotes pre-mix collapse coefficients, b denotes post-mix broadcast coefficients, and Amix mixes the residual copies. These are token-dependent intermediates computed from learned parameters; they are not independent fixed learned coefficients for every token.
+7.2 Computing mixing logits
+Purpose: Derive token-dependent mixing information from all copies together.
+Inputs: Flattened residual rp∈R20480.
+Learnable parameters: For each attention or FFN HC unit: WHC∈R20480×24, base vector η∈R24, and three learned scale values.
+Formula: The calculation is
+rp=flatten(Rp,:,:),mp=rpWHC120480i=120480rp,i2+ϵ
+Shape calculation: The dimensions are
+4·5120=20480,(2+4)4=24,(T×20480)(20480×24)→(T×24)
+Explanation: Normalization is over the whole flattened token stream, not separately over each copy. The projected logits and learned base and scales are passed to hc_split_sinkhorn, which returns four pre coefficients, four post coefficients, and sixteen residual mixing entries.
+Output: Three coefficient tensors for collapse, expansion, and residual mixing.
+NHC,unit=20480·24+24+3=491547
+There are separate attention and FFN HC parameter sets in each block. Needs Verification: the kernel implementing hc_split_sinkhorn is not supplied, so exact split transforms, sigmoid factors, positive offsets, and the placement of scale and base terms cannot be recovered from the wrapper. They are not invented here.
+The wrapper specifies 20 Sinkhorn iterations and hc_eps of one millionth. A standard Sinkhorn procedure alternately normalizes rows and columns of a positive matrix; finite iterations approximate a doubly stochastic matrix. The following explains that procedure symbolically without claiming the missing kernel uses this exact initialization or epsilon placement. General reference: https://arxiv.org/abs/2512.24880.
+Pk,c0>0,Uk,ct=Pk,ctvPk,vt+δ,Pk,ct1=Uk,ctuUu,ct+δ
+cAp,k,cmix≈1,kAp,k,cmix≈1,δ=10-6
+7.3 HC post-mixing after attention
+Purpose: Inject the attention update into each output copy while transporting residual information.
+Inputs: Attention output Ofinal and the residual saved before attention.
+Learnable parameters: Learned HC generators already described; the resulting b and Amix are intermediate coefficients.
+Formula: The calculation is
+Yp,c,:=bp,cOfinal,p,:+k=03Ap,k,cmixRp,k,:
+Shape calculation: The dimensions are
+Ofinal:T×5120,R:T×4×5120,Y:T×4×5120
+Explanation: The post coefficient broadcasts one update into each output copy, while the mixing matrix transports all input copies into that copy. The first matrix index denotes the input copy and the second the output copy. This agrees with hc_post’s reduction over the input-copy axis.
+Output: Four updated residual streams.
+Yp,0,:=bp,0Ofinal,p,:+Ap,0,0mixRp,0,:+Ap,1,0mixRp,1,:+Ap,2,0mixRp,2,:+Ap,3,0mixRp,3,:
+Source symbol
+Meaning
+Shape
+Ofinal
+Projected attention update
+T×5120
+R:,k,:
+One saved residual copy
+T×5120
+b:,c
+Post coefficient for output copy
+T
+A:,k,cmix
+Transport from input copy to output copy
+T
+Y
+Updated residual stream
+T×4×5120
+
+7.4 Preparing the next sublayer input
+Xcombined,p,:=c=03wp,cYp,c,:
+T×4×5120)⟶(T×5120
+This reconstructs the source’s weighted-copy equation with an explicit token index. The coefficient w is the applicable pre-mix tensor, not the routed-expert weight introduced later. The code does not show a requirement that pre coefficients form a softmax or sum to one.
+The coefficient timing matters: the attention input uses the incoming pre-mix from the previous FFN, while attention’s newly computed pre-mix is used to collapse the post-attention stream for this block’s FFN. FFN’s new pre-mix is returned to the next block. This schedule is directly established by Block.forward.
+7.5 Toy Numerical Example — four-stream residual update
+Status: Toy Numerical Example — The miniature presets identity residual transport and four equal post coefficients. These are hypothetical coefficients, not outputs of the unavailable HC kernel. The attention-generated pre coefficients used by its FFN are also set to one quarter each.
+Aattn,toy=I4,battn,toy=[1/4,1/4,1/4,1/4],aattn,toy=[1/4,1/4,1/4,1/4]
+Yp,c,:toy=Xp,:toy+14Ofinal,p,:toy
+Y2,c,:toy=[1,1]+14[0.6772,1.3543]≈[1.1693,1.3386]
+Y:,c,:toy≈1.17680.35360.06111.12221.16931.3386
+All copies remain equal in this intentionally simple case. In the real model different post coefficients and cross-copy transport can produce distinct streams; equal-copy behavior is not assumed in the symbolic equations.
+c=0314Yp,c,:toy=Yp,0,:toy,XMoEtoy=RMSNorm(Y:,0,:toy)
+XMoEtoy≈1.35440.40690.07691.41210.93041.0651
+Figure 8. Four Hyper-Connection streams and the collapsed sublayer input
+Input / source
+Calculation / connection
+Output / destination
+R:,0,:∣R:,1,:∣R:,2,:∣R:,3,:
+→ incoming pre coefficients collapse copies
+Xa:T×5120
+Collapsed attention input
+→ attention projections, aggregation, output factors
+Ofinal:T×5120
+Saved four-copy residual + attention update
+→ residual transport matrix + post broadcast
+Four updated copies
+Four updated copies
+→ attention-generated pre; FFN RMSNorm
+XMoE:T×5120
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Residual stream
+T×4×5120
+Copies within each token
+HC flattened projection input
+T×20480
+Per-token joint-copy statistic
+Pre / post / transport
+T×4; T×4; T×4×4
+Token-dependent coefficients
+Sublayer input or output
+T×5120
+Collapsed / broadcast vector
+
+Chapter 8 — Mixture of Experts (MoE)
+8.1 Collapse and normalize the MoE input
+Purpose: Give each expert a single hidden vector per token.
+Inputs: Post-attention residual Y and attention-generated pre coefficients aattn.
+Learnable parameters: FFN-input RMSNorm feature scale; the HC pre coefficients come from the attention HC generator.
+Formula: The calculation is
+XMoE=RMSNormffnc=03ap,cattnYp,c,:
+Shape calculation: The dimensions are
+T×4×5120)→(T×5120)→(T×5120
+Explanation: The router and the expert networks both consume this current normalized residual-derived input. It is not a new lookup of the original token embedding.
+Output: XMoE∈RT×5120.
+Configuration
+Meaning
+Value
+n_routed_experts
+Expert pool selected by router
+384
+n_shared_experts
+Always-active shared network
+1
+n_activated_experts
+Routed experts chosen per token
+6
+score_func
+Positive routing score transform
+sqrtsoftplus
+gate_temp
+Router-logit divisor; ModelArgs default
+1.0
+norm_topk_prob
+Normalize selected unbiased scores
+True (ModelArgs default)
+route_scale
+Scale normalized routed weights
+1.5
+swiglu_limit
+Expert activation clipping limit
+10.0
+
+gate_temp and norm_topk_prob are absent from config.json but have the shown defaults in ModelArgs. They should be described as defaults used when no override is supplied, rather than explicit JSON entries.
+8.2 Router projection and sqrtsoftplus
+Purpose: Compute one affinity score per routed expert for each token.
+Inputs: XMoE∈RT×5120.
+Learnable parameters: Router WG∈R5120×384 and expert-selection correction biases β∈R384.
+Formula: The calculation is
+Z=XMoEWGτ,τ=1,sp,i=ln(1+eZp,i)
+Shape calculation: The dimensions are
+T×5120)(5120×384)→(T×384
+Explanation: sqrtsoftplus maps each logit to a positive scalar independently; these scores do not yet form a distribution across experts. Softplus is evaluated with a numerically stable library operation, rather than a naive exponentiation of very large logits.
+Output: One unbiased score per token and routed expert.
+Symbol
+Definition
+Zp,i
+Raw temperature-adjusted routing logit for expert i
+sp,i
+Score after sqrtsoftplus
+e
+Euler’s number, the base of the natural exponential
+τ
+Router temperature divisor
+βi
+Expert-selection correction bias
+
+NG=5120·384=1966080
+8.3 Select experts using biased scores
+rp,i=sp,i+βi,Ep=TopKi(rp,i,6)
+The bias changes which experts are chosen, while their contribution weights are derived from the original unbiased scores. In the text-only example the ordinary bias is used. Because vision is enabled in the configuration, the implementation also allocates a separate image-token bias; it does not apply that bias to these text tokens.
+8.4 Normalize selected scores and apply route scale
+w^p,i=sp,ij∈Epsp,j,i∈Ep
+wp,i=1.5sp,ij∈Epsp,j+10-20
+i∈Epw^p,i=1,i∈Epwp,i≈1.5
+The first equation reconstructs the source image; the second adds the stability term and scaling used by Gate.forward. Normalization applies only to the selected six scores, not all 384 and not their bias-adjusted versions. With the defaults, the code normalizes only if more than one expert is selected.
+weights∈RT×6,indices∈ZT×6
+No actual expert IDs or gate weights can be computed without checkpoint parameters. The symbolic equations fully specify the calculation for each of the T token positions.
+8.5 Routed and shared experts
+Six routed experts are selected separately for each token, so different tokens can select different subsets. The one shared expert runs for every token and is not selected, bias-corrected, or multiplied by a router weight. It has independent FFN weights. With this configuration, seven expert-network outputs contribute to each token: six weighted routed outputs and one unweighted shared output.
+YMoE,p,:=i∈Epwp,ifi(XMoE,p,:)+fshared(XMoE,p,:)
+This sum is not an average over seven networks, and the shared contribution is not multiplied by route_scale. Distributed execution accumulates each rank’s routed expert outputs and reduces them before adding the shared network output.
+8.6 Toy Numerical Example — router logits, biased selection, unbiased weights
+Status: Toy Numerical Example — Continue the miniature MoE input. This toy has four routed experts and selects two, whereas the real configured layer selects six of 384. Toy expert labels A, B, C, D denote miniature networks only. A shared expert is always added separately.
+WGtoy≈10-10.5010.5-0.5
+Ztoy=XMoEtoyWGtoy≈1.35440.4069-1.15090.47370.07691.41210.6292-0.66760.93041.0651-0.3978-0.0674
+stoy=softplus(Ztoy)≈1.25860.95770.52430.97870.85581.27681.02780.64351.12381.16670.71690.8124
+βtoy=[0,0.2,0.6,0],rtoy=stoy+βtoy
+Toy expert
+Raw logit at “raining”
+Unbiased score
+Selection score
+A
+0.9304
+1.1238
+1.1238
+B
+1.0651
+1.1667
+1.3667
+C
+-0.3978
+0.7169
+1.3169
+D
+-0.0674
+0.8124
+0.8124
+
+Assumed position
+Selected toy experts
+Routed weights
+“it”
+A, B
+0.85180.6482
+“is”
+C, B
+0.6690.831
+“raining”
+B, C
+0.92910.5709
+
+w2,Btoy=1.51.16671.1667+0.7169≈0.9291
+w2,Ctoy≈0.5709,w2,B+w2,C=1.5
+The correction bias makes toy expert C more competitive, but it is not added to the numerator or denominator of the routed weights. The shared expert has no entry in this Top-K table and gets no router normalization weight.
+Figure 9. Real MoE routing and parallel expert contributions
+Input / source
+Calculation / connection
+Output / destination
+XMoE:T×5120
+→ learned router; sqrtsoftplus
+T×384 unbiased scores
+Unbiased scores + correction biases
+→ select expert indices
+Six IDs per token: ep,1,…,ep,6
+Selected unbiased scores
+→ normalize selected subset; scale by route_scale
+wp,1,…,wp,6
+Same token input
+→ six independent routed FFNs in parallel
+Six weighted hidden vectors
+Same token input
+→ one always-active shared FFN
+One unweighted hidden vector
+Six routed + one shared contribution
+→ sum
+YMoE:T×5120
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Router logits / scores
+T×384
+Per token; compare experts
+Selected indices / weights
+T×6
+Per token; selected-score normalization
+One expert input
+1×5120
+Per-token feature transform
+Combined output
+T×5120
+No cross-token averaging
+
+Chapter 9 — Expert Feed-Forward Network
+9.1 Gate and up branches
+Matrix
+Mathematical shape
+Role
+W1,i
+5120×2304
+Gate projection
+W3,i
+5120×2304
+Up projection
+W2,i
+2304×5120
+Down projection
+
+Purpose: Create two independent intermediate feature branches for one token and expert.
+Inputs: Current normalized MoE row x=XMoE,p,:∈R1×5120.
+Learnable parameters: Gate matrix W1,i and up matrix W3,i.
+Formula: The calculation is
+Gi=xW1,i,Ui=xW3,i
+Shape calculation: The dimensions are
+1×5120)(5120×2304)→(1×2304
+Explanation: The two projections use the same input but different parameters and can be evaluated independently. The gate will control features generated by the up branch; it is distinct from the MoE router that selects experts.
+Output: Two intermediate vectors with 2304 features each.
+9.2 Model-specific activation clipping
+Gc,i=min(Gi,10),Uc,i=clip(Ui,-10,10)
+The gate branch is capped only above; its negative values are not clipped to minus ten. The up branch is clipped on both sides. The source’s “clamp” wording is incomplete, and using identical symmetric clamps would change the implementation. Both branch activations are converted to floating point with 32-bit precision before clipping and SwiGLU.
+9.3 SwiGLU activation
+Purpose: Use a smooth nonlinear gate to modulate intermediate features.
+Inputs: Clipped gate and up vectors, each with 2304 features.
+Learnable parameters: No additional activation parameters.
+Formula: The calculation is
+Hi=SiLU(Gc,i)⊙Uc,i
+Shape calculation: The dimensions are
+1×2304)⊙(1×2304)→(1×2304
+Explanation: The circle-dot symbol denotes component-wise multiplication. SiLU applies the sigmoid gate to the same input, so gate values continuously modulate the up features. This formula reconstructs the source image’s activation and output size.
+Output: Gated intermediate vector Hi.
+SiLU(z)=zsigmoid(z)=z1+e-z
+Hi∈R1×2304
+9.4 Routing weight and down projection
+Purpose: Return the expert’s intermediate features to the model width.
+Inputs: Expert activation Hi and the routed scalar wp,i.
+Learnable parameters: Down matrix W2,i∈R2304×5120.
+Formula: The calculation is
+Yp,i,:=(wp,iHi)W2,i=wp,i(HiW2,i)
+Shape calculation: The dimensions are
+1×2304)(2304×5120)→(1×5120
+Explanation: Because the down projection has no bias, a scalar weight can be moved across the ideal real-valued linear operation. The implementation applies the routing weight before the down projection and casts the weighted activation to its original dtype; finite-precision and quantized results need not be identical if that ordering is changed.
+Output: One weighted routed-expert contribution per selected expert.
+Yp,shared,:=HsharedW2,shared
+The shared expert follows the same clipping and SwiGLU computation with its own weights, but its forward call has no routing weight. Its intermediate width is also 2304 in the supplied configuration. Routed expert weights use the configured fp4 storage path; the shared network uses the default Linear dtype, fp8 here.
+9.5 Combine expert outputs and count logical weights
+YMoE,p,:=i∈EpYp,i,:+Yp,shared,:,YMoE∈RT×5120
+Nexpert=3·5120·2304=35389440
+Nall experts=(384+1)·35389440=13624934400
+The logical matrix count is per MoE block, excluding the router, norms, HC, and quantization metadata. Activating six experts does not imply only six experts’ parameters are stored. A token uses seven networks’ matrix operations here, while the model allocates the entire expert pool, potentially partitioned across ranks.
+9.6 Toy Numerical Example — SwiGLU arithmetic and expert summation
+Status: Toy Numerical Example — Continue the selected miniature experts. To keep the calculation compact, their hypothetical gate and up matrices are equal, while their down matrices differ. The real model gives each expert independent gate, up, and down parameters. The shared miniature expert has down matrix one quarter of identity.
+W1toy≈1001
+W3toy≈1101
+W2,Atoy=I2,W2,Btoy=0.5001,W2,Ctoy=0110
+W2,Dtoy=1000.5,W2,sharedtoy=0.25I2
+Gtoy=XMoEtoyW1toy≈1.35440.40690.07691.41210.93041.0651
+Utoy=XMoEtoyW3toy≈1.35441.76130.07691.4890.93041.9955
+H2,0toy=0.93041+e-0.9304·0.9304≈0.6208
+H2,1toy=1.06511+e-1.0651·1.9955≈1.5805
+Htoy=SiLU(Gtoy)⊙Utoy≈1.45810.43030.00311.69070.62081.5805
+All miniature gate and up entries are inside the clipping limits, so clipping does not change them. A separate limit-check calculation makes the asymmetry clear:
+min([12,-12],10)=[10,-12],clip([12,-12],-10,10)=[10,-10]
+Y2,routedtoy=0.9291[0.3104,1.5805]+0.5709[1.5805,0.6208]≈[1.1907,1.8229]
+Y2,sharedtoy=0.25[0.6208,1.5805]≈[0.1552,0.3951]
+YMoEtoy=Yroutedtoy+Ysharedtoy≈2.07910.7531.13311.82981.34592.218
+Figure 10. An expert FFN: two branches, element-wise gate, down projection
+Input / source
+Calculation / connection
+Output / destination
+x:1×5120
+→ gate matrix and upper clipping
+Gc:1×2304
+x:1×5120
+→ up matrix and two-sided clipping
+Uc:1×2304
+Gate + up
+→ SiLU gate modulates up feature-wise
+H:1×2304
+Routed intermediate
+→ multiply route weight; down matrix
+1×5120 contribution
+Shared intermediate
+→ down matrix without router weight
+1×5120 contribution
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Gate / up / activation per token-expert
+1×2304
+Per token independently
+Down-projected contribution
+1×5120
+Features mix; tokens do not
+Combined MoE update
+T×5120
+Sum expert contributions within token
+
+Chapter 10 — Completing a Transformer Layer
+10.1 Post-MoE HC mixing
+Purpose: Merge the MoE update into the parallel residual stream and supply the next layer’s pre-mix.
+Inputs: Post-attention residual Y and MoE output YMoE.
+Learnable parameters: Separate FFN HC projection, bases, and scales. Its coefficients are computed from Y before the MoE call.
+Formula: The calculation is
+Rp,c,:next=bp,cffnYMoE,p,:+k=03Ap,k,cffnYp,k,:
+Shape calculation: The dimensions are
+T×5120),(T×4×5120)⟶(T×4×5120
+Explanation: The post-mixing structure is the same as after attention, but its learned generator and coefficients are separate. The residual for this step is the post-attention stream, not the stream saved before attention.
+Output: Rnext and the FFN pre coefficient tensor affn∈RT×4.
+Xattnnext=RMSNormattn,nextc=03ap,cffnRp,c,:next
+10.2 Complete block equations in code order
+The following compact chain connects the detailed chapters. Every operation applies independently across token positions except attention aggregation and the explicitly grouped compressor. Coefficient generation does not itself consume the subsequent sublayer output.
+aattn,battn,Aattn)=HCMixesattn(R
+xa=RMSNormattn(HCPre(R,ain)),o=Attention(xa),Y=HCPost(o,R,battn,Aattn)
+affn,bffn,Affn)=HCMixesffn(Y
+xf=RMSNormffn(HCPre(Y,aattn)),y=MoE(xf)
+Rnext=HCPost(y,Y,bffn,Affn),ain,next=affn
+10.3 Parameters reused across tokens and across layers
+Item
+Reuse within a layer
+Reuse across backbone layers
+Embedding table
+Shared across all token positions
+One input embedding module
+Query / local KV / output projections
+Same weights at every position
+Distinct attention modules per layer
+RMSNorm scales
+Same scale at every position
+Separate modules for Query, KV, attention input, FFN input, and layer
+Router and expert matrices
+Same expert parameters whenever selected
+Distinct MoE modules per layer
+Attention / FFN HC generators
+Shared generators; token-dependent coefficients
+Separate sets per sublayer and layer
+Compressed KV / index keys
+Cached activations
+Reused between specified producer layers
+Top-K indices / candidate mask
+Query-dependent intermediates
+Reused according to source-layer schedule
+Rotary frequencies
+Configuration-derived values
+May be cached/shared; not trainable matrices
+
+Cached compressed tensors and selected indices are activations, not tied projection weights. Later source layers replace the shared runtime state. Inference caches retain past representations; they do not perform training updates to the learned parameters.
+10.4 Overall shape progression
+Operation
+Output shape
+Comments
+Embedding lookup
+T×5120
+One row per token
+Initial HC expansion
+T×4×5120
+Four initially equal copies
+Engram before layers 1 and 14
+T×4×5120→T×4×5120
+Gated N-gram memory update; Chapter 11
+HC collapse + attention RMSNorm
+T×5120
+One attention input per token
+Query bottleneck
+T×1280
+RMSNorm preserves shape
+Headed Query + partial RoPE
+T×64×512
+64 Query heads
+Shared local KV + partial RoPE
+T×512
+Shared by all heads
+Compressed latent at layer 2
+nC×512
+Complete groups only
+Indexer Query / key
+T×32×128; nC×128
+Smaller selection computation
+Headed attention / inverse RoPE
+T×64×512
+Output per token and head
+Grouped first output projection
+T×8×1024
+Eight bottlenecks
+Flattened grouped output
+T×8192
+Concatenated group features
+Final attention projection
+T×5120
+Attention update
+Attention HC post-mix
+T×4×5120
+Updated residual copies
+HC collapse + FFN RMSNorm
+T×5120
+MoE input
+Router scores
+T×384
+One score per routed expert
+Selected indices / weights
+T×6
+Six routed experts per token
+Expert gate / up / SwiGLU
+1×2304
+For one token and one expert
+Expert down projection
+1×5120
+One expert output
+Combined MoE output
+T×5120
+Six routed plus one shared
+FFN HC post-mix
+T×4×5120
+Next block residual
+
+10.5 Toy Numerical Example — complete one block and hand off to the next
+Status: Toy Numerical Example — The miniature FFN HC uses identity transport, post coefficients one quarter, and returns pre coefficients one quarter. This completes the same single local-attention toy block used throughout; a second toy block is not silently substituted.
+Rp,c,:next,toy=Yp,c,:toy+14YMoE,p,:toy
+R2,c,:next,toy=[1.1693,1.3386]+14[1.3459,2.218]≈[1.5058,1.8931]
+R:,c,:next,toy≈1.69660.54180.34441.57961.50581.8931
+The next toy attention would collapse the four equal copies and normalize the displayed rows, then use that next block’s matrices. The real backbone does this for all its configured blocks, with the important per-layer differences below.
+10.6 Layer schedule for the entire configured backbone
+Zero-based layer range
+Compression / producers
+Additional behavior
+0
+Local window only; no compressed KV
+Initial one-hot incoming pre-mix
+1
+Local window only
+Engram update before this block
+2–7
+Ratio two; KV and index producer at 2
+Consumers reuse producer tensors
+8–13
+Ratio two; KV and index producer at 8
+Replace previous shared state
+14–19
+Ratio two; KV and index producer at 14
+Engram update before layer 14
+20–23
+Ratio one; KV and index producer at 20
+Candidate prefilter generated at 20
+24–27
+Ratio one; index producer at 24
+Reuse KV / index keys from 20
+28–31
+Ratio one; index producer at 28
+Apply candidate mask from 20
+32–35
+Ratio one; index producer at 32
+Apply candidate mask from 20
+36–39
+Ratio one; index producer at 36
+Final backbone block is 39
+
+Each layer has its own attention, normalization, HC, router, and expert parameters. Only the explicitly published compressed activations and index selections are reused. The token axis keeps length T throughout prefill. Ratio-one compression produces a projected and normalized vector for every token without a pooling gate, rather than disabling the compressed bank.
+Figure 11. Tensor handoff across successive Transformer layers
+Input / source
+Calculation / connection
+Output / destination
+R0:T×4×5120
+→ block 0: local attention, HC, MoE, HC
+R1,a0
+R1,a0
+→ Engram at 1; block 1 remains local
+R2,a1
+R2,a1
+→ block 2: compute compressed KV and indices
+R3,a2 plus shared caches
+Successive updated residuals
+→ continue layer schedule through block 39
+R40,a39
+R40,a39
+→ final collapse and normalization
+Hfinal:T×5120
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+10.7 Cross-token interactions and independent calculations
+Operation
+Interaction between token positions?
+Effect
+Embedding / projections / row RMSNorm
+No
+Each row is transformed independently
+RoPE / inverse RoPE
+No aggregation
+Position-dependent rotation per row
+Main attention
+Yes
+Weighted sum of accessible token representations
+Ratio-two compression
+Yes
+Feature-wise pool within complete groups
+Indexer
+Yes
+Query compares with compressed groups
+HC mixing
+No across tokens
+Mix four copies within a token
+Router / experts
+No
+Per-token expert choice and FFN
+Engram hashing
+Yes, local lookback
+N-gram lookup depends on recent IDs
+LM head / sampling
+No new context aggregation
+Read the final position’s contextual features
+
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Block input / output
+T×4×5120
+Preserve token and residual axes
+Returned pre-mix
+T×4
+Feeds next block attention
+Engram lookup IDs per layer
+T×24
+N-gram context
+Engram lookup features
+T×24×256
+Concatenate to hidden projection
+Final backbone stream
+T×4×5120
+After block 39
+
+Chapter 11 — Engram — N-gram Memory Lookup and Gated Residual Injection
+11.1 Architectural role and execution workflow
+Engram supplies learned memory features selected by short, ordered token sequences. It forms a separate branch from the normal Transformer block: token IDs determine memory addresses, while the current Hyper-Connection residual stream determines how strongly the retrieved Value is injected. The configured injections occur immediately before zero-based layers 1 and 14, preserving the four-copy residual shape. The updated residual then enters the existing Attention → HC → MoE → HC calculations in Chapters 2–10.
+Attention builds context-dependent interactions between token positions using projected activations, positional transformations, and normalized attention scores. Engram instead uses deterministic N-gram hashes to retrieve learned table rows and applies a separate sigmoid gate for each residual copy; it does not compute an attention distribution over earlier token positions. MoE selects feed-forward experts using a router applied to hidden activations. Engram selects memory rows using token sequences rather than selecting experts. These mechanisms complement one another: memory lookup contributes features before Attention, and the usual context mixing and expert transformations follow.
+Workflow: token IDs → compressed token IDs and causal N-gram construction → layer-specific hashing → embedding lookup and dequantization → Key/Value projection → residual-dependent gating → additive residual update. The worked example remains “it is raining”; all original formulas, tables, assumptions about three illustrative token rows, and tokenizer limitations are retained in Sections 11.2–11.9.
+Precomputation and execution timing: Transformer.forward calls NgramHashState before the ordinary token embedding lookup and before the backbone loop. Hash addresses for both Engram layers can therefore be computed in advance for the available input chunk: they depend on token IDs, the compressed token map, layer-specific hashing settings, and available causal history, not on hidden activations. This does not precompute the gated residual updates. Each Engram module retrieves and projects its own memory features when its designated layer is reached, then computes its gates from that layer’s current residual stream. The two injections use different residual states and separate learned parameters. During decoding, only available tokens and cached preceding context can be hashed; unknown future tokens are not precomputed.
+Architecture diagram — text-only path; all layer indices are zero-based.
+Main residual path
+Flow
+Separate Engram memory branch
+Input token IDs
+→ branch
+Compressed IDs → N-grams → hashes for layers 1 and 14; computed before embedding
+Token embedding → four HC copies → layer 0
+↓
+Keep layer-specific hash slices available until their injection points
+Residual arriving before layer 1
+→ gate input← gated Value
+Layer-1 hashes → lookup → projection; compare Keys with this residual and gate the shared Value
+Add memory contribution → layer 1 Attention / HC / MoE / HC → layers 2–13
+↓
+The residual continues through the ordinary backbone
+Residual arriving before layer 14
+→ gate input← gated Value
+Layer-14 hashes → separate lookup / projection; compute gates from this later residual
+Add memory contribution → layer 14 Attention / HC / MoE / HC → layers 15–39 → final output
+↓
+No other Engram injection is configured
+
+The arrows into the branch supply the current residual for gating; the returning arrows carry the gated Value contribution added to all four copies. Hash construction is outside the backbone loop, while the two additive updates are inside it. The diagram summarizes execution placement without replacing the Attention, HC, or MoE derivations.
+11.2 Configured Engram updates before layers 1 and 14
+Purpose: Add learned n-gram memory information into the four-copy residual before the designated blocks.
+Inputs: The symbolic input IDs and current R∈RT×4×5120.
+Learnable parameters: Two learned Engram embedding tables and one separate Engram projection per configured Engram layer; feature-wise Query and key scales.
+Formula: The calculation is
+vp=TokenMap(up),hashp,n,h=⨁s=0n-1(vp-sml,s)modPl,n,h+ol,n,h
+Shape calculation: The dimensions are
+n∈{2,3,4},h∈{0,…,7},(3·8)=24 lookups per token
+Explanation: TokenMap normalizes decoded vocabulary entries and merges equivalent token spellings into a compressed ID space. Lookback stops at the sequence beginning or blocked image tokens and uses the mapped padding ID. Odd deterministic hash multipliers are layer-specific; each n-gram/head pair has a distinct prime-sized bucket range. XOR denotes a bitwise operation, not ordinary addition.
+Output: Twenty-four hash lookup IDs per position and Engram layer.
+The formula uses symbolic padding for negative positions. In the wrapper, all Engram hashes for the sequence are computed before embedding, and the appropriate layer’s slice is consumed just before its block. The unknown tokenizer prevents computing actual compressed IDs or hashes. No real lookup values are invented.
+Nl∈{384006168,384016682},ElEngram∈RNl×256
+Bp=concatn,h(El,hashp,n,h,:Engram)∈R6144,24·256=6144
+[Kp,0,:,…,Kp,3,:,Vp,:]=BpWlEngram,WlEngram∈R6144×25600
+25600=(4+1)5120,K∈RT×4×5120,V∈RT×5120
+Lookup rows are stored in fp8 with scale metadata and dequantized on lookup. They are concatenated into one vector, then projected into one key per residual copy plus one value shared across copies.
+νp,c=a=05119Rp,c,a(γc,aqγc,ak)Kp,c,a512015120aRp,c,a2+ϵ15120aKp,c,a2+ϵ
+gp,c=σcopysign(1,νp,c)max(|νp,c|,10-6),Rp,c,:Engram=Rp,c,:+gp,cVp,:
+copysign supplies the sign of the dot product, including its signed-zero behavior. Normalization is over each copy’s hidden features, unlike HC’s flattened-copy statistic. Text-only tokens receive the gate; image tokens would have it masked to zero. The value is broadcast to each copy with that copy’s gate. The updated stream enters layer 1 or 14 and keeps its shape.
+No numerical Engram memory value can be computed without tokenizer assets and its enormous learned tables. The operations are still traced symbolically because this branch is enabled in the supplied text model. The miniature deliberately omits it and is not a substitute for the full configured model.
+11.3 Worked example and placement before Attention
+This detailed calculation continues the report’s input “it is raining”. The three rows below use the existing illustrative assumption that the words correspond to three tokens without inserted special tokens. Actual tokenizer IDs and compressed token-map values remain unavailable. General sequence-length expressions in the rest of the report are unchanged.
+R∈R3×4×5120,p∈{0,1,2},c∈{0,1,2,3},l∈{1,14}
+At each configured layer, Engram updates the incoming four-copy residual stream before Block.forward collapses it for Attention. The layer’s incoming HC pre-mix is retained, but both the HC coefficient generator and the attention input operate on the Engram-updated stream. Attention and MoE then follow the existing derivations; they are not repeated here.
+R→EngramlRE→HCPre, RMSNormXattn→Attention→HC→MoE→HCRnext
+Each Engram layer has its own learned table, projection, and feature scales. The input token sequence is unchanged across layers, but layer-specific hash multipliers and bucket layouts produce different lookup indices. Transformer.forward computes hashes for both Engram layers before embedding and consumes the corresponding slice immediately before layer 1 or 14.
+11.4 Step A — N-gram construction, padding, and hashing
+An N-gram is an ordered group of consecutive tokens ending at the current position. This Engram hashes bigrams, trigrams, and four-grams; it does not add a unigram lookup column. A three-token sentence still generates four-gram lookups because unavailable left context is padded rather than skipped.
+up=symbolic tokenizer ID,vp=token_map[up],vpad=token_map[2]
+The raw padding ID is configured as two, but its mapped value is not assumed to equal two. build_compressed_token_map decodes each vocabulary entry, applies Unicode normalization, accent removal, lowercase conversion, and whitespace normalization, and merges matching normalized strings. A special space-only sentinel and a partial-byte fallback prevent inappropriate merging. The resulting compressed vocabulary size must equal the configured value.
+Vcompressed=99092,vp∈{0,…,99091}
+Current assumed token
+Bigram, oldest → newest
+Trigram, oldest → newest
+Four-gram, oldest → newest
+“it”
+PAD, it
+PAD, PAD, it
+PAD, PAD, PAD, it
+“is”
+it, is
+PAD, it, is
+PAD, PAD, it, is
+“raining”
+is, raining
+it, is, raining
+PAD, it, is, raining
+
+These labels describe token positions under the stated assumption, not confirmed tokenizer pieces. Internally the lookback vector is ordered newest first:
+t0=[v0,vpad,vpad,vpad],t1=[v1,v0,vpad,vpad],t2=[v2,v1,v0,vpad]
+NgramHashState uses a cumulative blocked mask: after crossing the sequence start or a masked image token, all older slots are padded. Text-only “it is raining” has no image boundary. During decoding, the cache retains earlier compressed token IDs, so left context can extend beyond the currently supplied one-token chunk.
+Bm=max1⌊(263-1)/99092⌋2
+ml,s=2al,s+1,al,s~IntegerRNG(0,Bm;seed=10007l),s∈{0,1,2,3}
+The multipliers are deterministic odd integers generated using NumPy default_rng with one seed per layer. The range is chosen to keep token-ID multiplication inside signed 64-bit bounds. These are fixed hashing buffers, not trainable weights. The displayed RNG notation denotes the source’s integer generation procedure, not stochastic routing during inference.
+zp,l,n=⨁s=0n-1(tp,sml,s),n∈{2,3,4}
+jp,l,n,h=zp,l,nmodPl,n,h+ol,n,h,h∈{0,…,7}
+z2,l,3=(v2ml,0)⊕(v1ml,1)⊕(v0ml,2)
+z2,l,4=z2,l,3⊕(vpadml,3)
+The circled plus denotes bitwise XOR of integer products. For a given layer, position, and N-gram length, the same running XOR is reduced modulo eight different prime bucket sizes. The head index changes the prime and bucket offset; it does not introduce an additional head-specific hash multiplier in this implementation.
+ol,j=k<jPl,k,j=0,…,23;0≤jp,l,n,h<Nl
+EngramLayout selects distinct primes near engram_vocab_size, sixteen million, in N-gram-then-head order. A shared seen-prime set makes all bucket moduli distinct across both layers. Offsets concatenate the 24 disjoint ranges into each layer’s table. The configured row counts match the sums of the generated bucket sizes. Actual token-dependent hash IDs cannot be evaluated without the tokenizer and its compressed token map; none are invented.
+hash_idsall:3×2×24,hash_idsl:3×24
+11.5 Step B — Engram embedding lookup and dequantization
+nheads=8,dE=256,nmax=4,ncolumns=(4-1)8=24
+Each N-gram length has eight independent hash bucket ranges, and each selected row provides 256 features. These are eight hash heads, distinct from the 64 Query heads in main attention. All 24 lookups access different bucket ranges within the same layer-specific table; they are not 24 separately allocated full-size tables.
+E1∈R384006168×256,E14∈R384016682×256
+Bp,j,:=El,jp,l,j,:,B∈R3×24×256
+The storage table is fp8 E4M3, with one fp8 E8M0 scale per 32 features. A row has eight scale entries. ParallelEngramEmbedding fetches both the value row and its scale row, converts them to float32, multiplies each 32-feature group by its scale, then returns bfloat16 features.
+256/32=8,Sl∈RNl×8
+Bp,j,32g+adequant=float32(El,jp,l,j,32g+afp8)float32(Sl,jp,l,j,gfp8)
+g∈{0,…,7},a∈{0,…,31};3×24×256→3×24×8×32→3×24×256
+Bflat=flattencolumns,features(B)∈R3×6144,24·256=6144
+Flattening concatenates the 24 lookup rows for each token. It does not average over token positions or hash heads. On multiple ranks, the table is row-sharded; out-of-range lookups are zero-masked, and all-reduce combines the selected rows. The displayed shapes are global logical shapes.
+11.6 Step C — Project the retrieved features into four Keys and one Value
+WE∈R6144×25600,25600=(4+1)5120,Z=BflatWE
+(3×6144)(6144×25600)→3×25600
+The bias-free wkv projection maps each token’s concatenated Engram features to one Key for each HC copy and a single Value shared by all four copies. In PyTorch storage order its weight is output-by-input, the transpose of the row-vector convention used above.
+WEstored:25600×6144,Z=[Kflat∣V]
+Kflat:3×20480,20480=4·5120,K:3×4×5120,V:3×5120
+The first 20480 output features reshape into the four Key vectors; the final 5120 features form the shared Value. This Engram Key/Value projection is separate from Attention.wkv. There is no RoPE, attention-score matrix across token positions, or softmax over past tokens inside Engram.forward.
+11.7 Step D — Calculate a gate independently for each HC copy
+For each token and each HC copy, the current residual acts as the Query-like vector, and that copy’s Engram Key is the comparison vector. Two learned feature-scale arrays enter only through their element-wise product. The code does not apply a separate Engram Query projection.
+γq,γk∈R4×5120,wc,a=γc,aqγc,ak
+vp,cR=15120a=05119Rp,c,a2,vp,cK=15120a=05119Kp,c,a2,ϵ=10-20
+ρp,c=1vp,cR+ϵvp,cK+ϵ
+dp,c=ρp,c5120a=05119Rp,c,awc,aKp,c,a
+The statistics use the unscaled residual and Key; the learned scale product appears in the numerator, not inside those mean-square terms. Statistics and dot products are float32. Normalization is over 5120 hidden features separately for each copy, unlike HC mixing, which normalizes its flattened four-copy input. The normalized dot product is not an ordinary cosine similarity: the denominator uses RMS rather than Euclidean norms, followed by the width scale.
+R,K:3×4×5120→vR,vK,ρ,d:3×4,5120≈71.5542
+tp,c=copysignmax(|dp,c|,10-6)dp,c,gp,c=σ(tp,c)=11+e-tp,c
+Clamp the absolute dot product from below before taking its square root, restore its original sign using copysign, and apply sigmoid. The lower clamp prevents the square-root magnitude from becoming exactly zero. copysign preserves signed-zero behavior. Each of the three tokens has four scalar gates; the gates are not normalized across copies or across tokens.
+g∈R3×4,0<gp,c<1
+A positive dot product produces a gate above one half and a negative dot product below one half in ideal arithmetic. This is an independent compatibility gate, not causal self-attention. Token-history interaction already occurred in the N-gram lookup; the gate only compares the current token’s residual copies with their retrieved Keys. Real numerical gates cannot be computed without the learned tables, projection weights, and residual values.
+11.8 Step E — Add the gated Value and continue the existing workflow
+Rp,c,aE=Rp,c,a+gp,cVp,a
+g:3×4→3×4×1,V:3×5120→3×1×5120
+(3×4×1)⊙(3×1×5120)→3×4×5120,RE∈R3×4×5120
+The Value is broadcast to every residual copy, with a different scalar gate for each copy. The original residual is added, not replaced. The updated result is cast back to the incoming residual dtype. If a token_mask is supplied, a false token receives zero gate and its residual remains unchanged; text-only input uses no such exclusion.
+Xattn,p,:=RMSNormattnc=03ap,cinRp,c,:E,Xattn∈R3×5120
+At layer 1, the next Attention remains local sliding-window attention. At layer 14, Attention uses ratio-two compressed attention and acts as a new compressed-KV/index producer. The existing incoming pre coefficients are applied to the updated stream, while the block’s new HC coefficients are also generated from that updated stream. Refer to Chapters 2–9 for the subsequent projection, Attention, HC, and MoE equations.
+Engram flow block
+Calculation
+Output shape
+Symbolic IDs and left context
+→ pad unavailable lookback; hash lengths two through four
+3×24 indices per layer
+Indices
+→ fp8 table and scale lookup; dequantize
+3×24×256
+Lookup features
+→ concatenate; bias-free wkv
+3×6144→3×25600
+Projection output
+→ four Keys plus one shared Value
+3×4×5120; 3×5120
+Residual + Keys
+→ RMS statistics, scaled dot, signed sqrt, sigmoid
+3×4 gates
+Residual + gate-weighted Value
+→ gated additive update before Attention
+3×4×5120
+
+11.9 Parameter decomposition, precision, and weight memory
+The following are global quantities for both configured Engram layers, without distributed padding. Logical model weights and quantization scale tensors are listed separately. In this inference implementation scale tensors are registered as nn.Parameter, but their training behavior is not documented; their registration alone does not establish how a training system optimizes them.
+Tensor
+Global shape
+Entries
+Layer 1 lookup weights
+384006168×256
+98305579008
+Layer 14 lookup weights
+384016682×256
+98308270592
+Lookup scales at layer 1
+384006168×8
+3072049344
+Lookup scales at layer 14
+384016682×8
+3072133456
+wkv weights, each layer
+25600×6144
+157286400
+wkv scales, each layer
+800×192
+153600
+q_weight, each layer
+4×5120
+20480
+k_weight, each layer
+4×5120
+20480
+
+NE,1=384006168·256=98305579008,NE,14=384016682·256=98308270592
+Nwkv=6144·25600=157286400,Ngate=2·4·5120=40960 per layer
+Ncore,total=(384006168+384016682)256+2(157286400+40960)=196928504320
+Nscales,total=(384006168+384016682)8+2·153600=6144490000
+Nregistered,total=Ncore,total+Nscales,total=203072994320
+There is no Engram projection bias, no separate Engram Query matrix, no learnable N-gram prime/offset/multiplier, and no additive norm bias in this branch. The two feature-scale arrays are allocated separately even though only their product appears in the forward formula. Their initial ones are allocation defaults, not evidence that trained checkpoints retain all ones.
+wkv scale shape=2560032×614432=800×192
+Storage item
+Actual allocation dtype / conversion
+Payload calculation
+Lookup weight
+torch.float8_e4m3fn (one byte per element)
+Nl·256 bytes
+Lookup scale
+torch.float8_e8m0fnu (one byte per element)
+Nl·8 bytes
+wkv weight
+Configured default Linear dtype: fp8 E4M3
+157286400 bytes per layer
+wkv scale
+fp8 E8M0; one per block
+153600 bytes per layer
+q_weight and k_weight
+torch default floating dtype; runtime-dependent
+40960b bytes per layer
+Retrieved features
+Dequantize in float32, cast to bfloat16
+Activation storage, not parameter count
+Gate computation
+Residual, Keys, Value, scales converted to float32
+Temporary arithmetic, not fp32 weight copies at rest
+
+The configuration sets dtype to fp8, so Engram.wkv uses the fp8 path. Embedding weight/scale dtypes are explicitly fixed by ParallelEngramEmbedding. q_weight and k_weight have no explicit dtype: they inherit torch’s current default. The supplied standalone entry sets that default to bfloat16, whereas ordinary library use may leave it float32. The actual inference launcher and checkpoint are unavailable, so a single unconditional byte count for these two arrays cannot be asserted.
+b=2 for bfloat16,b=4 for float32;40960b∈{81920,163840} bytes per layer
+Lookup payload
+Weights only, bytes
+Scales, bytes
+Combined, GiB
+Layer 1
+98305579008
+3072049344
+101377628352/230≈94.4153
+Layer 14
+98308270592
+3072133456
+101380404048/230≈94.4179
+Both tables
+196613849600
+6144182800
+202758032400/230≈188.8331
+
+MEngram,total=202758032400+2(157286400+153600)+81920b bytes
+A parameter count counts scalar entries, regardless of their dtype. Weight memory counts bytes and must include scale metadata separately. These figures are ideal global tensor payloads, not device-memory requirements: allocator overhead, cached token maps and hashes, activations, model-wide weights, and communication buffers are excluded. They are not a recommendation that the model fits in a single device. FP4 expert storage does not make Engram lookup tables FP4.
+w=world_size,Nl,rank=⌈Nl/w⌉,Nl,allocated global=w⌈Nl/w⌉
+Only lookup rows are partitioned by ParallelEngramEmbedding. Its ceiling division can allocate unused tail rows, so actual aggregate storage may exceed the logical counts slightly. The ordinary Linear wkv and the two gate-scale arrays are replicated per rank in this implementation; they are not ColumnParallelLinear or RowParallelLinear modules. Global payload totals above count each logical tensor once, while multi-rank allocation must account for that replication.
+Validation limits: tokenizer-dependent IDs, lookup values, actual Keys/Values, gates, and memory observed on hardware require missing tokenizer/checkpoint/runtime inputs. Quantized GEMM rounding and kernel behavior require the absent kernel implementation. Hash layout, padding logic, shapes, tensor registrations, declared dtypes, and arithmetic counts above are directly recoverable from config.json, model.py, and engram.py.
+Chapter 12 — Final Hidden Representations, Logits, and Next-Token Prediction
+12.1 Collapse the final residual and normalize
+Purpose: Convert the final four-stream representation into the hidden rows used by the language-model head.
+Inputs: R40∈RT×4×5120 and the last block’s returned pre coefficients a39∈RT×4.
+Learnable parameters: Final RMSNorm scale γfinal∈R5120; collapse uses the last FFN-generated pre-mix.
+Formula: The calculation is
+Hp,:pre=c=03ap,c39Rp,c,:40,Hfinal=RMSNormfinal(Hpre)
+Shape calculation: The dimensions are
+T×4×5120)→(T×5120)→(T×5120
+Explanation: The final RMSNorm is a separate learned module. Each row now contains its learned causal context after 40 backbone blocks and any configured Engram contributions. Token count is unchanged.
+Output: Final hidden representations for all input positions; the default head selects the last row.
+12.2 Vocabulary output projection and logits
+Purpose: Score every vocabulary token as a potential continuation.
+Inputs: Last hidden row h=HT-1,:final∈R1×5120.
+Learnable parameters: Output matrix Whead∈R5120×129280; independent from the input embedding in the supplied implementation.
+Formula: The calculation is
+l=hWhead,lj=a=05119haWhead,a,j
+Shape calculation: The dimensions are
+1×5120)(5120×129280)→(1×129280
+Explanation: A logit is an unnormalized real-valued compatibility score. It is neither a probability nor a token ID. ParallelHead stores weights in transposed vocabulary-by-hidden order, computes float32 logits, and gathers vocabulary shards when distributed. The default full_logits setting is false; a full-position head would return a logit row at every position.
+Output: A full-vocabulary logit row. No logit values for the actual input can be computed without weights.
+Nhead=5120·129280=661913600,lall∈RT×129280 if full logits are requested
+For one batch element the code returns logits with shape one by vocabulary size and output_ids with shape one. The omitted-batch convention in this guide retains an explicit single row to make the matrix multiplication clear. Backbone input embeddings and this head are not tied by the local constructor; the optional draft modules explicitly reuse those modules.
+12.3 Next-token probabilities and the implemented selection rule
+Pj=exp(lj/τg)k=0129279exp(lk/τg),τg>0
+The generation temperature is separate from the router’s gate_temp. ModelArgs defaults generation temperature to one unless overridden. Softmax turns the logits into a normalized distribution used by sample, but Transformer.forward returns the original logits rather than replacing them with probabilities.
+j*=argmaxjljwhen temperature is zero
+τ^g=max(τg,10-5),Ej~Exponential(1),j*=argmaxjPjEjotherwise
+The wrapper uses an exponential-race form equivalent to Gumbel-max sampling for positive temperature. It does not implement top-p or top-k vocabulary truncation in this function. Sampling needs random draws, so a deterministic predicted ID cannot be claimed without the execution settings and a random state. Negative temperatures are not treated as a separate legitimate sampling mode; the code’s floor merely describes its arithmetic.
+next token text=Decode(j*)
+Decode requires the missing tokenizer. Nothing in the supplied data establishes which word follows “it is raining”; even a plausible continuation would be an invented model result. The generated ID becomes the next decoding-step input, with an updated absolute position and existing local/compressed/Engram state.
+12.4 Toy Numerical Example — final logits are not probabilities
+Status: Toy Numerical Example — This final exercise completes the miniature one-block model, not the configured 40-layer backbone. It collapses the four equal toy output copies and applies a final row norm. Its three vocabulary labels are arbitrary symbols vA, vB, vC, not genuine tokenizer IDs or asserted English continuations.
+Hfinal,toy=RMSNorm(R:,0,:next,toy)≈1.34720.43020.30121.38180.88031.1068
+Wheadtoy≈10-1010.5
+ltoy=[0.8803,1.1068]10-1010.5≈[0.8803,1.1068,-0.3269]
+Ptoy=softmax(ltoy)≈0.39170.49120.1171
+Toy vocabulary label
+Logit
+Probability at temperature one
+vA
+0.8803
+0.3917
+vB
+1.1068
+0.4912
+vC
+-0.3269
+0.1171
+
+Greedy selection would choose the toy label vB because it has the largest logit. Temperature-one sampling can select any label with nonzero probability. No sampled label is asserted here. Negative logits remain valid scores, and their probabilities are still nonnegative.
+Figure 12. Final language-model output and next decoding step
+Input / source
+Calculation / connection
+Output / destination
+Layer 39 output + returned pre-mix
+→ collapse four copies; final RMSNorm
+Hfinal:T×5120
+Last-position representation
+→ independent vocabulary head
+l:1×129280 real-valued logits
+Logit row
+→ zero-temperature argmax or positive-temperature sampling
+One integer vocabulary ID
+Selected ID
+→ tokenizer decode; feed next inference step
+Unknown actual next-token text
+
+Color key: Query — blue; KV — green; Hyper-Connection — amber; MoE — purple. Diagram blocks and labels are editable Word table cells.
+12.5 Other configured paths and the scope of this text forward call
+The exact sentence contains no images and this trace passes images=None and token_types=None, so the vision encoder and image-embedding replacement path do not run. Vision configuration does not itself turn plain text into an image input.
+The supplied Transformer.forward also records mean-over-copy hidden vectors before designated target blocks for a draft-decoding auxiliary return. This is distinct from vocabulary logits and does not itself select the next token.
+Ltarget=[37,38,39],Maux=concatl∈Ltarget14c=03Rbefore l,:,c,:∈RT×15360
+The mean is captured from the HC stream before the block; it is not the incoming pre-weighted normalized attention vector. This distinction follows the actual tensor expression in the wrapper rather than its shorthand comment. The primary call returns selected IDs, last-position logits, and this auxiliary tensor.
+Three MTP / DSpark draft modules are configured beyond the backbone, but Transformer.forward does not invoke forward_spec. If a separate controller calls it, a prefill call seeds their local caches; subsequent draft calls use the configured block size, draft expert counts, and speculative heads. A speculative-decoding controller and its acceptance algorithm are not supplied, so this guide does not fabricate that optional execution. It is not needed for the plain next-token path just traced.
+Reference: Compact tensor-shape summary
+Tensor / stage
+Real-model shape
+Interaction
+Final collapsed / normalized hidden
+T×5120
+Per-token norm after contextual layers
+Default returned logits
+1×129280
+Last position only
+Softmax distribution
+1×129280
+Intermediate in positive-temperature sampling
+Selected next-token ID
+1 integer
+Sampling or greedy result
+Auxiliary draft-target tensor
+T×15360
+Concatenate three mean-copy vectors
+
+Appendix A — Technical Review
+A.1 Established corrections and clarifications
+Source / prior-document issue
+Correction / clarification
+Basis
+Query projection parameter count
+Dense matrix is 5120×32768; the two factors contain 48496640 matrix entries. The token-count term is an activation size.
+Matrix dimensions and arithmetic
+Initially separate Query, key, and value matrices
+This attention module has factorized Query and one shared local KV projection.
+Attention.__init__ / forward
+RoPE applied to first 64 values
+It is applied to the last 64; the first 448 remain unchanged.
+Tail slice in apply_rotary_emb calls
+Possible pairing convention ambiguity
+The local implementation uses adjacent pairs.
+Complex reshape in apply_rotary_emb
+One RoPE base for all layers
+Pure local layers use base ten thousand without YaRN; compression-enabled layers use the compressed base and YaRN.
+Attention frequency setup
+Third Query written as S_3 with zero-based tokens
+Use Query position two; source illustrative score values are preserved.
+Index consistency
+Future masking described as window exclusion
+Three tokens all fit in the window; causality excludes future tokens.
+Window index generator
+Compressed vector described as a merge of local KV
+Its own projection and feature-wise gate act on the attention input before RoPE.
+Compressor.forward
+Compressed group available to all queries
+Group zero appears only from Query one onward.
+Indexer compress_lens mask
+Output called lower-dimensional
+Flattened heads have width 32768 before grouped reduction.
+Shape arithmetic
+HC coefficients described as simply learned
+The generators are learned; pre/post/comb coefficients vary with the token stream.
+Block.hc_mixes
+HC pre-mix coefficient timing omitted
+Incoming pre-mix feeds attention; attention pre feeds FFN; FFN pre feeds next block.
+Block.forward
+Router normalization lacks stability term
+Use selected unbiased scores, add the stated tiny stability constant, then apply route_scale.
+Gate.forward
+Shared expert apparently weighted like routed experts
+The shared network has no routing scalar.
+MoE.forward
+Both expert branches ambiguously clamped
+Gate is upper-capped; up is symmetrically clipped.
+Expert.forward
+Unclear expert input
+Both branches take the normalized current MoE input.
+Block.forward / MoE.forward
+Random initialization asserted
+Learnable tensors are allocated; inference files do not demonstrate the training initialization or update process.
+Parameter allocation with empty tensors
+
+A.2 Needs Verification
+The following details are not established by the available material. Their absence does not prevent the recoverable equations from being reconstructed.
+Unresolved item
+Why unresolved
+Treatment in this document
+Exact attention-sink equation
+sparse_attn kernel source absent
+Sink-free example labeled; conventional sink equation conditional
+Exact HC split / transforms / Sinkhorn epsilon placement
+hc_split_sinkhorn kernel source absent
+Wrapper logits derived exactly; generic Sinkhorn explanation explicitly conditional
+Quantized kernel numerical behavior
+kernel.py and GPU execution environment absent
+Logical real-valued equations; casting order and quantization calls stated
+Candidate-masked Top-K edge cases
+Only wrapper logic available
+Flagged in Section 5.6
+Actual token text, learned scores, selected expert IDs
+Tokenizer and checkpoint values not supplied
+Keep IDs; use symbolic calculations
+Training initialization and bias updates
+Inference implementation only
+No invented training dynamics
+Official implementation provenance
+Local files without verified upstream provenance
+Claims confined to supplied local code
+
+A.3 Model-specific assumptions
+The real-model trace uses one text sequence, unknown tokenizer output length T, initial prefill positions, global unsharded dimensions, and the supplied backbone expert counts. The three-word tokenization is an explicit illustrative assumption. All miniature weights and numerical outputs are hypothetical. Local KV is shared across Query heads and is used for both scoring and aggregation. Rotated value outputs are inverse-rotated before projection. Layers 0 and 1 use local attention only; layer 2 produces ratio-two compressed latents and index scores. The ordinary router bias applies to text. Norms and HC generators are distinct learned modules where the local code constructs distinct modules.
+The retained scalar-score softmax and the coherent miniature walkthrough are labeled Toy Numerical Example. Neither is an observed model output. Actual weights, output vectors, selected experts, and mixing coefficients require a checkpoint. The document makes static code-level claims only where the local wrapper is sufficient; it does not claim execution-level verification.
+A.4 Image formula reconstruction ledger
+Source image / paragraph
+Recoverable content
+Reconstruction location
+image1 / 87
+RMSNorm fraction, radical, sum, scale
+2.2; native fraction, radical, and sum
+image2 / 168
+Block rotary matrix with 32 pair blocks
+3.2; expanded matrix and exact block-diagonal form
+image3 / 183
+Scaled Query–KV score
+4.1
+image4 / 185
+Attention symbols, transpose, dimensions, square-root scale
+4.1 editable symbol table
+image5 / 247
+Weighted rectified index-head sum
+5.4
+image6 / 265
+Inverse pair rotation matrix
+6.1
+image7 / 303
+HC post-mixing equation
+7.3
+image8 / 304
+HC output and coefficient definitions
+7.3 editable symbol table
+image9 / 311
+Weighted residual-copy collapse
+7.4
+image10 / 337
+sqrtsoftplus score
+8.2
+image11 / 339
+Router symbol definitions
+8.2 editable symbol table
+image12 / 350
+Selected-score normalization
+8.4
+image13 / 369
+SwiGLU, SiLU, Hadamard product, output shape
+9.3
+
+All 13 images were inspected individually. Ten contain displayed formulas or formula collections; three mainly contain notation tables or definitions. Their recoverable mathematical content is now editable OMML, with descriptive content rebuilt as text or tables. There were no unreadable source-image formulas and no useful non-formula illustrations to preserve. No source equation image is embedded in this document.
+A.5 Typed-formula and derivation coverage
+Source paragraph ranges
+Equation families retained
+Output location
+5–22
+Token IDs, embedding rows and tensor dimensions
+Chapter 1
+29–83
+Query matrices, projections, normalization, reshape, rank and parameter-count correction
+2.1–2.4; A.1
+85–132
+RMSNorm, KV projection, shared shapes, transpose convention
+2.2–2.4
+138–177
+Partial RoPE, positions, angle construction, pair and block matrices
+Chapter 3
+180–230
+Head scores, masking indices, illustrative score lists, softmax and weighted outputs
+Chapter 4
+232–260
+Compression ratios, incomplete groups, indexer score, selected and combined KV, attention outputs
+Chapter 5
+262–289
+Inverse RoPE and both grouped output projections
+Chapter 6
+291–316
+HC post-mix, copy definitions, collapse and MoE preparation
+Chapters 7–8
+318–357
+Expert counts, router projection, score transform, biased selection and weight normalization
+Chapter 8
+359–377
+Expert matrices, gate/up/down, clamps, SwiGLU, routing weight and combined output
+Chapter 9
+379
+Final HC post-mix and next-layer output
+Chapter 10
+
+Incorrect source arithmetic is explicitly recorded rather than silently omitted. For comparison, the source asserted the following two counts; they are not the correct Query weight count:
+Nsource,dense=32768·32768,Nsource,factorized=3·5120+5120·1280
+The incomplete source angle explanation is completed from the supplied implementation. The attention-score table’s dk is consistently renamed dh, since both the Query and shared KV dot-product widths are 512. All projection and tensor-shape derivations remain explicit in the chapters.
+A.6a Revision audit and numerical-example boundaries
+Revision item
+Verified treatment
+Input replacement
+The only input sentence is “it is raining”; original numeric ID example removed
+Tokenizer status
+No matching assets; general T and symbolic IDs; three-word segmentation is illustrative
+Checkpoint status
+No learned checkpoint; no genuine activation or prediction claimed
+Numerical arithmetic
+One explicit miniature block plus a separately identified compression side branch; NumPy float64 calculations
+Full text-model path
+All backbone layer ranges, Engram at 1 and 14, final collapse, final norm, head, sampling, auxiliary return
+Native mathematical editability
+Existing and new formulas, matrices, numeric results, and shape diagrams use OMML
+Visual editability
+All flow diagrams are native Word tables with consistent component colors
+Preservation
+Previous organized DOCX and source DOCX are separate unchanged files
+
+The prior document’s fixed sequence-length dimensions were replaced by T. Complete compressed groups now use nC. Three-position access tables are retained only as explicitly conditional illustrations. No tokenizer setting is implied by the exact literal text.
+The earlier chapter ending at one block is extended to the full enabled text path. The final output weight is independent of the embedding table in the local constructor. Temperature sampling is distinguished from greedy selection. The auxiliary draft-target vector is identified as a mean-copy pre-block capture, rather than the normalized attention input.
+Toy matrices and coefficients are hypothetical and substantially smaller than the real architecture. The miniature uses one block, two hidden features, one Query head, one Query rank, one output group, four routed toy experts with two selected, and three arbitrary output vocabulary symbols. It retains four residual copies. The real model’s six-of-384 routing and full dimensions remain in the main derivations.
+No random values are represented as checkpoint outputs. Numerical values shown are deterministic calculations from the disclosed toy matrices; display rounding can cause sums of printed values to differ slightly from calculations made at full precision. The retained source scalar-score exercise is an additional separate toy exercise.
+T unknown,Ttoy=3,nC=⌊T/2⌋,p∈{0,…,T-1}
+A.6 Notation glossary
+Symbol
+Meaning
+T,V,D
+Sequence length, vocabulary size, hidden width
+p,j,h,i,c,k
+Query position, key/group position, head, feature-pair or expert index, output residual copy, input residual copy; local context distinguishes reuse
+H,dh,dR
+Query-head count, head width, rotary-tail width
+E,X,R
+Embedding weights, sublayer input, parallel residual stream
+AQ,BQ,Qr,Q
+Query projection factors, normalized bottleneck, headed Query
+WKV,L,L'
+Local shared-KV projection, latent, rotated latent
+Rp,R~p
+Rotary matrix for tail and full partially rotated head
+Sh,sp,h,j,αp,h,j
+Score matrix, scalar score, attention weight
+Cj,πj,t,a
+Compressed latent and feature-wise pooling coefficient
+qI,kI,wp,h
+Indexer Query, key, and index-head weight
+O,Oinv,Ofinal
+Headed output, inverse-rotated output, projected hidden update
+a,b,Amix
+HC pre, post, and residual transport coefficients
+Z,s,r,β
+Router logits, unbiased scores, biased selection scores, correction bias
+Ep,wp,i
+Selected expert set and final routed weight
+Gi,Ui,Hi
+Expert gate, up, and SwiGLU intermediate
+γ,ϵ,τ
+RMSNorm learned scale, stability term, routing temperature
+⊙,(·)T,R,Z
+Element-wise product, transpose, real-valued space, integer-valued space
+
+A.7 Validation sources and limits
+Primary local evidence: params_decomposition.docx; DeepSeek-V4.1-Flash/config.json; DeepSeek-V4.1-Flash/model.py. Local implementation anchors: RMSNorm; precompute_freqs_cis; apply_rotary_emb; get_window_topk_idxs; Compressor; Indexer; Attention; Gate; Expert; MoE; Block; Transformer. Supporting conceptual sources: RoFormer (https://arxiv.org/abs/2104.09864) and mHC (https://arxiv.org/abs/2512.24880). The local code takes precedence over a generic architectural description.
+Static verification includes projection compatibility, head/group divisibility, parameter arithmetic, compression availability, expert-normalization rules, clipping direction, HC tensor axes, and formula-image coverage. Native equations are stored as Office Math elements, not as rendered pictures. The accompanying internal audit records source-paragraph and image mappings and checks the final DOCX package.

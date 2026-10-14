@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "fullLogicalParameters": 763205315794,
+  "textAndEngramParameters": 748494684784,
+  "currentToken": {
+    "tokensProcessed": 1,
+    "priorCachedTokens": 1024,
+    "position": 1025,
+    "modeledOperations": 35584521265
+  },
+  "sourceLedgerReconciled": true,
+  "encoderDecoderTotalsReconciled": true,
+  "finiteDifferenceMaxErrors": {
+    "low_rank_query.dX": 2.4770924200723243e-10,
+    "low_rank_query.dW_QA": 4.666192987556883e-10,
+    "low_rank_query.dW_QB": 2.6935853547627175e-10,
+    "RMSNorm.dGamma": 1.5701662192668664e-10,
+    "SwiGLU.gate": 4.7624307846259135e-09,
+    "SwiGLU.up": 5.255783787350143e-09,
+    "shared_KV_attention.dQ": 9.544113069304139e-11,
+    "shared_KV_attention.dKV": 2.315086039539338e-10,
+    "shared_KV_attention.dSink": 6.967711130290155e-11,
+    "router_selected_scores": 6.135902896886591e-11,
+    "HC.residual": 9.007287138373954e-10,
+    "HC.sublayer": 3.2375524483541085e-10,
+    "HC.post_coeff": 4.2560199808860943e-10,
+    "HC.comb_coeff": 4.846327783525339e-10
+  },
+  "limit": "Tiny real-valued mathematical tests only. No checkpoint, GPU kernel or official training/backward validation."
+}

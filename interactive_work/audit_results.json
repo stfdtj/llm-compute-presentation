@@ -1,0 +1,2553 @@
+{
+  "summary": {
+    "Verified": 63,
+    "Estimated": 82,
+    "Unverified": 44,
+    "Mismatch": 0,
+    "historicalMismatchesCorrected": 38
+  },
+  "changes": [
+    {
+      "module": "indexer",
+      "mode": "forward",
+      "item": "索引 Key 和 Head 汇合",
+      "previous": "只展示 Query×Key 点积",
+      "corrected": "补齐 W_IK / γ、新 latent 的条件、ReLU 与加权求和",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "源码 Indexer.forward 明确执行这些阶段；选址与主 Attention 分别统计。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 527,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L527",
+          "symbol": "Indexer.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 514,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L514",
+          "symbol": "Indexer.wq_b"
+        }
+      ]
+    },
+    {
+      "module": "compressor",
+      "mode": "forward",
+      "item": "归一化权重的使用阶段",
+      "previous": "γ 只列数量，流程未显示",
+      "corrected": "补齐完整分组产生后才执行的归一化",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "半组 Decode 不执行该阶段；不能误认 γ 不学习或每步都执行。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 458,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L458",
+          "symbol": "Compressor.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 446,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L446",
+          "symbol": "Compressor.wkv"
+        }
+      ]
+    },
+    {
+      "module": "hc",
+      "mode": "forward",
+      "item": "base / scale 的明确用途",
+      "previous": "只在文字中列出 base / scale",
+      "corrected": "补齐 pre / post / comb 的参数变换",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "核对 hc_split_sinkhorn 的缩放、偏置、epsilon 与先行后列次序。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 950,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L950",
+          "symbol": "Block.hc_mixes"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 964,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L964",
+          "symbol": "Block.hc_post"
+        },
+        {
+          "file": "inference/kernel.py",
+          "line": 407,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L407",
+          "symbol": "hc_split_sinkhorn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 943,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L943",
+          "symbol": "Block.hc_attn_fn"
+        }
+      ]
+    },
+    {
+      "module": "qnorm",
+      "mode": "forward",
+      "item": "RMSNorm 4d+2 的解释",
+      "previous": "平方、求和、两次逐项缩放共约 4×1280 次乘加；求均值的除法和开平方倒数各简化计 1 次。",
+      "corrected": "平方 d 次、求和 d−1 次、两次逐项缩放 2d 次；均值除法、加 ε、rsqrt 共 3 次，合计 4d+2。特殊函数简化记 1 次。",
+      "status": "Estimated",
+      "previousStatus": "Mismatch",
+      "reason": "所有五类 RMSNorm 面板保留正确数值；说明独立列出 d−1 求和、均值除法、epsilon 与 rsqrt，避免口头漏数。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 288,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L288",
+          "symbol": "RMSNorm.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 642,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L642",
+          "symbol": "Attention.q_norm"
+        }
+      ]
+    },
+    {
+      "module": "sliding",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 640,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L640",
+          "symbol": "Attention.attn_sink"
+        }
+      ]
+    },
+    {
+      "module": "sparse",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 640,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L640",
+          "symbol": "Attention.attn_sink"
+        }
+      ]
+    },
+    {
+      "module": "multi",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 640,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L640",
+          "symbol": "Attention.attn_sink"
+        }
+      ]
+    },
+    {
+      "module": "encoderattn",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "decoderattn",
+      "mode": "forward",
+      "item": "明确 sink 的归一化计算",
+      "previous": "P 未写出归一化关系",
+      "corrected": "分母包含 exp(a_sink)，不附加 Value 行",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "显式绑定可学习 sink，不误标为零参数。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "engram",
+      "mode": "forward",
+      "item": "Engram 门控权重",
+      "previous": "仅文字概括门值",
+      "corrected": "补齐 q_weight / k_weight 的加权归一化点积与 signed sqrt",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "实际 Engram.forward 使用这两组学习权重；不是普通 RMSNorm γ。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 350,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L350",
+          "symbol": "Engram.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 309,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L309",
+          "symbol": "ParallelEngramEmbedding.weight"
+        }
+      ]
+    },
+    {
+      "module": "engram1",
+      "mode": "forward",
+      "item": "Engram 门控权重",
+      "previous": "仅文字概括门值",
+      "corrected": "补齐 q_weight / k_weight 的加权归一化点积与 signed sqrt",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "实际 Engram.forward 使用这两组学习权重；不是普通 RMSNorm γ。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 350,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L350",
+          "symbol": "Engram.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 309,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L309",
+          "symbol": "ParallelEngramEmbedding.weight"
+        }
+      ]
+    },
+    {
+      "module": "engram14",
+      "mode": "forward",
+      "item": "Engram 门控权重",
+      "previous": "仅文字概括门值",
+      "corrected": "补齐 q_weight / k_weight 的加权归一化点积与 signed sqrt",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "实际 Engram.forward 使用这两组学习权重；不是普通 RMSNorm γ。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 350,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L350",
+          "symbol": "Engram.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 309,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L309",
+          "symbol": "ParallelEngramEmbedding.weight"
+        }
+      ]
+    },
+    {
+      "module": "enggate",
+      "mode": "forward",
+      "item": "Engram 门控权重",
+      "previous": "仅文字概括门值",
+      "corrected": "补齐 q_weight / k_weight 的加权归一化点积与 signed sqrt",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "实际 Engram.forward 使用这两组学习权重；不是普通 RMSNorm γ。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 350,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L350",
+          "symbol": "Engram.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 345,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L345",
+          "symbol": "Engram.wkv"
+        }
+      ]
+    },
+    {
+      "module": "hidden",
+      "mode": "forward",
+      "item": "状态与投影的区别",
+      "previous": "状态面板直接展示 KV 投影",
+      "corrected": "状态合并、归一化；KV 分支独立统计",
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "防止将 512 维 KV 当成 Encoder 隐藏状态。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 935,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L935",
+          "symbol": "Block.attn_norm"
+        }
+      ]
+    },
+    {
+      "module": "query",
+      "mode": "parameter",
+      "item": "Query 含 RMSNorm",
+      "previous": [
+        [
+          "本模块存储",
+          "48,496,640 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "本模块存储",
+          "48,497,920 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "模块包含的 1,280 个 γ 原本只在子面板计数，主模块总量漏列；正确每层 48,497,920。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "hc",
+      "mode": "forward",
+      "item": "comb 方向与 pre 使用次序",
+      "previous": [
+        {
+          "title": "① 为这一个 token 生成混合系数",
+          "formulas": [
+            "L=R_{flat}\\times W_{HC}"
+          ],
+          "dimensions": [
+            "[1,20480]\\times[20480,24]=[1,24]"
+          ],
+          "symbols": [
+            [
+              "R_flat",
+              "当前 token 的 4 路向量拼成一行，4×5120=20480"
+            ],
+            [
+              "W_HC",
+              "学习得到的 20480×24 权重"
+            ],
+            [
+              "L",
+              "24 个数字，后续调整成 4 个输入比例、4 个输出比例与 16 个路间混合比例"
+            ]
+          ],
+          "note": "还会稳定这些数字的大小，并使用 base、scale 调整；16 个路间比例反复按行、列调整。"
+        },
+        {
+          "title": "② 合成一行，送入 Attention 或 FFN",
+          "formulas": [
+            "X=a_1R_1+a_2R_2+a_3R_3+a_4R_4"
+          ],
+          "dimensions": [
+            "4\\text{ vectors }[1,5120]\\longrightarrow[1,5120]"
+          ],
+          "symbols": [
+            [
+              "R₁…R₄",
+              "同一个 token 的四路向量"
+            ],
+            [
+              "a₁…a₄",
+              "四个输入混合比例"
+            ],
+            [
+              "X",
+              "送入当前子模块的一行向量"
+            ]
+          ],
+          "note": ""
+        },
+        {
+          "title": "③ 将子模块结果送回四路",
+          "formulas": [
+            "Y_j=b_jU+\\sum_{i=1}^{4}C_{ji}R_i"
+          ],
+          "dimensions": [
+            "[1,5120]+[1,4,5120]\\longrightarrow[1,4,5120]"
+          ],
+          "symbols": [
+            [
+              "U",
+              "Attention 或 FFN 刚算出的结果"
+            ],
+            [
+              "bⱼ",
+              "这一结果送给第 j 路的比例"
+            ],
+            [
+              "Cⱼᵢ",
+              "第 i 路旧状态送给第 j 路的比例"
+            ],
+            [
+              "Σᵢ",
+              "把四路的贡献相加；Yⱼ 是第 j 路的新状态"
+            ]
+          ],
+          "note": ""
+        }
+      ],
+      "corrected": [
+        {
+          "title": "① 为这一个 token 生成混合系数",
+          "formulas": [
+            "r=\\operatorname{rsqrt}(\\operatorname{mean}(R_{flat}^2)+\\epsilon)",
+            "L=(R_{flat}\\times W_{HC})r"
+          ],
+          "dimensions": [
+            "[1,20480]\\times[20480,24]=[1,24]"
+          ],
+          "symbols": [
+            [
+              "R_flat",
+              "当前 token 的 4 路向量拼成一行，4×5120=20480"
+            ],
+            [
+              "W_HC",
+              "学习得到的 20480×24 权重"
+            ],
+            [
+              "r、ε",
+              "该拼接向量算出的缩放比例 / 稳定小数，没有额外 γ"
+            ],
+            [
+              "L",
+              "24 个分数，经过 base、scale 及 Sinkhorn 调整后产生 4+4+16 个比例"
+            ]
+          ],
+          "note": "本次生成的 pre 比例交给下一子模块；当前子模块的输入合并使用前一子模块传来的 pre_mix。",
+          "parameterRefs": [
+            "hc_fn-0"
+          ],
+          "tensorKind": "activation"
+        },
+        {
+          "title": "base / scale 将分数转为混合比例",
+          "formulas": [
+            "a_i^{next}=\\sigma(scale_0 L_i+base_i)+\\epsilon",
+            "b_i=2\\sigma(scale_1 L_{4+i}+base_{4+i})",
+            "C_0=\\operatorname{Softmax}_{row}(scale_2 L_{8:24}+base_{8:24})+\\epsilon",
+            "C=\\operatorname{AltNorm}_{19}(\\operatorname{ColNorm}_{\\epsilon}(C_0))"
+          ],
+          "dimensions": [
+            "L:[1,24]\\longrightarrow a^{next},b:[1,4],C:[1,4,4]"
+          ],
+          "symbols": [
+            [
+              "base / scale",
+              "24 个学习偏置 / 3 个学习缩放系数"
+            ],
+            [
+              "σ / ε",
+              "sigmoid / 10⁻⁶ 稳定数"
+            ],
+            [
+              "a_next",
+              "本次生成、交给下一子模块的 pre 比例"
+            ],
+            [
+              "b / C",
+              "本次使用的 post / comb；与参数不同，是运行时比例"
+            ],
+            [
+              "Softmax_row / Sinkhorn₂₀",
+              "先逐行 Softmax，加 ε，再交替列/行归一化；分母也加 ε"
+            ],
+            [
+              "i",
+              "索引从 0 到 3；L 的 0…3 / 4…7 / 8…23 三段分别供 pre / post / comb"
+            ],
+            [
+              "ColNorm_ε / AltNorm₁₉",
+              "先除以列和加 ε；再重复 19 轮行和 / 列和归一化，分母各加 ε"
+            ]
+          ],
+          "note": "比例都是当前 token 的中间数据；不是新增的 24 个可学习权重。",
+          "parameterRefs": [
+            "hc_base-1",
+            "hc_scale-2"
+          ],
+          "tensorKind": "activation"
+        },
+        {
+          "title": "② 合成一行，送入 Attention 或 FFN",
+          "formulas": [
+            "X=a_1R_1+a_2R_2+a_3R_3+a_4R_4"
+          ],
+          "dimensions": [
+            "4\\text{ vectors }[1,5120]\\longrightarrow[1,5120]"
+          ],
+          "symbols": [
+            [
+              "R₁…R₄",
+              "同一个 token 的四路向量"
+            ],
+            [
+              "a₁…a₄",
+              "前一子模块产生的输入比例；模型开头使用固定 one-hot"
+            ],
+            [
+              "X",
+              "送入当前子模块的一行向量"
+            ]
+          ],
+          "note": "",
+          "parameterRefs": [],
+          "tensorKind": "activation"
+        },
+        {
+          "title": "③ 将子模块结果送回四路",
+          "formulas": [
+            "Y_j=b_jU+\\sum_{i=1}^{4}R_i C_{ij}"
+          ],
+          "dimensions": [
+            "Y:[1,4,5120],\\quad U:[1,5120]"
+          ],
+          "symbols": [
+            [
+              "U",
+              "Attention 或 FFN 刚算出的结果"
+            ],
+            [
+              "bⱼ",
+              "这一结果送给第 j 路的比例"
+            ],
+            [
+              "Cᵢⱼ",
+              "第 i 路旧状态送给第 j 路；行是输入路、列是输出路"
+            ],
+            [
+              "Σᵢ",
+              "把四路的贡献相加；Yⱼ 是第 j 路的新状态"
+            ]
+          ],
+          "note": "",
+          "parameterRefs": [],
+          "tensorKind": "activation"
+        }
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "hc_post 对 comb 的输入路求和，正确 Σ_i R_i C_ij；本次 pre 交给下一子模块。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 950,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L950",
+          "symbol": "Block.hc_mixes"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 964,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L964",
+          "symbol": "Block.hc_post"
+        },
+        {
+          "file": "inference/kernel.py",
+          "line": 407,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L407",
+          "symbol": "hc_split_sinkhorn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 943,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L943",
+          "symbol": "Block.hc_attn_fn"
+        }
+      ]
+    },
+    {
+      "module": "hc",
+      "mode": "backward",
+      "item": "路间梯度与归一化路径",
+      "previous": [
+        {
+          "title": "① 梯度分回子模块和四路旧状态",
+          "formulas": [
+            "dU=\\sum_{j=1}^{4}b_jdY_j",
+            "dR_i=\\sum_{j=1}^{4}C_{ji}dY_j"
+          ],
+          "dimensions": [
+            "dY:[1,4,5120]\\longrightarrow dU:[1,5120]",
+            "dR:[1,4,5120]"
+          ],
+          "symbols": [
+            [
+              "dYⱼ",
+              "第 j 路新状态传来的梯度"
+            ],
+            [
+              "bⱼ / Cⱼᵢ",
+              "前向的子模块比例 / 路间比例"
+            ],
+            [
+              "dU / dRᵢ",
+              "子模块输出的梯度 / 第 i 路旧状态的梯度"
+            ],
+            [
+              "Σⱼ",
+              "合并四路的贡献"
+            ]
+          ],
+          "note": ""
+        },
+        {
+          "title": "② 混合权重也需要梯度",
+          "formulas": [
+            "dW_{HC}=R_{flat}^{\\mathsf T}dL",
+            "dR_{flat}=dLW_{HC}^{\\mathsf T}"
+          ],
+          "dimensions": [
+            "[20480,1]\\times[1,24]=[20480,24]",
+            "[1,24]\\times[24,20480]=[1,20480]"
+          ],
+          "symbols": [
+            [
+              "dL",
+              "经过比例变换和数值调整后，回到 L 的梯度"
+            ],
+            [
+              "R_flat / W_HC",
+              "前向的四路拼接输入 / 混合矩阵"
+            ],
+            [
+              "dW_HC / dR_flat",
+              "混合矩阵的梯度 / 额外传回四路的梯度"
+            ],
+            [
+              "ᵀ",
+              "转置"
+            ]
+          ],
+          "note": ""
+        }
+      ],
+      "corrected": [
+        {
+          "title": "① 梯度分回子模块和四路旧状态",
+          "formulas": [
+            "dU=\\sum_{j=1}^{4}b_jdY_j",
+            "dR_i=\\sum_{j=1}^{4}C_{ij}dY_j"
+          ],
+          "dimensions": [
+            "dY:[1,4,5120]\\longrightarrow dU:[1,5120]",
+            "dR:[1,4,5120]"
+          ],
+          "symbols": [
+            [
+              "dYⱼ",
+              "第 j 路新状态传来的梯度"
+            ],
+            [
+              "bⱼ / Cᵢⱼ",
+              "前向的子模块比例 / 输入路 i 到输出路 j 的比例"
+            ],
+            [
+              "dU / dRᵢ",
+              "子模块输出的梯度 / 第 i 路旧状态的直接梯度"
+            ],
+            [
+              "Σⱼ",
+              "合并四路的贡献；生成比例的间接路径仍要另算"
+            ]
+          ],
+          "note": "",
+          "parameterRefs": [],
+          "tensorKind": "gradient"
+        },
+        {
+          "title": "② 混合权重也需要梯度",
+          "formulas": [
+            "dW_{HC}=R_{flat}^{\\mathsf T}dL",
+            "dR_{flat}=dLW_{HC}^{\\mathsf T}"
+          ],
+          "dimensions": [
+            "[20480,1]\\times[1,24]=[20480,24]",
+            "[1,24]\\times[24,20480]=[1,20480]"
+          ],
+          "symbols": [
+            [
+              "dL",
+              "经过比例变换、反复归一化和 r 缩放后，回到线性投影的梯度"
+            ],
+            [
+              "R_flat / W_HC",
+              "前向的四路拼接输入 / 混合矩阵"
+            ],
+            [
+              "dW_HC / dR_flat",
+              "混合矩阵的梯度 / 投影路径传回四路的梯度，r 的路径需另加"
+            ],
+            [
+              "ᵀ",
+              "转置"
+            ]
+          ],
+          "note": "",
+          "parameterRefs": [
+            "hc_fn-0"
+          ],
+          "tensorKind": "gradient"
+        }
+      ],
+      "status": "Estimated",
+      "previousStatus": "Mismatch",
+      "reason": "改为 dR_i=Σ_j C_ij dY_j；投影小计不代表全部 HC 梯度。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 950,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L950",
+          "symbol": "Block.hc_mixes"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 964,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L964",
+          "symbol": "Block.hc_post"
+        },
+        {
+          "file": "inference/kernel.py",
+          "line": 407,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L407",
+          "symbol": "hc_split_sinkhorn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 943,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L943",
+          "symbol": "Block.hc_attn_fn"
+        }
+      ]
+    },
+    {
+      "module": "moe",
+      "mode": "parameter",
+      "item": "一层 MoE 边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,624,934,400 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "一层 MoE · 全部逻辑权重",
+          "13,626,901,248 个参数"
+        ],
+        [
+          "当前 token · 激活权重",
+          "249,692,544 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "旧主结果只计专家；新增明确含 Router 的 Total / Activated，专家小计仍可在表中查看。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 891,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L891",
+          "symbol": "MoE.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 807,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L807",
+          "symbol": "Gate.weight"
+        }
+      ]
+    },
+    {
+      "module": "encoder",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 0 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "decoder",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 20 层实际拥有的权重",
+          "13,762,606,326 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer0",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 0 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer1",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 1 层实际拥有的权重",
+          "112,217,418,358 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer2",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 2 层实际拥有的权重",
+          "13,765,227,766 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer13",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 13 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer14",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 14 层实际拥有的权重",
+          "112,230,825,718 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer19",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 19 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer20",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 20 层实际拥有的权重",
+          "13,762,606,326 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer21",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 21 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer22",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 22 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer33",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 33 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer34",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 34 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "layer39",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 39 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "encoderblock",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 0 层实际拥有的权重",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "decoderblock",
+      "mode": "parameter",
+      "item": "层级统计边界",
+      "previous": [
+        [
+          "本模块存储",
+          "13,754,511,990 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "第 20 层实际拥有的权重",
+          "13,762,606,326 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "代表层按实际 owner 枚举，不能把普通层固定模板用于 source / Engram 层。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 970,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L970",
+          "symbol": "Block.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "encoderattn",
+      "mode": "parameter",
+      "item": "完整 Attention 与读取子操作",
+      "previous": [
+        [
+          "比较与汇总",
+          "不新增投影权重"
+        ],
+        [
+          "每层的 64 个 sink 数字",
+          "64 个可学习参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "代表层完整 Attention 权重",
+          "126,617,408 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "旧标题指整个 Attention，统计却只显示 kernel 的 sink；现在明确完整参数、读取 FLOPs 的不同边界。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "decoderattn",
+      "mode": "parameter",
+      "item": "完整 Attention 与读取子操作",
+      "previous": [
+        [
+          "比较与汇总",
+          "不新增投影权重"
+        ],
+        [
+          "每层的 64 个 sink 数字",
+          "64 个可学习参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "代表层完整 Attention 权重",
+          "134,711,744 个参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "旧标题指整个 Attention，统计却只显示 kernel 的 sink；现在明确完整参数、读取 FLOPs 的不同边界。",
+      "evidence": [
+        {
+          "file": "inference/kernel.py",
+          "line": 311,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/kernel.py#L311",
+          "symbol": "sparse_attn_kernel"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 766,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L766",
+          "symbol": "Attention.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "overview",
+      "mode": "parameter",
+      "item": "全模型范围",
+      "previous": [
+        [
+          "完整主模型存储",
+          "748,494,684,784 个参数"
+        ]
+      ],
+      "corrected": [
+        [
+          "Text Backbone",
+          "551,566,180,464 个逻辑参数"
+        ],
+        [
+          "Engram",
+          "196,928,504,320 个逻辑参数"
+        ],
+        [
+          "Draft",
+          "14,225,362,530 个逻辑参数"
+        ],
+        [
+          "Vision",
+          "485,268,480 个逻辑参数"
+        ],
+        [
+          "Text + Engram",
+          "748,494,684,784 个逻辑参数"
+        ],
+        [
+          "All logical weights",
+          "763,205,315,794 个逻辑参数"
+        ]
+      ],
+      "status": "Verified",
+      "previousStatus": "Mismatch",
+      "reason": "原 748,494,684,784 只为 Text + Engram；补齐 Draft、Vision、完整逻辑权重范围。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 1245,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1245",
+          "symbol": "Transformer.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    },
+    {
+      "module": "overview",
+      "mode": "forward",
+      "item": "当前一步的统计范围",
+      "previous": [
+        [
+          "此处已有 1024 个历史 token 时，全模型当前一步",
+          "约 35,584,521,265 次操作"
+        ]
+      ],
+      "corrected": [
+        [
+          "Text + Engram · 当前一步简化估计",
+          "35,584,521,265 次操作"
+        ]
+      ],
+      "status": "Estimated",
+      "previousStatus": "Mismatch",
+      "reason": "独立按 kernel 逐项核对，原操作总数一致；修正“全模型”边界：这里只是 Text + Engram，未执行 Vision / Draft。64 位块归约为 63 次加法，分母更新另有乘、加两次。",
+      "evidence": [
+        {
+          "file": "inference/model.py",
+          "line": 1245,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L1245",
+          "symbol": "Transformer.forward"
+        },
+        {
+          "file": "inference/model.py",
+          "line": 641,
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/5254448103b6254fc646dacbca1cbbf20e9216c1/inference/model.py#L641",
+          "symbol": "Attention.wq_a"
+        }
+      ]
+    }
+  ],
+  "records": [
+    {
+      "module": "kv",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "kv",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "kv",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "qa",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "qa",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "qa",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "qb",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "qb",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "qb",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "head",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "head",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "head",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "qnorm",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "qnorm",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "qnorm",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "kvnorm",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "kvnorm",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "kvnorm",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "anorm",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "anorm",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "anorm",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "fnorm",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "fnorm",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "fnorm",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "finalnorm",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "finalnorm",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "finalnorm",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "query",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "query",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "query",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "output",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "output",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "output",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "rope",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "rope",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "rope",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "sliding",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "sliding",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "sliding",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "sparse",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "sparse",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "sparse",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "multi",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "multi",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "multi",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "compressor",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "compressor",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "compressor",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "global",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "global",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "global",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "indexer",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "indexer",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "indexer",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "hc",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "hc",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "hc",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "router",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "router",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "router",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "weights",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "weights",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "weights",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "selection",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "selection",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "selection",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "expert",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "expert",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "expert",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "shared",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "shared",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "shared",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "swiglu",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "swiglu",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "swiglu",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "combine",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "combine",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "combine",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "moe",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "moe",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "moe",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "input",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "input",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "input",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "tokenizer",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "tokenizer",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "tokenizer",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "ids",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "ids",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "ids",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "embedding",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "embedding",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "embedding",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "ngram",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "ngram",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "ngram",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "hash",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "hash",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "hash",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "engembed",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "engembed",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "engembed",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "enggate",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "enggate",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "enggate",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "injection",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "injection",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "injection",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "engram1",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "engram1",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "engram1",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "engram14",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "engram14",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "engram14",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "engram",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "engram",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "engram",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "streams",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "streams",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "streams",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "hidden",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "hidden",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "hidden",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "localstates",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "localstates",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "localstates",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "logits",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "logits",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "logits",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "prediction",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "prediction",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "prediction",
+      "mode": "backward",
+      "status": "Estimated"
+    },
+    {
+      "module": "encoder",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "encoder",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "encoder",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "decoder",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "decoder",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "decoder",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer0",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer0",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer0",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer1",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer1",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer1",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer2",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer2",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer2",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer13",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer13",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer13",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer14",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer14",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer14",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer19",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer19",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer19",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer20",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer20",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer20",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer21",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer21",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer21",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer22",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer22",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer22",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer33",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer33",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer33",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer34",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer34",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer34",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "layer39",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "layer39",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "layer39",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "encoderblock",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "encoderblock",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "encoderblock",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "decoderblock",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "decoderblock",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "decoderblock",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "encoderattn",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "encoderattn",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "encoderattn",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "decoderattn",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "decoderattn",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "decoderattn",
+      "mode": "backward",
+      "status": "Unverified"
+    },
+    {
+      "module": "overview",
+      "mode": "parameter",
+      "status": "Verified"
+    },
+    {
+      "module": "overview",
+      "mode": "forward",
+      "status": "Estimated"
+    },
+    {
+      "module": "overview",
+      "mode": "backward",
+      "status": "Unverified"
+    }
+  ],
+  "totals": {
+    "Text Backbone": 551566180464,
+    "Engram": 196928504320,
+    "Draft": 14225362530,
+    "Vision": 485268480,
+    "Text + Engram": 748494684784,
+    "All logical weights": 763205315794
+  },
+  "revision": "5254448103b6254fc646dacbca1cbbf20e9216c1",
+  "forwardModeled": 35584521265
+}

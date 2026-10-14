@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "architecture": "请填写模型架构",
+  "source": "请填写已核验来源或本地审计文件",
+  "verified": false,
+  "precision": "BF16",
+  "forwardFlopsPerToken": null,
+  "backwardFlopsPerToken": null,
+  "tokensPerSecond": null,
+  "tokensPerStep": null,
+  "stepSeconds": null,
+  "deviceCount": null,
+  "peakFlopsPerSecondPerDevice": null,
+  "recomputationExecutionFlopsPerToken": null
+}

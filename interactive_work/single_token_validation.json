@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "moduleModes": 189,
+  "numericEquationsVerified": 83,
+  "matrixProductsVerified": 160,
+  "compressorExamples": [
+    3,
+    4,
+    1
+  ],
+  "unchangedSvgElements": 323,
+  "preserved": [
+    "shapes",
+    "positions",
+    "arrows",
+    "colors",
+    "groups",
+    "viewBox"
+  ]
+}

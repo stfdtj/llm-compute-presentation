@@ -1,0 +1,117 @@
+{
+  "passed": true,
+  "revision": "5254448103b6254fc646dacbca1cbbf20e9216c1",
+  "tests": [
+    {
+      "test": "Pinned config / source constructors",
+      "status": "PASS",
+      "detail": {
+        "formalConfigFields": 32,
+        "constructorFamilies": 57,
+        "reportPages": 51,
+        "reportSections": [
+          "2.2",
+          "2.3",
+          "2.5",
+          "4.2.1"
+        ],
+        "allSnapshotHashes": true
+      }
+    },
+    {
+      "test": "Linear shapes / forward / backward math",
+      "status": "PASS",
+      "detail": {
+        "linearFamilies": 27,
+        "singleTokenOuterProduct": "KN exact; 2KN approximation"
+      }
+    },
+    {
+      "test": "Page formulas / dimensions / bindings",
+      "status": "PASS",
+      "detail": {
+        "arithmeticEquations": 83,
+        "matrixProducts": 160,
+        "moduleModes": 189
+      }
+    },
+    {
+      "test": "Logical parameter counts",
+      "status": "PASS",
+      "detail": {
+        "Text Backbone": 551566180464,
+        "Engram": 196928504320,
+        "Draft": 14225362530,
+        "Vision": 485268480,
+        "Text + Engram": 748494684784,
+        "All logical weights": 763205315794
+      }
+    },
+    {
+      "test": "Layer and group totals",
+      "status": "PASS",
+      "detail": {
+        "layers": 40,
+        "modeledDecode": 35584521265,
+        "scope": "text + Engram; not full multimodal execution"
+      }
+    },
+    {
+      "test": "Shared weights counted once",
+      "status": "PASS",
+      "detail": {
+        "uniquePaths": 1393,
+        "kvProjectionOwners": 4,
+        "indexQueryOwners": 8,
+        "indexKeyOwners": 4,
+        "mainEmbeddingAndHead": "counted once each"
+      }
+    },
+    {
+      "test": "MoE Total / Activated",
+      "status": "PASS",
+      "detail": {
+        "total": 13626901248,
+        "activated": 249692544,
+        "expertsTotal": 13624934400,
+        "expertsActivated": 247726080,
+        "router": 1966848,
+        "fortyTotal": 545076049920,
+        "fortyActivated": 9987701760
+      }
+    },
+    {
+      "test": "Nonlinear and operation subtotals",
+      "status": "PASS",
+      "detail": {
+        "normShapes": 5,
+        "attentionWidths": [
+          128,
+          640
+        ],
+        "mainOperationResults": 16,
+        "specialFunctionPolicy": "one operation; memory, comparison and bit operations excluded"
+      }
+    },
+    {
+      "test": "Page versus calculation source",
+      "status": "PASS",
+      "detail": {
+        "modules": 63,
+        "standalone": true,
+        "dataAndDisplayMatch": true
+      }
+    },
+    {
+      "test": "Statuses and Assumptions",
+      "status": "PASS",
+      "detail": {
+        "Verified": 63,
+        "Estimated": 82,
+        "Unverified": 44,
+        "Mismatch": 0,
+        "historicalMismatchesCorrected": 38
+      }
+    }
+  ]
+}

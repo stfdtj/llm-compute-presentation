@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "viewport": "1920x1080",
+  "directModuleKeys": 60,
+  "calculationModesChecked": 189,
+  "physicalClicksAcrossAreas": 30,
+  "checks": [
+    "all direct module mappings in 3 modes",
+    "panel-only compressor/indexer/SwiGLU in 3 modes",
+    "blank and outside close",
+    "Escape close",
+    "inside click remains open",
+    "mode switch updates existing panel",
+    "wheel zoom",
+    "drag pan",
+    "reset and region focus",
+    "diagram identical across modes",
+    "offline local file",
+    "MathML equations",
+    "responsive panel containment",
+    "no JS or console errors",
+    "no raster diagram"
+  ],
+  "responsiveSizes": [
+    {
+      "width": 1366,
+      "height": 768
+    },
+    {
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "errors": [],
+  "networkRequests": [],
+  "screenshots": [
+    "overview_1920.png",
+    "reference_comparison.png",
+    "panel_backward.png"
+  ]
+}

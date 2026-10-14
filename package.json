@@ -1,0 +1,17 @@
+{
+  "name": "llm-compute-presentation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline LLM architecture and compute teaching tools",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test:lab": "node llm_compute_lab/tests.js && node llm_compute_lab/extension_tests.js && node llm_compute_lab/teaching_tests.js && node llm_compute_lab/final_tests.js",
+    "test:browser:lab": "node llm_compute_lab/browser_test.mjs",
+    "test:browser:deepseek": "node interactive_work/verify_browser.cjs && node interactive_work/verify_parameters.cjs && node interactive_work/verify_flow.cjs && node interactive_work/verify_step4.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0"
+  }
+}

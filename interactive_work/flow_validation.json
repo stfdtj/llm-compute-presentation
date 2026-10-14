@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "steps": 5,
+  "cacheWrites": 3,
+  "queryGlobalLocalFilters": true,
+  "allCalculationModesPreserved": true,
+  "geometryPreserved": true,
+  "offline": true,
+  "errors": []
+}

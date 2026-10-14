@@ -1,0 +1,972 @@
+CURRENT READER GUIDE (kernel and training-forward revision)
+Sections 1-17 retain the ORIGINAL decode analysis and its original conclusion
+for comparison. Their missing-kernel statements describe that earlier snapshot.
+Sections 18-22 contain the CURRENT kernel derivation, unified accounting,
+revised decode result, and Training Forward FLOPs Calculation.
+No Backward, Optimizer, or Loss calculation is included in this revision.
+
+DeepSeek V4.1 Flash: single-token text-backbone forward FLOPs
+
+1. Convention and execution counts
+
+Historical snapshot: sections 1-17 predate kernel verification. Their estimates
+are retained as the baseline; sections 18-22 supersede the missing-kernel claims.
+
+Y = XW; X=[M,K], W=[K,N], Y=[M,N].
+Approximate GEMM = 2MKN; exact dot-product arithmetic would be MN(2K-1).
+Weight shapes below use [input,output]; PyTorch stores their transpose.
+B=1, T=1, S=1024 historical tokens EXCLUDING the current token.
+start_pos=S; N=S+1=1025 visible tokens including the current token.
+All layer IDs are zero-based. Count logical whole-model work at world_size=1.
+Reuse existing window KV, compressed KV and Index Keys; do not project history.
+
+B = source-verifiable multiply/add FLOPs (GEMMs use the requested 2MKN rule).
+E = additional simplified special-operation or external-kernel estimates.
+Add/subtract/multiply = 1 each. A length-d reduction = d-1 adds.
+Mean = reduction plus one division. Division, rsqrt, sqrt, exp, softplus,
+and sigmoid each count as 1 E operation; their real instruction costs differ.
+SiLU = one sigmoid (E) plus one multiply (B); do not expand sigmoid again.
+Comparisons, max/top-k, integer hashes/indexing, abs/sign operations, casts,
+quantization, memory copies and communication are separate from these totals.
+RoPE sin/cos are precomputed; ignore views and Python shape/constant arithmetic.
+Explicit Engram dequantization multiplies ARE included, separately identified.
+
+Layers 0-1: local only, 2 layers.
+Layers 2-19: ratio-2 compressed + local, 18 layers.
+Layers 20-39: ratio-1 compressed + local, 20 layers.
+Window length L(S)=min(128,S+1).
+C2(S)=floor((S+1)/2); C1(S)=S+1.
+b(S)=1 if (S+1) is even, otherwise 0 (ratio-2 group completion).
+At S=1024: L=128, C2=512, C1=1025, b=0.
+Compressor owners: 2/8/14 (ratio 2), 20 (ratio 1): 4 calls.
+New compressed latents / Index Keys: J(S)=3*b+1; here J=1, NOT 4.
+Indexers: 2/8/14/20/24/28/32/36: 8 calls when C2>0.
+HC: 2*40=80 instances, plus one final pre-collapse.
+MoE: 40 routers, 240 routed-expert calls, 40 shared-expert calls.
+Engram: layers 1 and 14 only, 2 calls.
+
+Source caveat: Indexer.forward only republishes its key cache when a new latent
+exists. On this b=0 step, layers 2/8/14 can read the previous layer-20 cache.
+Shapes/FLOPs below still hold. Here all 512 ratio-2 positions are selected,
+so this issue does not alter their selected index sets. See the audit.
+
+2. Q Low-Rank Projection [40 layers]
+
+X=[1,5120], W_QA=[5120,1280], latent=[1,1280].
+2*1*5120*1280 = 13,107,200
+Intermediate RMSNorm is section 3, before W_QB.
+W_QB=[1280,32768], Q=[1,64,512].
+2*1*1280*32768 = 83,886,080
+Per layer:
+13,107,200+83,886,080 = 96,993,280
+96,993,280*40 = 3,879,731,200
+Total B = 3.879731200 GFLOPs. Original dimensions/arithmetic are correct.
+
+3. Query RMSNorm [40 layers]
+
+Input/output=[1,1280], gamma=[1280]. Code uses rsqrt, then multiplies.
+General RMSNorm(d): square d; sum d-1; epsilon +1; normalize *d; gamma *d.
+B=4d; E=1 mean division + 1 rsqrt. Combined simplified count=4d+2.
+4*1280 = 5,120
+5,120*40 = 204,800
+2*40 = 80
+Total B=204,800; E=80; combined=204,880. Original 4d+2 total is correct.
+This normalizes only the query latent; the Indexer reuses it without another norm.
+
+4. Shared KV Projection + KV RMSNorm [40 layers]
+
+X=[1,5120], W_KV=[5120,512], KV=[1,512].
+Shared across heads and K/V within a layer; window KV is NOT shared across layers.
+2*1*5120*512 = 5,242,880
+5,242,880*40 = 209,715,200
+KV RMSNorm: gamma=[512], input/output=[1,512], 40 executions.
+4*512*40 = 81,920
+2*40 = 80
+Total B=209,797,120; E=80. Original projection correct; KV norm was missing.
+Only the current window KV is projected. Compressor projections are section 7.
+
+5. Partial RoPE + Inverse RoPE [40 layers]
+
+No learned weight. Rotate only the last 64 of 512 coordinates per main head.
+Each adjacent pair: 4 multiplies + 2 adds = 6; hence 3*H*rope_dim.
+Query input/output=[1,64,512]:
+3*64*64 = 12,288
+Window Key input/output=[1,512]:
+3*1*64 = 192
+Inverse on attention output=[1,64,512]:
+3*64*64 = 12,288
+Per layer and all layers:
+12,288+192+12,288 = 24,768
+24,768*40 = 990,720
+Total B=990,720. Index RoPE is section 6; compressed-KV RoPE is section 7.
+Conjugation/sign handling and copies excluded; no new sin/cos computation.
+
+6. Indexer [8 calls, only 1 new Key at this decode step]
+
+Inputs: qr=[1,1280], X=[1,5120], new compressed latent=[1,512] if emitted.
+W_Q=[1280,4096]; Q=[1,32,128]. W_weight=[5120,32]; weights=[1,32].
+W_K=[512,128]; new K=[1,128]. Cached K=[C_r,128]; scores=[1,32,C_r].
+Output: min(512,C_r) integer positions, reused by following layers.
+
+Positions scored per call: C2=512 (3 calls), C1=1025 (5 calls).
+P_index(S)=3*floor((S+1)/2)+5*(S+1), for warm S>=1.
+3*512+5*1025 = 6,661
+Candidate filtering is AFTER the einsum; it does not reduce this score work.
+
+Query projection per call and total:
+2*1*1280*4096 = 10,485,760
+10,485,760*8 = 83,886,080
+New Key projection per emission and total (J=1):
+2*1*512*128 = 131,072
+131,072*1 = 131,072
+Head-weight projection per call and total:
+2*1*5120*32 = 327,680
+327,680*8 = 2,621,440
+Dot products per call = 2*32*128*C_r; all 8 calls:
+2*32*128*6661 = 54,566,912
+Head aggregation per call = (32 multiplies+31 adds)*C_r:
+63*6661 = 419,643
+Query RoPE per call=3*32*64=6144; total:
+3*32*64*8 = 49,152
+Key RoPE per emission=3*64; total:
+3*64*1 = 192
+Key RMSNorm gamma=[128]: B=4*128 per emission, E=2 per emission.
+4*128*1 = 512
+Head-weight scaling per call=32; total:
+32*8 = 256
+
+83,886,080+131,072+2,621,440+54,566,912+419,643+49,152+192+512+256 = 141,675,259
+Total B=141,675,259; E=2; combined=141,675,261 FLOPs.
+Symbolic B = 8*(2*1280*4096+2*5120*32+3*32*64+32)
+           + J*(2*512*128+4*128+3*64) + (2*32*128+63)*P_index(S).
+Symbolic E = 2*J. Historical Keys are scored but never reprojected.
+
+Non-FLOP work: 32*6661=213152 ReLU comparisons; top-k then position sort
+at each of 8 indexers (512 returned indices each); gather/mask/cache writes.
+Layer 20 candidate selection: ceil(1025/8)=129 blocks, 2048-block cap.
+All 129 blocks survive here. Block amax needs 129*7=903 comparisons in a
+standard reduction; top-k algorithm cost is unspecified. Layers 24/28/32/36
+apply masks to 1025 scores each AFTER computing every score.
+For symbolic S, candidate blocks=min(2048,ceil((S+1)/8)); index dots still
+scan all C1 positions. FP4 query/key fake quantization is unquantified.
+
+7. Compressor [3 ratio-2 calls, 1 ratio-1 call]
+
+Input X=[1,5120], W_KV=[5120,512], output new latent=[1,512] or None.
+Ratio 2 also has W_gate=[5120,512], score=[1,512], state=[1,2,512].
+Both projections execute on EVERY ratio-2 call, even when no latent is emitted.
+2*1*5120*512 = 5,242,880
+(5,242,880+5,242,880)*3 = 31,457,280
+Ratio 1: projection only, always emits; no gate or pooling.
+5,242,880*1 = 5,242,880
+Ratio-2 projection total + ratio-1 projection:
+31,457,280+5,242,880 = 36,700,160
+
+For each completed ratio-2 group: softmax on [2,512] across the 2 tokens.
+Reference softmax B: subtract max 2*512 + sum 512 = 3*512.
+E: exp 2*512 + division 2*512 = 4*512.
+Weighted pooling B: 2*512 multiplies + 512 adds = 3*512.
+Combined pooling B=6*512=3072, E=4*512=2048 per emission; count=3*b=0 here.
+Max comparisons=512 per emission, excluded. Softmax lowering is an estimate.
+
+RMSNorm gamma=[512], B=4*512, E=2 per emitted latent; count J=1.
+Compressed-KV RoPE (AFTER Index Key projection): B=3*64 per emission; count J=1.
+36,700,160+4*512+3*64 = 36,702,400
+Total B=36,702,400; E=2; combined=36,702,402 FLOPs.
+Symbolic B=36,700,160+J*(4*512+3*64)+3*b*(6*512).
+Symbolic E=2*J+3*b*(4*512). State writes and FP4 quantization excluded.
+The original 36.70 MFLOPs projection scale was right, but norms/pooling are
+emission-dependent, and compressed-KV RoPE was missing.
+
+8. Grouped Low-Rank Attention Output [40 layers]
+
+Input=[1,64,512], grouped=[1,8,4096].
+P_OA: 8 weights [4096,1024]; output=[1,8,1024].
+2*1*4096*1024*8 = 67,108,864
+Concatenate to [1,8192]; P_OB=[8192,5120]; output=[1,5120].
+2*1*8192*5120 = 83,886,080
+67,108,864+83,886,080 = 150,994,944
+150,994,944*40 = 6,039,797,760
+Total B=6.039797760 GFLOPs. Original calculation correct.
+
+9. Hyper-Connection [2 per layer, 80 instances]
+
+Input residual R=[1,4,5120]; flattened=[1,20480].
+W_HC=[20480,24]; base=[24], scale=[3].
+Output coefficients: pre=[1,4], post=[1,4], comb=[1,4,4].
+Coefficient projection per instance:
+2*1*20480*24 = 983,040
+983,040*80 = 78,643,200
+Global RMS statistic (no gamma) per instance: squares+sum+epsilon=2*20480 B;
+mean division+rsqrt=2 E. Scale 24 projected coefficients by rsqrt: 24 B.
+(2*20480+24)*80 = 3,278,720
+2*80 = 160
+
+Pre-mixing R -> [1,5120]: 4 products+3 adds per coordinate.
+(4+3)*5120 = 35,840
+35,840*80 = 2,867,200
+Post+comb: O=[1,5120], R=[1,4,5120] -> Y=[1,4,5120].
+Y_c=post_c*O + sum_k(comb_c,k*R_k).
+Per output coordinate: post product 1 + comb products 4 + comb adds 3 + final add 1.
+4*(1+4+3+1)*5120 = 184,320
+184,320*80 = 14,745,600
+Per instance / all instances, excluding external coefficient normalization:
+983,040+40,960+24+35,840+184,320 = 1,244,184
+1,244,184*80 = 99,534,720
+Total B=99,534,720; E=160; plus UNKNOWN U_HC.
+U_HC=80*cost(hc_split_sinkhorn on 24 coefficients, hc_mult=4, iters=20).
+The kernel implementation is absent: affine scale/base, pre/post transforms,
+comb normalization, iteration order and epsilon use cannot be counted exactly.
+Do not treat U_HC as zero. It is not included in any numeric subtotal.
+Pre coefficients are passed to the next sublayer; still 80 actual pre calls.
+The initial one-hot pre_mix is not optimized away in this source.
+Final HC collapse is counted once in section 15.
+
+10. Attention RMSNorm + FFN RMSNorm [40+40 executions]
+
+Input/output=[1,5120], gamma=[5120]. B=4d and E=2 per execution.
+4*5120 = 20,480
+20,480*80 = 1,638,400
+2*80 = 160
+Total B=1,638,400; E=160 (819,200 B + 80 E for each type).
+These are distinct from Query, KV, Compressor and final norms.
+
+11. Main Sparse Attention [40 external-kernel calls: ESTIMATE]
+
+Q=[1,64,512]; physical decode K/V bank=[128+C_r,512], or [128,512].
+The window always allocates 128 entries; only L are valid for short history.
+At this step all 128 are valid. No separate V projection.
+Selected indices=[1,A]; logits=[1,64,A]; output=[1,64,512].
+These are logical valid shapes; short histories also pass -1 window slots.
+attn_sink=[64]; no other learned weight in the attention core.
+A0(S)=L(S); A2(S)=L(S)+min(512,C2(S)); A1(S)=L(S)+min(512,C1(S)).
+P_attn(S)=2*A0+18*A2+20*A1.
+2*128+18*640+20*640 = 24,576
+Do not deduplicate local and compressed entries: they are distinct K/V slots.
+
+Per call, QK score estimate=2*64*512*A; value aggregation=2*64*A*512.
+Local-only A=128: both GEMMs together:
+4*64*512*128 = 16,777,216
+Compressed+local A=640: both GEMMs together:
+4*64*512*640 = 83,886,080
+All score GEMMs / all value GEMMs:
+2*64*512*24576 = 1,610,612,736
+2*64*24576*512 = 1,610,612,736
+
+Reference scale/softmax/sink: scale A logits, append one learned sink logit,
+subtract a max over A+1 entries, exponentiate all A+1, sum with A adds,
+and divide the A real probabilities by that denominator. Sink has zero value.
+Per head: multiply/add=3*A+1; special exp/div=2*A+1.
+Per call: 64*(5*A+2) total simplified operations.
+Local A=128: 24,640 basic +16,448 special =41,088 per call, count 2.
+Compressed A=640: 122,944 basic +81,984 special =204,928 per call, count 38.
+64*(3*24576+40) = 4,721,152
+64*(2*24576+40) = 3,148,288
+
+1,610,612,736+1,610,612,736+4,721,152+3,148,288 = 3,229,094,912
+Total E=3.229094912 GFLOPs (ALL of section 11 is an external-kernel estimate).
+Symbolic E=4*64*512*P_attn(S)+64*(5*P_attn(S)+2*40).
+The missing sparse_attn kernel prevents verification of sink semantics,
+softmax/reduction method, padding, quantization and extra rescaling work.
+This is a conventional mathematical attention estimate, not an exact kernel count.
+
+12. MoE Router [40 layers]
+
+Input X=[1,5120], W_G=[5120,384]; scores=[1,384].
+Selected indices=[1,6]; weights=[1,6].
+2*1*5120*384 = 3,932,160
+3,932,160*40 = 157,286,400
+score_func=sqrtsoftplus. Defaults: gate_temp=1, norm_topk_prob=True.
+Per layer E: divide 384 scores by gate_temp + softplus 384 + sqrt 384.
+The code executes division even with temperature 1.
+Selection bias=[384]: 384 adds B; top-k comparisons/gather are non-FLOP.
+Normalize 6 UNBIASED selected scores: sum 5 + epsilon 1 B; division 6 E.
+Scale weights by route_scale=1.5: 6 multiplies B.
+384+5+1+6 = 396
+(3,932,160+396)*40 = 157,302,240
+(384+384+384+6)*40 = 46,320
+Total B=157,302,240; E=46,320.
+Text-only uses the text bias; no vision routing branch executes.
+
+13. MoE Experts + Aggregation [6 routed + 1 shared, all 40 layers]
+
+Input=[1,5120]; gate W1=[5120,2304]; up W3=[5120,2304].
+Gate/up/activation=[1,2304]; down W2=[2304,5120]; output=[1,5120].
+Each gate/up/down projection:
+2*5120*2304 = 23,592,960
+3*23,592,960 = 70,778,880
+70,778,880*7*40 = 19,818,086,400
+Only 6 of 384 routed experts execute; the shared expert also executes.
+
+SwiGLU=SiLU(gate)*up: 2*2304 multiplies B +2304 sigmoid E per expert.
+2*2304*7*40 = 1,290,240
+2304*7*40 = 645,120
+Clamps at +/-10: up two bounds, gate upper bound, about 3*2304*7*40
+comparisons; excluded. No train-time auxiliary loss in this forward.
+Route weighting occurs BEFORE down projection on 2304 activations, not 5120 outputs:
+2304*6*40 = 552,960
+Output accumulation: 6 additions into the zero-initialized y, then shared output.
+7*5120*40 = 1,433,600
+Total per layer B=495,534,080; E=16,128.
+19,818,086,400+1,290,240+552,960+1,433,600 = 19,821,363,200
+Total B=19,821,363,200; E=645,120.
+Expert dispatch, bincount, CPU list conversion and gather/scatter are non-FLOP.
+
+14. Engram [layers 1 and 14 only]
+
+Hash input token IDs=[1,1], output IDs=[1,1,2,24], computed ONCE for both layers.
+24=(4-1)*8: 2/3/4-grams, 8 hash heads each; each lookup row has 256 features.
+Per layer memory=[24,256] -> flattened [1,6144].
+Tables: [384006168,256] / [384016682,256] FP8, scales [rows,8].
+Only 24 rows/layer are fetched; table parameter count is not forward FLOPs.
+Non-FLOP hashes across both layers: 8 integer products, 6 XORs,
+48 remainders and 48 offset adds, plus token-map/cache indexing and masks.
+
+Memory dequantization per layer: 24*256 float multiplies, scales broadcast by 32.
+24*256 = 6,144
+W_KV=[6144,25600]: key=[1,4,5120], shared value=[1,5120].
+2*1*6144*25600 = 314,572,800
+Equivalent key projection=2*6144*20480; value projection=2*6144*5120.
+
+Compatibility gate input h,key=[1,4,5120]; q_weight,k_weight=[4,5120].
+For EACH of 4 copies (d=5120):
+  q_weight*k_weight: d B (recomputed every call in source).
+  h/key RMS statistics: 4*d B; 2 mean divisions+2 rsqrt E.
+  Multiply the two inverse RMS values: 1 B.
+  (h*weight*key).sum: 2*d multiplies+(d-1) adds.
+  Multiply dot by rstd and d^(-0.5): 2 B.
+  Signed sqrt then sigmoid: 1 sqrt+1 sigmoid E; abs/clamp/copysign separate.
+  Residual injection h+gate*value: 2*d B.
+Gate output=[1,4]; injected output=[1,4,5120].
+Per copy B=10*d+2, E=6; per layer:
+4*(10*5120+2) = 204,808
+4*6 = 24
+Per execution / two executions:
+6,144+314,572,800+204,808 = 314,783,752
+314,783,752*2 = 629,567,504
+24*2 = 48
+Total B=629,567,504; E=48. No additional standalone Q/K RMSNorm is counted.
+The present Engram implementation has no convolution or extra MLP branch.
+
+15. Final HC Collapse + RMSNorm + Full LM Head [one execution each]
+
+HC input=[1,4,5120], pre=[1,4], output=[1,5120]; no new coefficients.
+(4+3)*5120 = 35,840
+Final norm input/output=[1,5120], gamma=[5120]:
+4*5120 = 20,480
+Final norm E=2 (mean division +rsqrt).
+LM head W=[5120,129280]; output logits=[1,129280].
+2*1*5120*129280 = 1,323,827,200
+35,840+20,480+1,323,827,200 = 1,323,883,520
+Total B=1,323,883,520; E=2. No bias or vocabulary softmax inside LM head.
+
+16. Other executed work / costs outside the logits backbone
+
+Embedding: input token ID=[1,1], table=[129280,5120], output=[1,1,5120].
+One row lookup and HC repeat to [1,1,4,5120]: 0 arithmetic FLOPs; memory only.
+RoPE table creation, Engram primes/token-map initialization and model construction
+are one-time setup, excluded from warm-token FLOPs.
+
+Transformer.forward additionally captures h.mean(dim=2) at layers 37/38/39,
+even if forward_spec is never called. Input=[1,4,5120] -> [1,5120] each.
+3*(4-1)*5120 = 46,080
+3*5120 = 15,360
+Capture B=46,080; E=15,360. These DSpark support outputs are outside the
+requested text-logits backbone, but execute in the unmodified forward wrapper.
+
+The wrapper also calls sample(logits,temperature=1 default), after the LM head.
+Input=[1,129280], output one integer. Reference stable vocabulary softmax:
+B=V subtractions+(V-1) sum adds; E=V temperature divisions+V exp+V softmax
+divisions+V divisions by exponential random samples. V=129280; count=1.
+2*129280-1 = 258,559
+4*129280 = 517,120
+Sampling estimate=775,679 plus unquantified exponential RNG, max/argmax.
+Temperature=0 instead executes argmax only. Sampling is outside backbone FLOPs.
+46,080+15,360+258,559+517,120 = 837,119
+Literal forward wrapper adds 837,119 modeled operations, plus RNG uncertainty.
+Vision and forward_spec/DSpark draft layers are excluded entirely.
+
+Quantization overhead, separate from logical GEMMs at S=1024:
+1010 Linear activation-quantizer calls (720 FP4-weight GEMMs +290 FP8-weight GEMMs),
+40 explicit window-KV quantizer calls, and 10 FP4 fake-quantizer calls
+(8 Index queries +1 new Index Key +1 new compressed KV). Kernel FLOPs unknown.
+Engram's 12,288 explicit dequantization multiplies are already in section 14.
+KV/cache concatenation, top-k sorting, FP casts, copies and synchronization are
+not zero cost, but have no assigned floating-point arithmetic in this ledger.
+
+17. Compact summary (S=1024 historical, one new token)
+
+Module                            | Verified B FLOPs | Additional E estimate
+Q Projection                      | 3,879,731,200    | 0
+Q RMSNorm                         | 204,800          | 80
+KV Projection + Norm              | 209,797,120      | 80
+Main RoPE                         | 990,720          | 0
+Compressor                        | 36,702,400       | 2
+Indexer                           | 141,675,259      | 2
+Main Attention                    | unverified       | 3,229,094,912
+Output Projection                 | 6,039,797,760    | 0
+Hyper-Connection                  | 99,534,720       | 160 + U_HC
+Attention + FFN Norm              | 1,638,400        | 160
+MoE Router                        | 157,302,240      | 46,320
+MoE Experts                       | 19,821,363,200   | 645,120
+Engram                            | 629,567,504      | 48
+Final Collapse + Norm + LM Head    | 1,323,883,520    | 2
+Other backbone lookup/view work   | 0 arithmetic     | unquantified costs above
+TOTAL quantified                  | 32,342,188,843   | 3,229,786,886
+
+Verified B subtotal = 32.342188843 GFLOPs/token under the stated 2MKN convention.
+Additional special-operation estimate outside attention = 691,974 operations.
+Additional main-attention estimate = 3,229,094,912 FLOPs.
+32,342,188,843+691,974+3,229,094,912 = 35,571,975,729
+Modeled backbone subtotal ~= 35.572 GFLOPs/token, PLUS unquantified U_HC and
+quantization/kernel overhead. This is NOT a verified exact whole-model total.
+The complete physical/kernel FLOPs total cannot be determined from these files.
+The attention estimate itself may differ from the missing kernel's implementation.
+Literal forward including capture/sampling: modeled 35.572812848 GFLOPs,
+plus the same unknowns and RNG. This wrapper figure is outside requested scope.
+
+Change S using C1, C2, b, J, P_index and P_attn above. Projection/expert/Engram
+work stays constant. Index Score grows with S even after candidate masking;
+main attention saturates at the window+512 entries, and compressor/key overhead
+alternates with group completion. Do not use a prefill cost as a decode cost:
+prefill projects all T tokens, emits floor(T/r) latents, and this source's index
+einsum forms the full T-by-floor(T/r) score tensor before applying causal masks.
+The missing attention kernel may also process masked/padded slots in prefill.
+
+18. Current counting rules and evidence labels
+
+The source is DeepSeek-V4.1-Flash/{config.json,model.py,engram.py,kernel.py}.
+No separate inference/kernel.py or training implementation was found locally.
+This analysis does not claim to have reviewed a separate official trainer.
+
+Source Verified (SV): operation/shapes/control flow are present in local source.
+Mathematical Estimate (ME): 2MKN, reduction arithmetic, unit-cost special ops,
+or an explicitly specified mathematical algorithm; not a measured GPU count.
+Assumption (A): a proposed training-forward execution choice, not source fact.
+Unknown (U): actual training code, compiler/hardware lowering, or a cost not
+quantified in this report. Unknown never means zero.
+
+Use FB=Basic FLOPs; FE=Special Operations Estimate; FM=FB+FE.
+In the training section B means Batch Size, not Basic FLOPs.
+GEMM FB=2MKN, including its multiply/add accumulation; do not add the same
+accumulation again. Add/subtract/multiply each cost 1. A k-term sum has k-1 adds.
+Division, sqrt, rsqrt, exp and sigmoid each cost 1 FE operation. Softplus also
+costs 1 FE operation, without additionally counting its internal exp/log.
+Fused SiLU counts sigmoid in FE and its multiply in FB. Sigmoid in the HC
+kernel is counted once per call, without expanding it a second time.
+A mean counts reduction in FB and one division in FE, even at constant divisor.
+No reassociation, denominator hoisting or identity simplification is assumed
+in the literal kernel-expression ledger. GEMM remains the requested 2MKN model.
+
+Views/reshape/transpose contribute 0 arithmetic; copies they may induce are
+memory work. Casts, clamp/max comparisons, sign/abs, top-k, sorting, indexing,
+integer hashes, dispatch and communication are outside FB/FE. Memory traffic
+and latency are not FLOPs. Quantization arithmetic is discussed separately in
+section 22; it is excluded from the core totals, except the explicitly counted
+Engram table-dequantization multiplies. Full hardware instruction totals remain U.
+Thus evidence status and FB/FE are different concepts: an attention GEMM belongs
+to FB even if its FLOPs are a mathematical estimate of source-verifiable work.
+The old section 17 put all attention into E; the CURRENT tables correct that.
+
+19. External kernels: verified algorithms and revised Decode
+
+19.1 hc_split_sinkhorn
+Source: kernel.py:407-474; model.py:948-955; hc_mult=4, hc_sinkhorn_iters=20.
+Each call consumes mixes=[B,T,24], scale=[3], base=[24], and returns
+pre/post=[B,T,4], comb=[B,T,4,4]. Each token is processed independently.
+Let c=4, I=20; the coefficient GEMM and its RMS statistic are already section 9.
+This subsection counts ONLY the previously unknown coefficient transforms.
+
+1) pre_j=sigmoid(mix_j*scale_0+base_j)+eps:
+   FB=3c, FE=c.
+2) post_j=2*sigmoid(mix_(c+j)*scale_1+base_(c+j)):
+   FB=3c, FE=c.
+3) comb_jk=mix_(2c+jc+k)*scale_2+base_(2c+jc+k):
+   FB=2c^2, FE=0.
+4) Row softmax followed by elementwise +eps:
+   subtract row max c^2, row sums c(c-1), add eps c^2:
+   FB=3c^2-c; FE=2c^2 (exp c^2 + division c^2).
+   Row-max comparisons are separate; there is no extra sigmoid here.
+5) One column normalization comb_jk/(column_sum_k+eps).
+6) I-1=19 repetitions of row normalization then column normalization.
+   Therefore 20 column normalizations and 19 ordinary row normalizations,
+   preceded by the initial row softmax. Do not count 20 additional row/col pairs.
+
+Each ordinary normalization: c(c-1) sum adds + c^2 epsilon adds in the literal
+(j,k) expressions, and c^2 divisions. FB=2c^2-c, FE=c^2.
+Number of such normalizations=2I-1=39.
+U_HC is now replaced by the following SOURCE-EXPRESSION mathematical count:
+uB=6c+2c^2+(3c^2-c)+(2I-1)*(2c^2-c).
+uE=2c+2c^2+(2I-1)*c^2.
+6*4+2*16+(3*16-4)+39*(2*16-4) = 1,192
+2*4+2*16+39*16 = 664
+1,192+664 = 1,856
+80*1,192 = 95,360
+80*664 = 53,120
+80*1,856 = 148,480
+
+Revised full HC (coefficient GEMM/statistic, pre/post/comb and this kernel):
+99,534,720+95,360 = 99,630,080
+160+53,120 = 53,280
+99,630,080+53,280 = 99,683,360
+
+Compiler caveat: (sum+eps) can be shared across a row/column, reducing epsilon
+adds from c^2 to c per normalization. That alternative has uB=724, uE=664,
+and 1388 modeled operations per instance; difference=39*(16-4)=468 FB.
+We use 1856 consistently in CURRENT totals, retaining literal expressions.
+Neither is a claim about generated device instructions. The mathematical
+transform is known; exact compiler lowering remains U, not an unknown HC module.
+
+19.2 sparse_attn
+Source: kernel.py:311-403; model.py:765-789.
+Q=[B,T,a,D], KV=[B,Nkv,D], indices=[B,T,Klist], sink=[a], output=[B,T,a,D].
+a=64 heads, D=512; no head padding because a>=16. There is no separate V.
+The wrapper gathers indices in tiles q=64. Let n=ceil(Klist/64).
+Invalid indices and final partial-tile slots load zero KV and start at -inf
+scores. BOTH GEMMs still execute on the full 64-position tile. Max/masks do
+not skip these GEMMs. Source tensors for Q/KV and probability tiles are BF16;
+FP4 fake quantization earlier writes dequantized values back before this call.
+
+For each tile, per head:
+  QK GEMM: 2*q*D FB; multiply scores by 1/sqrt(D): q FB.
+  Find a running maximum: comparisons only.
+  alpha=exp(previous_max-new_max): 1 FB +1 FE.
+  p=exp(score-new_max): q FB +q FE.
+  tile_sum=sum(p): q-1 FB.
+  running_sum=running_sum*alpha+tile_sum: 2 FB.
+  output_accumulator*=alpha: D FB (including the first zero accumulator).
+  output_accumulator+=p*KV GEMM: 2*q*D FB.
+After all tiles, per head:
+  running_sum+=exp(sink-running_max): 2 FB +1 FE.
+  output_accumulator/=running_sum: D FE.
+Sink contributes only to the denominator, not an extra value vector/GEMM.
+Unlike the old reference softmax, the running maximum excludes the sink, which
+is exponentiated at the end. This is mathematically equivalent for finite,
+well-behaved scores, but can have different numerical overflow behavior.
+
+Per query, all heads:
+A_B(n)=a*[n*(4*q*D+3*q+2+D)+2].
+A_E(n)=a*[n*(q+1)+D+1].
+A_M(n)=A_B(n)+A_E(n).
+This accounts for online output rescaling and final D output divisions;
+it does NOT divide each stored attention probability by its sum.
+It is a literal tile-algorithm estimate, not a profiler measurement.
+
+Decode S=1024: Klist=128 in 2 layers and 640 in 38 layers; n=2 or 10.
+2*2+38*10 = 384
+64*(384*(4*64*512+3*64+2+512)+2*40) = 3,238,581,248
+64*(384*(64+1)+40*(512+1)) = 2,910,720
+3,238,581,248+2,910,720 = 3,241,491,968
+QK/PV GEMMs are unchanged from the old decode estimate: 3,221,225,472 total.
+Online softmax/rescaling/sink now contribute 20,266,496 modeled operations,
+versus 7,869,440 in the original one-shot-softmax reference.
+3,241,491,968-3,229,094,912 = 12,397,056
+
+For other decode S, use the actual index-list widths:
+K0=128, K2=128+min(512,floor((S+1)/2)), K1=128+min(512,S+1).
+The ring always supplies 128 index slots, even for short history; invalid slots
+remain work in this kernel. Sum 2*A(n0)+18*A(n2)+20*A(n1).
+
+19.3 CURRENT Decode Forward summary
+B=1 token here means batch 1; history S=1024 excludes current token.
+Evidence: SV graph and loop shapes; ME arithmetic/special-op costs.
+The original 35,571,975,729 conclusion remains in section 17 as historical.
+Current correction adds 148,480 HC operations and 12,397,056 attention operations.
+35,571,975,729+148,480+12,397,056 = 35,584,521,265
+No other decode module arithmetic changes. The existing cache-publication issue
+in section 1 remains a model-source issue; this task does not edit model.py.
+
+Cost tags used in BOTH current tables:
+Q = activation/weight quantization, scale arithmetic and dense-kernel padding;
+R = compiler lowering/reduction details; N = non-FLOP memory/cast/view work;
+S = selection/clamp/mask/indexing comparisons; C = communication (not modeled).
+These tags identify excluded costs, not extra zeros to add to the totals.
+Every row gives Basic, Special and Total; all rows additionally exclude N/C.
+
+Tag | Module | Basic FLOPs | Special Operations Estimate | Total Modeled Operations | Excluded costs
+D | Q Projection | 3,879,731,200 | 0 | 3,879,731,200 | Q,R,N,C
+D | Q RMSNorm | 204,800 | 80 | 204,880 | R,N,C
+D | KV Projection + Norm | 209,797,120 | 80 | 209,797,200 | Q,R,N,C
+D | Main RoPE | 990,720 | 0 | 990,720 | R,N,C
+D | Compressor | 36,702,400 | 2 | 36,702,402 | Q,R,S,N,C
+D | Indexer | 141,675,259 | 2 | 141,675,261 | Q,R,S,N,C
+D | Output Projection | 6,039,797,760 | 0 | 6,039,797,760 | Q,R,N,C
+D | Hyper-Connection | 99,630,080 | 53,280 | 99,683,360 | R,S,N,C
+D | Attention + FFN Norm | 1,638,400 | 160 | 1,638,560 | R,N,C
+D | MoE Router | 157,302,240 | 46,320 | 157,348,560 | R,S,N,C
+D | MoE Experts | 19,821,363,200 | 645,120 | 19,822,008,320 | Q,R,S,N,C
+D | Engram | 629,567,504 | 48 | 629,567,552 | Q,R,S,N,C
+D | Final Collapse + Norm + LM Head | 1,323,883,520 | 2 | 1,323,883,522 | R,N,C
+D | Main Attention | 3,238,581,248 | 2,910,720 | 3,241,491,968 | R,S,N,C
+D | TOTAL | 35,580,865,451 | 3,655,814 | 35,584,521,265 | same exclusions; not physical GPU total
+
+CURRENT decode = 35.580865451G Basic +0.003655814G Special
+               = 35.584521265G modeled operations/token.
+The HC transform no longer needs U_HC. The remaining uncertainty is lowering,
+quantization and physical execution cost, not the HC mathematical workflow.
+
+20. Training Forward FLOPs Calculation
+
+20.1 Scope and variables
+
+ACTUAL DEEPSEEK TRAINING FORWARD TOTAL: Unknown from the available files.
+The local Transformer.forward uses inference_mode, stateful cache buffers,
+and last-position-only logits. No official training entry point, distributed
+training policy or training attention kernel is supplied. Comments saying
+"matching training" verify only what those comments describe, not a trainer.
+
+We calculate Scenario P: a complete text-backbone forward mathematical model
+using the source's full-sequence/prefill graph and supplied sparse kernel,
+with ALL-token LM logits. This is an explicit training-forward proxy (A).
+It is not incremental decode and does not reuse old tokens from a prior pass.
+Fresh activations/keys are computed for every batch and every training step.
+Within the SAME forward, source-layer compressed KV/Index results are shared
+with later layers exactly as in local source. Such sharing does not skip
+creating the source activations and does not imply detaching gradients.
+
+Assumptions: independent dense sequences, no padding tokens/packing, no token
+or expert dropping, six selected experts per token plus one shared expert,
+no activation checkpoint replay, no draft/vision/sampling/loss computation,
+no input prefix cache. Full LM logits for all T positions, even though the
+unmodified wrapper defaults to only the last. No model implementation is changed.
+Use sufficient buffer capacities for B,T: local runtime defaults are max batch
+4 and max sequence 4096; formulas beyond these require larger allocations.
+T is the number of tokens actually forwarded, not the number of loss targets.
+
+B = Batch Size; T = Sequence Length; M=B*T; H=5120 = Hidden Size.
+L=40 layers; a=64 attention heads; D=512 head width; p=64 rotary width.
+R=1280 query rank; G=8 output groups; O=1024 output rank per group.
+c=4 HC copies; z=c*(c+2)=24 HC coefficients; I=20 Sinkhorn iterations.
+a_i=32 Index heads; d_i=128 Index width; K=512 selected compressed positions.
+W=128 sliding window; F=2304 expert intermediate width.
+n_e=384 routed experts; e=6 activated experts; one shared expert.
+V=129280 vocabulary; J=24*256=6144 Engram memory width.
+C2=floor(T/2), C1=T; Jc=B*(3*C2+C1) newly produced compressed latents/keys.
+G2=3*B*C2 completed ratio-2 groups; nI=5+3*indicator(C2>0).
+Pidx=B*T*(3*C2+5*C1) = rectangular Index query/key pairs across 8 indexers.
+q=64 sparse-attention tile width. All formulas are per COMPLETE batch forward.
+
+20.2 CED / cross-layer execution
+
+The name/acronym CED is not defined anywhere in the supplied source; its
+expanded meaning and official training design are Unknown. The relevant
+compressed/shared attention structure IS visible and counted as follows:
+
+Layers | Attention type | KV producer | Index producer
+0-1 | local only | own local projection | none
+2-7 | local + ratio 2 | compressed source 2 | 2
+8-13 | local + ratio 2 | compressed source 8 | 8
+14-19 | local + ratio 2 | compressed source 14 | 14
+20-23 | local + ratio 1 | compressed source 20 | 20
+24-27 | local + ratio 1 | compressed source 20 | 24
+28-31 | local + ratio 1 | compressed source 20 | 28
+32-35 | local + ratio 1 | compressed source 20 | 32
+36-39 | local + ratio 1 | compressed source 20 | 36
+
+Every layer still creates its own local/window KV for all T tokens.
+Only 4 layers compress, 4 produce Index Keys, and 8 perform Index scoring.
+Every compressed-attention consumer performs its own main attention and Q/O
+projections. Reuse of top-k indices is not reuse of attention outputs.
+Scenario P preserves this within-forward dependency graph (A for training).
+If an actual trainer recomputes shared tensors or uses different routing,
+these counts must be changed. Do not multiply all source operations by 40.
+
+20.3 Tokenwise modules (reuse dimensions, replace token count with M)
+
+Shapes below omit no token axis: [B,T,...]; GEMMs flatten it to [M,...].
+Weight shapes are logical [input,output]. Each formula gives FB, FE; FM=FB+FE.
+Excluded costs are given by the matching summary-table row and section 22.
+Evidence: shapes/operations SV; FLOPs arithmetic ME; training scheduling A.
+
+Q Projection [40 executions over the whole batch]
+Input [B,T,H] -> latent [B,T,R] -> Q [B,T,a,D].
+W_QA=[H,R], W_QB=[R,aD].
+FB=L*M*(2*H*R+2*R*a*D); FE=0.
+Query RMSNorm: latent [B,T,R] -> same; gamma=[R].
+FB=L*M*4R; FE=2*L*M. This norm is shared with the Indexer's query input.
+
+Local KV Projection + Norm [40]
+Input [B,T,H], W_KV=[H,D], output [B,T,D]; gamma=[D].
+FB=L*M*(2*H*D+4D); FE=2*L*M.
+ALL T local keys are projected here, not just one current key.
+
+Main RoPE [40 query, 40 local-key, 40 inverse-output calls]
+Query/output [B,T,a,D], local KV [B,T,D]; only the final p coordinates rotate.
+FB=L*M*(6*a*p+3*p); FE=0. Compressed and Index RoPE are counted below.
+
+Grouped Output Projection [40]
+Input [B,T,a,D] -> [B,T,G,aD/G] -> [B,T,G,O] -> [B,T,H].
+Weights: G blocks [aD/G,O], then [G*O,H].
+FB=L*M*(2*a*D*O+2*G*O*H); FE=0.
+
+Hyper-Connection [80 batch calls, plus final collapse counted separately]
+Input [B,T,c,H], coefficient weight [cH,z], coefficients [B,T,z].
+Pre-mix output [B,T,H]; post/comb return [B,T,c,H].
+FB=2*L*M*[2*c*H*z+2*c*H+z+(2c-1)*H+c*(2c+1)*H+uB].
+FE=2*L*M*(2+uE), with uB=1192, uE=664 from section 19.1.
+The two statistic operations are mean division and rsqrt. No extra gamma.
+
+Attention + FFN RMSNorm [40+40]
+Input/output [B,T,H], gamma=[H]. FB=2*L*M*4H; FE=2*L*M*2.
+
+MoE Router [40]
+Input [M,H], W=[H,n_e], scores [M,n_e], selected weights/IDs [M,e].
+FB=L*M*(2*H*n_e+n_e+2e); FE=L*M*(3*n_e+e).
+Bias addition and selected-score reduction/scale are FB. Temperature division,
+softplus, sqrt, and selected-weight divisions are FE. Top-k is comparison work.
+
+MoE Experts + Aggregation [40 MoE calls]
+Expert j receives X_j=[m_j,H], produces gate/up [m_j,F], output [m_j,H].
+W_gate/W_up=[H,F], W_down=[F,H]. sum_j(m_j)=e*M for routed experts;
+shared expert receives all M tokens. Some experts can receive zero tokens.
+FB=L*M*[(e+1)*(6*H*F+2F)+e*F+(e+1)*H].
+FE=L*M*(e+1)*F (sigmoids).
+The 6HF is the three projections. The 2F is SiLU and gate/up multiplication.
+eF weights routed intermediate activations. (e+1)H counts output additions.
+Logical projection FLOPs depend on total routed tokens, not on the number of
+nonempty experts. Device padding/dispatch DOES depend on the unknown m_j.
+
+Final HC Collapse + Norm + Full LM Head [one batch call each]
+[B,T,c,H] -> [B,T,H]; pre=[B,T,c]; final gamma=[H]; W_head=[H,V].
+Output logits=[B,T,V], explicitly using the behavior of full_logits=True.
+FB=M*[(2c-1)*H+4H+2*H*V]; FE=2M.
+This all-token head is a training-scenario Assumption: Transformer.forward
+normally calls ParallelHead without full_logits=True and would emit [B,V].
+Only the head changes by 2*B*(T-1)*H*V relative to that literal wrapper;
+its final collapse and norm already process the complete sequence.
+
+20.4 Compressor: recreate the full sequence, then pool
+
+Three ratio-2 sources and one ratio-1 source. Input per source=[B,T,H].
+Each W_KV=[H,D]. Ratio-2 W_gate=[H,D]. Projected KV/scores=[B,T,D].
+Ratio-2 completed groups=[B,C2,2,D], output=[B,C2,D].
+Ratio-1 output=[B,T,D]. Norm gamma=[D], plus p-wide compressed RoPE.
+Every token is projected; incomplete trailing ratio-2 groups are not emitted.
+For independent training sequences, tails do not become history for another batch.
+
+Projection FB=(3*2+1)*2*M*H*D = 7*2*M*H*D; FE=0.
+For each ratio-2 group: reference softmax over 2 per coordinate contributes
+3D FB (subtract 2, sum 1) and 4D FE (2 exp, 2 div).
+Pooling contributes another 3D FB (2 products, 1 add).
+All source-emitted norm/rotation work: Jc*(4D+3p) FB, 2Jc FE.
+FB_comp=7*2*M*H*D+G2*6D+Jc*(4D+3p).
+FE_comp=G2*4D+2Jc. FM_comp=FB_comp+FE_comp.
+Pooling arithmetic is ME because PyTorch softmax's exact lowering is not given.
+Compressor shapes/emission conditions are SV. The three pool operations run
+on ALL C2 groups here, unlike the b=0 decode step where they run on none.
+
+20.5 Indexer: rectangular scores BEFORE causal/candidate masks
+
+Query latent [B,T,R], X=[B,T,H]. W_Q=[R,a_i*d_i], W_weight=[H,a_i].
+Projected Q=[B,T,a_i,d_i]; head weights=[B,T,a_i].
+At each of 4 key owners, latent [B,C_r,D], W_K=[D,d_i], K=[B,C_r,d_i].
+Raw scores=[B,T,a_i,C_r]; head-summed scores=[B,T,C_r].
+Top-k output=[B,T,min(K,C_r)] with invalid positions replaced by -1.
+
+FB_index=nI*M*(2*R*a_i*d_i+2*H*a_i+3*a_i*p+a_i)
+        +Jc*(2*D*d_i+4*d_i+3p)
+        +(2*a_i*d_i+2*a_i-1)*Pidx.
+FE_index=2Jc; FM_index=FB_index+FE_index.
+The head sum costs a_i products+(a_i-1) adds per query/key pair.
+Only key owners project full-sequence keys; later indexers reuse those keys.
+
+For query position t=0..T-1, compressed visibility=floor((t+1)/r).
+model.py:556-557 computes ALL T*C_r score pairs, then :565 applies causal masks.
+Do NOT replace T*C_r by a triangular pair count for this implementation.
+Layer 20 selects candidate blocks after scoring; later indexers mask after
+their own full score tensors. Candidate masks do not reduce these GEMMs.
+Candidate width=ceil(T/8); top blocks=min(2048,ceil(T/8)), per batch/query.
+At T=1024, all 128 blocks can be kept; future entries still have causal -inf.
+Candidate maxima, top-k, mask construction and index sorting are S/N costs.
+For T>16384, candidate pruning can change selected identities, but source
+Index GEMMs remain rectangular. Runtime buffers must first support such T.
+
+20.6 Main Sparse Attention: valid math vs scheduled tile work
+
+Prefill local KV bank=[B,T,D], NOT a 128-entry history ring.
+Each query sees only min(W,t+1) local entries. Index-list local width is
+w=min(W,T) for every query, with future entries stored as -1 near the start.
+Compressed bank adds [B,C_r,D]; completed group j is visible after token
+(j+1)*r-1. No key from a future compressed group should contribute.
+
+Logical valid positions per query:
+a0(t)=min(W,t+1).
+a2(t)=a0(t)+min(K,floor((t+1)/2)).
+a1(t)=a0(t)+min(K,t+1).
+Useful pair count (all 40 layers)=
+Pvalid=B*sum_{t=0..T-1}[2*a0(t)+18*a2(t)+20*a1(t)].
+Ideal valid-entry QK/PV math=4*a*D*Pvalid. This is a useful-work comparison,
+NOT the executed GEMM count of the supplied kernel.
+
+Actual fixed index-list widths:
+k0=w; k2=w+min(K,C2); k1=w+min(K,T).
+n0=ceil(k0/64), n2=ceil(k2/64), n1=ceil(k1/64).
+Z=2*n0+18*n2+20*n1 tiles per sequence position, across all layers.
+The source executes M*Z complete tiles, including masked and padded positions.
+FB_attn=a*[(4*q*D+3*q+2+D)*M*Z+2*L*M].
+FE_attn=a*[(q+1)*M*Z+(D+1)*L*M].
+FM_attn=FB_attn+FE_attn.
+All these shape/loop bounds are SV for the inference full-sequence kernel;
+using this algorithm as the training kernel is an Assumption in Scenario P.
+An actual training implementation may pack valid indices or use another kernel.
+
+B=1,T=1024: w=128, C2=512, C1=1024, k2=k1=640, Z=384.
+Local valid-count sum=122944; ratio-2 compressed sum=262144;
+ratio-1 compressed sum=393472 (each before multiplying layer counts).
+40*122944+18*262144+20*393472 = 17,505,792
+1024*384*64 = 25,165,824
+4*64*512*17505792 = 2,294,519,169,024
+4*64*512*25165824 = 3,298,534,883,328
+The latter is the scheduled QK+PV GEMM math. Online-softmax/rescaling/sink
+raises it to 3,319,287,775,232 total modeled attention operations.
+This example shows why a causal mask cannot be treated as free skipped math.
+
+20.7 Engram: broadcasted parameters are not recomputed per token
+
+Hash input [B,T], output [B,T,2,24]; integer work only, no forward float FLOPs.
+Each Engram lookup=[B,T,24,256] -> [B,T,J]. W_KV=[J,(c+1)H].
+Output key=[B,T,c,H], value=[B,T,H]; residual/gated output=[B,T,c,H].
+Two instances, layers 1 and 14. Hash history starts at each sequence boundary;
+all needed n-grams are formed in this batch, with padding at sequence starts.
+
+Per layer: M*J dequantization multiplies; 2*M*J*(c+1)*H projection FLOPs.
+q_weight*k_weight has shape [c,H], formed ONCE per layer invocation, then
+broadcast to B*T tokens: cH FB, not M*cH.
+All remaining gate/statistic/injection work is M*c*(9H+2) FB and 6*M*c FE.
+FB_engram=2*[M*(J+2*J*(c+1)*H+c*(9H+2))+cH].
+FE_engram=2*6*M*c; FM_engram=FB_engram+FE_engram.
+At M=1 this agrees exactly with the original decode Engram count.
+At M>1, multiplying that whole decode count by M overcounts by
+2*(M-1)*c*H. At M=1024 the correction is 41,902,080 FB.
+The source expressions are SV; their use in a training step is Scenario P (A).
+
+20.8 B=1, T=1024 Training Forward summary (Scenario P)
+
+This table covers every modeled text-backbone module through ALL-token logits.
+Each row inherits the evidence labels and assumptions above. It is a complete
+core ledger for Scenario P, not a complete hardware/official training ledger.
+Quantization, other dense GEMM padding, comparisons, communication, memory
+and compiler implementation costs remain outside the reported numbers.
+
+Tag | Module | Basic FLOPs | Special Operations Estimate | Total Modeled Operations | Excluded costs
+P | Q Projection | 3,972,844,748,800 | 0 | 3,972,844,748,800 | Q,R,N,C
+P | Q RMSNorm | 209,715,200 | 81,920 | 209,797,120 | R,N,C
+P | KV Projection + Norm | 214,832,250,880 | 81,920 | 214,832,332,800 | Q,R,N,C
+P | Main RoPE | 1,014,497,280 | 0 | 1,014,497,280 | R,N,C
+P | Compressor | 37,591,416,832 | 3,150,848 | 37,594,567,680 | Q,R,S,N,C
+P | Indexer | 145,235,607,552 | 5,120 | 145,235,612,672 | Q,R,S,N,C
+P | Output Projection | 6,184,752,906,240 | 0 | 6,184,752,906,240 | Q,R,N,C
+P | Hyper-Connection | 102,021,201,920 | 54,558,720 | 102,075,760,640 | R,S,N,C
+P | Attention + FFN Norm | 1,677,721,600 | 163,840 | 1,677,885,440 | R,N,C
+P | MoE Router | 161,077,493,760 | 47,431,680 | 161,124,925,440 | R,S,N,C
+P | MoE Experts | 20,297,075,916,800 | 660,602,880 | 20,297,736,519,680 | Q,R,S,N,C
+P | Engram | 644,635,222,016 | 49,152 | 644,635,271,168 | Q,R,S,N,C
+P | Final Collapse + Norm + LM Head | 1,355,656,724,480 | 2,048 | 1,355,656,726,528 | R,N,C
+P | Main Attention | 3,316,307,197,952 | 2,980,577,280 | 3,319,287,775,232 | R,S,N,C
+P | TOTAL | 36,434,932,621,312 | 3,746,705,408 | 36,438,679,326,720 | same exclusions; not physical GPU total
+
+Training Scenario P Basic = 36,434,932,621,312 FLOPs.
+Training Scenario P Special = 3,746,705,408 simplified operations.
+36,434,932,621,312+3,746,705,408 = 36,438,679,326,720
+Modeled full batch forward = 36.438679326720 TFLOPs-equivalent operations.
+Divide by B*T=1024, not by the number of historical tokens:
+36,438,679,326,720/1024 = 35,584,647,780
+Average per token = 35.584647780 GFLOPs-equivalent operations.
+This is a sequence-average of Scenario P, NOT single-token decode cost.
+Actual official training-forward total remains Unknown; no numerical
+placeholder for a missing trainer or a different official CED policy is added.
+
+Other module: embedding lookup [B,T] -> [B,T,H] and repeat to [B,T,c,H]
+have FB=0, FE=0, FM=0 arithmetic and nonzero memory/indexing costs (N).
+Full-sequence wrapper extras (draft-support means and sampling) are excluded
+from training Scenario P, just as draft execution and loss are excluded.
+No dropout, auxiliary loss or other training-only layer is inferred from names.
+
+21. Decode vs Training Forward comparison and totals check
+
+Quantity | Warm Decode | Training Scenario P
+Batch / current positions | 1 / 1 | B / T
+Historical reuse | S=1024 cached tokens | none from an earlier forward
+Current/source-local KV | 40 new vectors | 40*B*T new vectors
+New compressed latents/keys | 1 | B*(3*floor(T/2)+T); example 2560
+Index pairs scored | 6661 | B*T*(3*floor(T/2)+5*T); example 6815744
+Ratio-2 groups pooled | 0 | 3*B*floor(T/2); example 1536
+Main attention position slots | 24576 | padded example 25165824
+Useful main attention positions | 24576 | example 17505792
+LM logits | [1,129280] | [B,T,129280] (explicit assumption)
+FB | 35,580,865,451 | 36,434,932,621,312 for B=1,T=1024
+FE | 3,655,814 | 3,746,705,408 for B=1,T=1024
+FM | 35,584,521,265 | 36,438,679,326,720 for B=1,T=1024
+FM/(forwarded tokens) | 35.584521265G | 35.584647780G
+Evidence | local decode graph + operation model | local sequence graph + training assumptions
+Actual hardware/official training total | not claimed | Unknown
+
+Why the averages are close at this length: the supplied sparse kernel gives
+every sequence query the same tile width as mature decode; most projection
+and expert work is per-token. Similar totals do not imply identical execution.
+An implementation that skips invalid positions could have a lower attention
+cost; this report does not assume that optimization in the supplied kernel.
+
+Independent arithmetic check versus 1024 copies of revised Decode:
+Training compressor difference: +8,159,232 FB +3,148,800 FE.
+Training Indexer difference: +160,142,336 FB +3,072 FE.
+Training Engram difference: -41,902,080 FB.
+Other modeled modules agree with 1024 times their revised decode counts at
+this particular T. The net difference is expanded below.
+8,159,232+3,148,800+160,142,336+3,072-41,902,080 = 129,551,360
+35,584,521,265*1024+129,551,360 = 36,438,679,326,720
+Do not add either the old attention estimate or U_HC to the new totals.
+The kernel transforms are inside HC; final HC collapse is inside final output;
+all Query/KV/Index/Compressor norms and rotations are charged exactly once.
+
+22. Remaining costs, uncertainty, and source map
+
+Quantization has arithmetic and is NOT free. It is a separately excluded cost
+category, not classified as "non-FLOP" in its entirety. The new source reveals:
+- act_quant_kernel: absmax/clamp comparisons, scale creation, element divisions,
+  casts, and an extra multiply per element for inplace quantize/dequantize.
+  For logical Mq-by-Nq FP8 data with groups g: scale FB=Mq*Nq/g,
+  FE=Mq*Nq divisions; inplace adds Mq*Nq FB. Bit-based rounding is integer work.
+- fp4_quant_kernel: analogous per-element divisions/inplace multiplies.
+  E8M0 scales use one multiply per group before bit manipulation;
+  compressed-KV E4M3 scales use one division per group instead.
+- Quantizers tile 32 rows, so device work may also cover padded rows.
+- fp8_gemm_kernel and fp4_gemm_kernel accumulate each K-block result using
+  C_accum += C_block*scale_a*scale_b: 3 extra FB per output per K block.
+  These are beyond the semantic projection GEMM's 2MKN and are not silently
+  folded into that formula. With K-block=32, logical scale work is 3*M*N*(K/32).
+  Literal dense tiles are M'=32*ceil(M/32), N'=128*ceil(N/128),
+  K'=32*ceil(K/32); GEMM tile math is 2*M'*N'*K', plus 3*M'*N'*(K'/32)
+  scale arithmetic. These physical-padding formulas are NOT added to the
+  standard model FLOPs tables. Actual lowering still requires compiled analysis.
+- Expert M is m_j, which depends on routing; summing ceil(m_j/32) cannot be
+  inferred from B,T alone. Thus a full device-kernel number is not fixed by
+  the architecture even though logical expert 2MKN is fixed by e*B*T.
+
+Explicit Engram memory dequantization is already in FB; do not add it again.
+Memory gathers/copies/cache writes, reductions' comparisons, RNG, top-k,
+expert dispatch and network collectives remain separately unquantified.
+These exclusions apply to BOTH Decode and Scenario P, consistently.
+HC and sparse attention mathematical algorithms are now known; the official
+training path, compiler transformations and full device costs are not.
+
+Source references (local paths; line numbers refer to the reviewed snapshot):
+DeepSeek-V4.1-Flash/config.json: all dimensions, source IDs, ratios, top-k, HC iters.
+model.py:281 RMSNorm; :328 Engram; :392 apply_rotary_emb; :410 window indices.
+model.py:429 Compressor; :488 Indexer; :583 select_candidate_blocks.
+model.py:613 Attention; :739 _compress_kv; :765 attention forward.
+model.py:792 Gate; :830 Expert; :854 MoE; :907 Block; :948 HC mixing.
+model.py:997 ParallelHead; :1166 SharedAttentionRuntime; :1242 Transformer.forward.
+engram.py:160 NgramHashState.forward; integer hash and sequence-boundary handling.
+kernel.py:41 act_quant_kernel; :128 fp4_quant_kernel; :208 fp8_gemm_kernel;
+:311 sparse_attn_kernel; :392 sparse_attn; :407 hc_split_sinkhorn_kernel;
+:465 hc_split_sinkhorn; :478 fp4_gemm_kernel.
+
+Validation: FLOPs_calculation_verify.py independently enumerates kernel operations,
+recomputes all module ledgers and checks the historical/current summary tables.
+It also checks short/odd lengths and that parameter-only Engram products are
+not multiplied by B*T. No GPU execution or official training validation claimed.
+Run: python -B FLOPs_calculation_verify.py
+For symbolic-formula examples: --training-batch 2 --training-length 2048.
+Backward, Optimizer, Loss, activation replay and other training costs are
+explicitly outside this report's scope.

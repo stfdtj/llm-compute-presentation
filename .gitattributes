@@ -1,0 +1,2 @@
+# Preserve fixed-source and regression-fixture SHA256 checks on checkout.
+* -text

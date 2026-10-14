@@ -1,0 +1,9 @@
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+llm_compute_lab/qa/chrome-profile/
+llm_compute_lab/qa/diagnostic-profile/
+*.log
+.DS_Store

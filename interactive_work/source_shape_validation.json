@@ -1,0 +1,492 @@
+[
+  {
+    "parameter": "qa",
+    "shapeFromAST": [
+      1280,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 641
+  },
+  {
+    "parameter": "qnorm",
+    "shapeFromAST": [
+      1280
+    ],
+    "file": "inference/model.py",
+    "line": 642
+  },
+  {
+    "parameter": "qb",
+    "shapeFromAST": [
+      32768,
+      1280
+    ],
+    "file": "inference/model.py",
+    "line": 643
+  },
+  {
+    "parameter": "kv",
+    "shapeFromAST": [
+      512,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 644
+  },
+  {
+    "parameter": "kvnorm",
+    "shapeFromAST": [
+      512
+    ],
+    "file": "inference/model.py",
+    "line": 645
+  },
+  {
+    "parameter": "oa",
+    "shapeFromAST": [
+      8192,
+      4096
+    ],
+    "file": "inference/model.py",
+    "line": 646
+  },
+  {
+    "parameter": "ob",
+    "shapeFromAST": [
+      5120,
+      8192
+    ],
+    "file": "inference/model.py",
+    "line": 651
+  },
+  {
+    "parameter": "sink",
+    "shapeFromAST": [
+      64
+    ],
+    "file": "inference/model.py",
+    "line": 640
+  },
+  {
+    "parameter": "anorm",
+    "shapeFromAST": [
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 935
+  },
+  {
+    "parameter": "fnorm",
+    "shapeFromAST": [
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 936
+  },
+  {
+    "parameter": "hc_fn",
+    "shapeFromAST": [
+      24,
+      20480
+    ],
+    "file": "inference/model.py",
+    "line": 943
+  },
+  {
+    "parameter": "hc_base",
+    "shapeFromAST": [
+      24
+    ],
+    "file": "inference/model.py",
+    "line": 945
+  },
+  {
+    "parameter": "hc_scale",
+    "shapeFromAST": [
+      3
+    ],
+    "file": "inference/model.py",
+    "line": 947
+  },
+  {
+    "parameter": "router",
+    "shapeFromAST": [
+      384,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 807
+  },
+  {
+    "parameter": "bias",
+    "shapeFromAST": [
+      384
+    ],
+    "file": "inference/model.py",
+    "line": 808
+  },
+  {
+    "parameter": "bias_vl",
+    "shapeFromAST": [
+      384
+    ],
+    "file": "inference/model.py",
+    "line": 809
+  },
+  {
+    "parameter": "router_draft",
+    "shapeFromAST": [
+      128,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 807
+  },
+  {
+    "parameter": "bias_draft",
+    "shapeFromAST": [
+      128
+    ],
+    "file": "inference/model.py",
+    "line": 808
+  },
+  {
+    "parameter": "bias_vl_draft",
+    "shapeFromAST": [
+      128
+    ],
+    "file": "inference/model.py",
+    "line": 809
+  },
+  {
+    "parameter": "w1",
+    "shapeFromAST": [
+      2304,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 838
+  },
+  {
+    "parameter": "w3",
+    "shapeFromAST": [
+      2304,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 840
+  },
+  {
+    "parameter": "w2",
+    "shapeFromAST": [
+      5120,
+      2304
+    ],
+    "file": "inference/model.py",
+    "line": 839
+  },
+  {
+    "parameter": "ckv",
+    "shapeFromAST": [
+      512,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 446
+  },
+  {
+    "parameter": "cgate",
+    "shapeFromAST": [
+      512,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 448
+  },
+  {
+    "parameter": "cnorm",
+    "shapeFromAST": [
+      512
+    ],
+    "file": "inference/model.py",
+    "line": 443
+  },
+  {
+    "parameter": "iq",
+    "shapeFromAST": [
+      4096,
+      1280
+    ],
+    "file": "inference/model.py",
+    "line": 514
+  },
+  {
+    "parameter": "ih",
+    "shapeFromAST": [
+      32,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 515
+  },
+  {
+    "parameter": "ik",
+    "shapeFromAST": [
+      128,
+      512
+    ],
+    "file": "inference/model.py",
+    "line": 518
+  },
+  {
+    "parameter": "inorm",
+    "shapeFromAST": [
+      128
+    ],
+    "file": "inference/model.py",
+    "line": 519
+  },
+  {
+    "parameter": "embedding",
+    "shapeFromAST": [
+      129280,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 166
+  },
+  {
+    "parameter": "head",
+    "shapeFromAST": [
+      129280,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 1008
+  },
+  {
+    "parameter": "finalnorm",
+    "shapeFromAST": [
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 1208
+  },
+  {
+    "parameter": "etable1",
+    "shapeFromAST": [
+      384006168,
+      256
+    ],
+    "file": "inference/model.py",
+    "line": 309
+  },
+  {
+    "parameter": "etable14",
+    "shapeFromAST": [
+      384016682,
+      256
+    ],
+    "file": "inference/model.py",
+    "line": 309
+  },
+  {
+    "parameter": "ew",
+    "shapeFromAST": [
+      25600,
+      6144
+    ],
+    "file": "inference/model.py",
+    "line": 345
+  },
+  {
+    "parameter": "eq",
+    "shapeFromAST": [
+      4,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 347
+  },
+  {
+    "parameter": "ek",
+    "shapeFromAST": [
+      4,
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 348
+  },
+  {
+    "parameter": "dmain",
+    "shapeFromAST": [
+      5120,
+      15360
+    ],
+    "file": "inference/model.py",
+    "line": 1116
+  },
+  {
+    "parameter": "dmainnorm",
+    "shapeFromAST": [
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 1117
+  },
+  {
+    "parameter": "dfinalnorm",
+    "shapeFromAST": [
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 1119
+  },
+  {
+    "parameter": "markovembed",
+    "shapeFromAST": [
+      129280,
+      256
+    ],
+    "file": "inference/model.py",
+    "line": 1083
+  },
+  {
+    "parameter": "markovhead",
+    "shapeFromAST": [
+      129280,
+      256
+    ],
+    "file": "inference/model.py",
+    "line": 1084
+  },
+  {
+    "parameter": "confidence",
+    "shapeFromAST": [
+      1,
+      5376
+    ],
+    "file": "inference/model.py",
+    "line": 1096
+  },
+  {
+    "parameter": "patch",
+    "shapeFromAST": [
+      1024,
+      588
+    ],
+    "file": "inference/vision.py",
+    "line": 40
+  },
+  {
+    "parameter": "patchbias",
+    "shapeFromAST": [
+      1024
+    ],
+    "file": "inference/vision.py",
+    "line": 40
+  },
+  {
+    "parameter": "vqkv",
+    "shapeFromAST": [
+      3072,
+      1024
+    ],
+    "file": "inference/vision.py",
+    "line": 51
+  },
+  {
+    "parameter": "vqkvbias",
+    "shapeFromAST": [
+      3072
+    ],
+    "file": "inference/vision.py",
+    "line": 51
+  },
+  {
+    "parameter": "vo",
+    "shapeFromAST": [
+      1024,
+      1024
+    ],
+    "file": "inference/vision.py",
+    "line": 52
+  },
+  {
+    "parameter": "vobias",
+    "shapeFromAST": [
+      1024
+    ],
+    "file": "inference/vision.py",
+    "line": 52
+  },
+  {
+    "parameter": "vup",
+    "shapeFromAST": [
+      5632,
+      1024
+    ],
+    "file": "inference/vision.py",
+    "line": 66
+  },
+  {
+    "parameter": "vdown",
+    "shapeFromAST": [
+      1024,
+      2816
+    ],
+    "file": "inference/vision.py",
+    "line": 67
+  },
+  {
+    "parameter": "vnorm",
+    "shapeFromAST": [
+      1024
+    ],
+    "file": "inference/vision.py",
+    "line": 28
+  },
+  {
+    "parameter": "align1",
+    "shapeFromAST": [
+      5120,
+      9216
+    ],
+    "file": "inference/vision.py",
+    "line": 111
+  },
+  {
+    "parameter": "align1bias",
+    "shapeFromAST": [
+      5120
+    ],
+    "file": "inference/vision.py",
+    "line": 111
+  },
+  {
+    "parameter": "align2",
+    "shapeFromAST": [
+      5120,
+      5120
+    ],
+    "file": "inference/vision.py",
+    "line": 112
+  },
+  {
+    "parameter": "align2bias",
+    "shapeFromAST": [
+      5120
+    ],
+    "file": "inference/vision.py",
+    "line": 112
+  },
+  {
+    "parameter": "image_delimiter",
+    "shapeFromAST": [
+      5120
+    ],
+    "file": "inference/model.py",
+    "line": 1223
+  }
+]

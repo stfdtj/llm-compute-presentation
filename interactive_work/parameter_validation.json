@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "checks": [
+    "Query W_QA / gamma / W_QB table, MathML and matrix synchronize",
+    "Backward gradients separate; results expose exact/approx, four assumptions, pinned source locations",
+    "RoPE zero; RMSNorm gamma and 64 Attention Sinks counted",
+    "Global / Indexer normalization gamma; HC base and scale stages",
+    "MoE Total / Activated / Shared / Top-6 / Router boundary and complete parameter list",
+    "Global Assumptions opens, four categories and statuses; Escape closes",
+    "189 module/mode metadata coverage",
+    "1920 / 1366 / 768 / 390 toolbar and inspector bounds; Data Flow five-step preservation"
+  ],
+  "coverage": 189,
+  "errors": [],
+  "offline": true,
+  "statuses": {
+    "Verified": 63,
+    "Estimated": 82,
+    "Unverified": 44,
+    "Mismatch": 0,
+    "historicalMismatchesCorrected": 38
+  }
+}
