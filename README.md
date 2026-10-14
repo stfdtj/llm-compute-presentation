@@ -3,7 +3,7 @@
 两个可离线打开的教学网页，以及从架构、参数量、FLOPs 到 Roofline / MFU 的中文讲稿。
 
 - [DeepSeek 架构交互页](deepseek_v4_1_interactive.html)：参数、前向、局部反向与信息流。
-- [LLM Compute Lab](llm_compute_lab/index.html)：六种 Attention 对比、Roofline、MFU 与演示模式。
+- [LLM Compute Lab](index.html)：六种 Attention 对比、Roofline、MFU 与演示模式。
 - [12–15 分钟主讲稿](presentation_script_short.md)：小矩阵开场，六段口语讲述与网页演示。
 - [演讲支持附录](presentation_script_appendix.md)：复杂公式、详细结果与统计边界。
 - [原始技术底稿](presentation_script.md)：保留完整五章讲义，供学习和查阅。
@@ -36,7 +36,7 @@
 
 ### 2. LLM Compute Lab：比较计算开销，理解硬件性能与训练效率
 
-入口：[llm_compute_lab/index.html](llm_compute_lab/index.html)。
+入口：[index.html](index.html)。
 
 这个网页适合在理解矩阵和模块之后，进一步探索“改变架构会减少哪些工作”“为什么 FLOPs 少了却不一定同比例加速”。它提供可调参数、实时计算、图形和数字代入，包含三个 Tab：
 
@@ -62,42 +62,38 @@ Roofline 默认自动计算并绘图，访存量来自明确的假设模型。�
 
 ## 目录与修改入口
 
+根目录保留网页成品和讲稿，打开即可使用。源码及模块测试集中在 `src/`，截图和浏览器检查记录在各模块的 `qa/`；模型、来源资料和技术报告分别收纳在 `models/`、`references/` 与 `docs/`。
+
 ```text
 llm-compute-presentation/
-├─ README.md                         仓库导航、网页用途与运行说明
+├─ index.html                        Compute Lab 网页成品
+├─ deepseek_v4_1_interactive.html     DeepSeek 网页成品
 ├─ presentation_script_short.md      12–15 分钟主讲稿
-├─ presentation_script_appendix.md   推导、数值与边界附录
-├─ presentation_script.md            保留的五章技术底稿
-├─ deepseek_v4_1_interactive.html     DeepSeek 离线网页成品
-├─ llm_compute_lab/
-│  ├─ index.html                     Compute Lab 离线网页成品
-│  ├─ page.html / style.css          页面模板与样式
-│  ├─ model.js                       纯计算与输入校验
-│  ├─ ui.js / extension.js           Attention、Roofline 等交互
-│  ├─ learning.js / presentation.js  教学解读与演示模式
-│  ├─ build.py                       单文件 HTML 打包
-│  └─ 测试脚本、验证文档、qa/         回归测试与图形检查记录
-├─ interactive_work/
-│  ├─ teaching_data.py / audited_data.py  教学内容与审计绑定
-│  ├─ build_diagram.py / build.py     架构图生成与网页打包
-│  ├─ page_template.html / *_ui.html 页面与分步演示交互
-│  ├─ audit_sources/                 固定版本参考资料
-│  └─ verify_* / JSON / PNG          计算、浏览器测试与基线
-├─ DeepSeek-V4.1-Flash/              静态分析用模型源码与配置
-├─ FLOPs_calculation_verify.py      根目录计算复核
-├─ 计算报告与审计文档                公式依据、假设和边界
-└─ requirements*.txt / package*.json 开发依赖与安装锁定
+├─ presentation_script_appendix.md   支持附录
+├─ presentation_script.md            原始技术底稿
+├─ README.md                         使用与开发导航
+├─ src/
+│  ├─ compute_lab/                   Lab 模板、计算、交互、构建与测试
+│  └─ deepseek/                      架构图、教学内容、审计、构建与测试
+├─ models/DeepSeek-V4.1-Flash/        静态分析用模型源码与配置
+├─ references/deepseek/              固定版本官方源码、报告与许可
+├─ docs/
+│  ├─ architecture/                 架构页审计与假设
+│  ├─ flops/                        FLOPs 技术报告与审计
+│  └─ compute_lab/                  Lab 验证说明
+├─ scripts/FLOPs_calculation_verify.py  独立计算复核
+└─ requirements*.txt / package*.json  开发依赖与锁定
 ```
 
 | 路径 | 内容 |
 |---|---|
-| `llm_compute_lab/` | HTML 模板、JS 计算与交互、CSS、打包脚本、测试和 QA 记录 |
-| `interactive_work/` | 架构 SVG 生成、教学数据、HTML 模板、审计与浏览器测试 |
-| `interactive_work/audit_sources/` | 固定 revision 的参考源码、配置、技术报告和 SHA256 |
-| `DeepSeek-V4.1-Flash/` | 原项目的本地模型源码与配置；用于静态分析，不是完整推理部署 |
-| `FLOPs_calculation_verify.py` | 根目录计算复核，也是 DeepSeek 教学构建的依赖 |
-| `FLOPs_calculation_forward.txt`、`FLOPs_calculation_audit.md` | 计算报告与边界 |
-| `calculation_audit.md`、`assumptions.md` | 架构页构建时生成的审计说明 |
+| `src/compute_lab/` | HTML 模板、JS 计算与交互、CSS、打包脚本、测试和 QA 记录 |
+| `src/deepseek/` | 架构 SVG 生成、教学数据、HTML 模板、审计与浏览器测试 |
+| `references/deepseek/` | 固定 revision 的参考源码、配置、技术报告和 SHA256 |
+| `models/DeepSeek-V4.1-Flash/` | 原项目的本地模型源码与配置；用于静态分析，不是完整推理部署 |
+| `scripts/FLOPs_calculation_verify.py` | 根目录计算复核，也是 DeepSeek 教学构建的依赖 |
+| `docs/flops/FLOPs_calculation_forward.txt`、`docs/flops/FLOPs_calculation_audit.md` | 计算报告与边界 |
+| `docs/architecture/calculation_audit.md`、`docs/architecture/assumptions.md` | 架构页构建时生成的审计说明 |
 
 修改源码后再构建，不直接编辑成品 HTML。子目录 README 保留详细功能和验证历史。
 
@@ -116,13 +112,13 @@ Python 依赖用于公式转换和数值梯度测试；Playwright 仅供浏览�
 ## 构建与计算验证
 
 ```powershell
-.venv\Scripts\python.exe llm_compute_lab/build.py
-.venv\Scripts\python.exe interactive_work/build.py
+.venv\Scripts\python.exe src/compute_lab/build.py
+.venv\Scripts\python.exe src/deepseek/build.py
 npm run test:lab
-.venv\Scripts\python.exe FLOPs_calculation_verify.py
-.venv\Scripts\python.exe interactive_work/verify_audit.py
-.venv\Scripts\python.exe interactive_work/verify_single_token.py
-.venv\Scripts\python.exe interactive_work/verify_calculations.py
+.venv\Scripts\python.exe scripts/FLOPs_calculation_verify.py
+.venv\Scripts\python.exe src/deepseek/verify_audit.py
+.venv\Scripts\python.exe src/deepseek/verify_single_token.py
+.venv\Scripts\python.exe src/deepseek/verify_calculations.py
 ```
 
 Lab 构建仅需 Python 标准库；DeepSeek 构建同时更新模块 JSON、SVG 和审计文档，不下载或执行模型权重。
@@ -148,9 +144,9 @@ SHA256 按原始字节核对，`.gitattributes` 禁止 checkout 自动换行转�
 .venv\Scripts\python.exe -m pip install -r requirements-sources.txt
 ```
 
-依次运行 `interactive_work/fetch_audit_sources.py` 和 `fetch_technical_report.py` 后重新审计；`inspect_report.py` 可渲染报告页。更新会改变 revision / SHA256，应单独审查。
+依次运行 `src/deepseek/fetch_audit_sources.py` 和 `fetch_technical_report.py` 后重新审计；`inspect_report.py` 可渲染报告页。更新会改变 revision / SHA256，应单独审查。
 
-参考源码与报告的来源见 `interactive_work/audit_sources/manifest.json`。官方源码许可见该目录的 LICENSE；原始参考图保留为 `interactive_work/reference.png`，用于架构几何对照。
+参考源码与报告的来源见 `references/deepseek/manifest.json`。官方源码许可见该目录的 LICENSE；原始参考图保留为 `src/deepseek/qa/reference.png`，用于架构几何对照。
 
 ## 数据边界
 

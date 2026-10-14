@@ -3,7 +3,7 @@ node_modules/
 __pycache__/
 *.py[cod]
 .pytest_cache/
-llm_compute_lab/qa/chrome-profile/
-llm_compute_lab/qa/diagnostic-profile/
+src/compute_lab/qa/chrome-profile/
+src/compute_lab/qa/diagnostic-profile/
 *.log
 .DS_Store

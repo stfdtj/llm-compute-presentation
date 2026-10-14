@@ -170,7 +170,7 @@ $$
 
 这是工作量的求和，不代表各专家运行时间相同。少量 token 的小矩阵可能效率较低，负载不均和为满足内核尺寸而补齐的无效位置，也可能增加实际时间或实际执行量。
 
-本地 DeepSeek 推理源码可以核对 Expert、Router 的前向形状和选择路径，但不能仅凭这些代码确认完整训练的路由梯度、辅助目标和反向内核。本项目现有 FLOPs 审计也明确区分了假设的训练前向场景与实际训练实现。本文的反向式子是数学推导，未把它们冒充该仓库已经验证的训练总量。[当前审计范围](FLOPs_calculation_audit.md)
+本地 DeepSeek 推理源码可以核对 Expert、Router 的前向形状和选择路径，但不能仅凭这些代码确认完整训练的路由梯度、辅助目标和反向内核。本项目现有 FLOPs 审计也明确区分了假设的训练前向场景与实际训练实现。本文的反向式子是数学推导，未把它们冒充该仓库已经验证的训练总量。[当前审计范围](docs/flops/FLOPs_calculation_audit.md)
 
 ## C. Attention 的统一配置、完整分项与阶段边界
 
@@ -317,7 +317,7 @@ $$
 | MLA（本节 factorized 路径） | 67,633,152 | 71,499,744 | 0 | 139,132,896 |
 | GDA | 已知 168,296,448 | 3,678,208 | 尚有未核验项 | **未知** |
 
-数字使用项目 [model.js](llm_compute_lab/model.js) 的纯计算函数复算，并与上述分项公式核对。这里的 0 只表示该表范围内没有额外索引项，不是整个架构没有任何其他运算。
+数字使用项目 [model.js](src/compute_lab/model.js) 的纯计算函数复算，并与上述分项公式核对。这里的 0 只表示该表范围内没有额外索引项，不是整个架构没有任何其他运算。
 
 再看缓存。令 b 为 KV 每元素字节数，本例 b=2；$b_s$ 为递归状态每元素字节数，本例为 4。MHA 缓存为 $L H_q(d_k+d_v)b$，GQA 为 $L H_{kv}(d_k+d_v)b$。SWA 将缓存位置数限制为 256；MLA 保存每位置 $r+d_r$ 个数；MSA 仍保存完整 GQA KV，再加每位置 $d_i$ 个索引 Key；GDA 的已知状态为 $H_qd_kd_vb_s$。
 
@@ -631,4 +631,4 @@ Attention 使用项目 defaults，再覆盖 S=1023、W=256、topk=4、block=128�
 
 第一个网页的数据用于解释本地 DeepSeek 模块；第二个网页是各自声明路径的架构比较。二者不自动共享全模型数据，不将 Lab 的 MLA 等同于本地 DeepSeek 完整实现。训练反向式子是数学推导，不代表仓库提供并核验了官方完整训练实现。
 
-相关实现与证据：[计算模型](llm_compute_lab/model.js)、[架构页说明](interactive_work/README.md)、[Lab 最新验收](llm_compute_lab/final_validation.md)、[当前 DeepSeek FLOPs 审计](FLOPs_calculation_audit.md)。来源链接保留在各节原文中，不引入新的模型、硬件规格或实测成绩。
+相关实现与证据：[计算模型](src/compute_lab/model.js)、[架构页说明](src/deepseek/README.md)、[Lab 最新验收](docs/compute_lab/final_validation.md)、[当前 DeepSeek FLOPs 审计](docs/flops/FLOPs_calculation_audit.md)。来源链接保留在各节原文中，不引入新的模型、硬件规格或实测成绩。

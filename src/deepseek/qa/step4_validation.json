@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "substeps": 6,
+  "viewports": [
+    [
+      1920,
+      1080
+    ],
+    [
+      1366,
+      768
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      390,
+      667
+    ]
+  ],
+  "concatPositionAxis": true,
+  "jointSoftmaxWithSink": true,
+  "sharedLatentWeightedSum": true,
+  "groupedOutputProjection": true,
+  "offline": true,
+  "originalDiagramPreserved": true,
+  "auditHashesPreserved": [
+    "src/deepseek/module_data.json",
+    "src/deepseek/audit_data.json",
+    "src/deepseek/architecture.svg",
+    "docs/architecture/calculation_audit.md",
+    "docs/architecture/assumptions.md"
+  ],
+  "errors": []
+}

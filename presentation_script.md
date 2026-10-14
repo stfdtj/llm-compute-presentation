@@ -142,7 +142,7 @@ $$
 P_e=3\times5120\times2304=35,389,440.
 $$
 
-专家池按 385 份保存，一个 token 的专家路径按 7 份计算。但完整 MoE 还要加 Router。当前代码还定义了文本选择偏置，并根据配置分配图像选择偏置，所以不能把刚才“无偏置 Router”的假设原封不动用于真实总数。这里讨论的是逻辑参数，而非低比特打包后的物理存储元素数。[本地配置](DeepSeek-V4.1-Flash/config.json)、[Expert / Gate / MoE 实现](DeepSeek-V4.1-Flash/model.py)
+专家池按 385 份保存，一个 token 的专家路径按 7 份计算。但完整 MoE 还要加 Router。当前代码还定义了文本选择偏置，并根据配置分配图像选择偏置，所以不能把刚才“无偏置 Router”的假设原封不动用于真实总数。这里讨论的是逻辑参数，而非低比特打包后的物理存储元素数。[本地配置](models/DeepSeek-V4.1-Flash/config.json)、[Expert / Gate / MoE 实现](models/DeepSeek-V4.1-Flash/model.py)
 
 再举一个更简单的真实模块。该模型的 Query 第一投影 `wq_a` 把 5120 维变成 1280 维，权重参数就是 $5120\times1280=6,553,600$。这只算第一张投影矩阵，不能称为整个 Query 模块，更不能称为整个 Attention。后续投影与归一化权重需要另外统计。
 
@@ -262,7 +262,7 @@ $$
 
 这是工作量的求和，不代表各专家运行时间相同。少量 token 的小矩阵可能效率较低，负载不均和为满足内核尺寸而补齐的无效位置，也可能增加实际时间或实际执行量。
 
-本地 DeepSeek 推理源码可以核对 Expert、Router 的前向形状和选择路径，但不能仅凭这些代码确认完整训练的路由梯度、辅助目标和反向内核。本项目现有 FLOPs 审计也明确区分了假设的训练前向场景与实际训练实现。本文的反向式子是数学推导，未把它们冒充该仓库已经验证的训练总量。[当前审计范围](FLOPs_calculation_audit.md)
+本地 DeepSeek 推理源码可以核对 Expert、Router 的前向形状和选择路径，但不能仅凭这些代码确认完整训练的路由梯度、辅助目标和反向内核。本项目现有 FLOPs 审计也明确区分了假设的训练前向场景与实际训练实现。本文的反向式子是数学推导，未把它们冒充该仓库已经验证的训练总量。[当前审计范围](docs/flops/FLOPs_calculation_audit.md)
 
 ### 正文：Attention 到底改变了哪部分工作？
 
@@ -407,7 +407,7 @@ $$
 | MLA（本节 factorized 路径） | 67,633,152 | 71,499,744 | 0 | 139,132,896 |
 | GDA | 已知 168,296,448 | 3,678,208 | 尚有未核验项 | **未知** |
 
-数字使用项目 [model.js](llm_compute_lab/model.js) 的纯计算函数复算，并与上述分项公式核对。这里的 0 只表示该表范围内没有额外索引项，不是整个架构没有任何其他运算。
+数字使用项目 [model.js](src/compute_lab/model.js) 的纯计算函数复算，并与上述分项公式核对。这里的 0 只表示该表范围内没有额外索引项，不是整个架构没有任何其他运算。
 
 再看缓存。令 b 为 KV 每元素字节数，本例 b=2；$b_s$ 为递归状态每元素字节数，本例为 4。MHA 缓存为 $L H_q(d_k+d_v)b$，GQA 为 $L H_{kv}(d_k+d_v)b$。SWA 将缓存位置数限制为 256；MLA 保存每位置 $r+d_r$ 个数；MSA 仍保存完整 GQA KV，再加每位置 $d_i$ 个索引 Key；GDA 的已知状态为 $H_qd_kd_vb_s$。
 
@@ -789,8 +789,8 @@ MFU、运行时间与模型质量的综合评估
 
 本稿只有 DeepSeek 的局部尺寸使用真实项目配置；主干每层 384 个路由专家、Top-6、一个共享专家、三矩阵 Expert，以及 Query 第一投影均已与本地配置和源码核对。其他小网络、矩阵 Roofline 芯片和 MFU 吞吐均为显式假设。没有推导或声称该模型的官方完整训练 FLOPs，也没有提供硬件实测性能。
 
-Attention 表由现有 [model.js](llm_compute_lab/model.js) 的 \`results\` 复算：在 \`defaults\` 上覆盖 \`S:1023, W:256, topk:4, block:128\`，保留其余本节声明的值。若使用网页重现，必须切到 Single Token，不能保留默认连续生成 1024 tokens 的累计模式。这里没有修改网页、计算公式或模型源码。
+Attention 表由现有 [model.js](src/compute_lab/model.js) 的 \`results\` 复算：在 \`defaults\` 上覆盖 \`S:1023, W:256, topk:4, block:128\`，保留其余本节声明的值。若使用网页重现，必须切到 Single Token，不能保留默认连续生成 1024 tokens 的累计模式。这里没有修改网页、计算公式或模型源码。
 
-项目早期 [validation.md](llm_compute_lab/validation.md) 的后续接口状态描述属于历史版本，当前功能应结合 [扩展验证](llm_compute_lab/extension_validation.md) 与 [最新验收](llm_compute_lab/final_validation.md) 阅读。矩阵及架构公式以现有计算源码为准。DeepSeek 训练证据边界见 [FLOPs 审计的 Current revision](FLOPs_calculation_audit.md)；不把旧版本缺 kernel 的说明当作当前文件状态，也不把已有推理计数当作完整训练结果。
+项目早期 [validation.md](docs/compute_lab/validation.md) 的后续接口状态描述属于历史版本，当前功能应结合 [扩展验证](docs/compute_lab/extension_validation.md) 与 [最新验收](docs/compute_lab/final_validation.md) 阅读。矩阵及架构公式以现有计算源码为准。DeepSeek 训练证据边界见 [FLOPs 审计的 Current revision](docs/flops/FLOPs_calculation_audit.md)；不把旧版本缺 kernel 的说明当作当前文件状态，也不把已有推理计数当作完整训练结果。
 
 前一版 \`presentation_outline.md\` 和 \`presentation_qa.md\` 对应此前短讲，本次按要求仅更新本演讲稿，未同步改写它们。

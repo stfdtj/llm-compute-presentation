@@ -9,7 +9,7 @@
 打开本稿的 Markdown 预览，用它展示小矩阵和假设数字。再开两个浏览器标签：
 
 - 第一个网页：[DeepSeek 架构交互页](deepseek_v4_1_interactive.html)。准备定位“Query 第一步：压缩”和“专家混合 / MoE”。
-- 第二个网页：[LLM Compute Lab](llm_compute_lab/index.html)。Attention 设置为 **Single Token**，历史 **S=1023**，即含当前 token 共 1024 个可见位置；其余公共维度保留默认值。为使其余架构结果也与附录一致，将 SWA 窗口设为 **W=256**，MSA 块预算设为 **4**、块大小 **128**。Roofline 保持默认 H100；MFU 保持默认 50% 假设示例。启用右上角“演示模式”。
+- 第二个网页：[LLM Compute Lab](index.html)。Attention 设置为 **Single Token**，历史 **S=1023**，即含当前 token 共 1024 个可见位置；其余公共维度保留默认值。为使其余架构结果也与附录一致，将 SWA 窗口设为 **W=256**，MSA 块预算设为 **4**、块大小 **128**。Roofline 保持默认 H100；MFU 保持默认 50% 假设示例。启用右上角“演示模式”。
 
 两个网页的输入与统计范围独立。第一网页的普通模块主要讲当前一个 token，第二网页的 Attention 对比是单层 Decode，MFU 则是独立的全模型训练假设。现场不用逐个点击所有模块，也不用读长整数。
 
@@ -91,7 +91,7 @@ X：[1,4]        W：[4,3]        Y：[1,3]
 
 **比较条件（展示，不逐项朗读）：**单层、Batch=1、一次 Decode；1023 个历史位置加当前位置，共 1024 个可见位置。隐藏宽度 4096，32 个 Query 头，每头 Key/Value 维度均为 128。MHA 使用 32 个 KV 头，GQA 使用 8 个；KV 为 BF16。采用项目声明范围与矩阵近似，详细配置、排除项和精确数值见附录 C。
 
-**网页演示：**【打开第二个网页 `llm_compute_lab/index.html`，进入“Attention 计算量”。确认 Single Token、S=1023 和上述维度；比较 MHA/GQA 的投影与 Core 分项，再切到缓存图。最后展示六种架构的结果图，只点明各自改变了什么，不展开它们的公式。】
+**网页演示：**【打开第二个网页 `index.html`，进入“Attention 计算量”。确认 Single Token、S=1023 和上述维度；比较 MHA/GQA 的投影与 Core 分项，再切到缓存图。最后展示六种架构的结果图，只点明各自改变了什么，不展开它们的公式。】
 
 ### 讲述
 
