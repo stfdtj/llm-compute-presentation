@@ -8,7 +8,82 @@
 
 下载后可直接双击 HTML；阅读成品不需要安装依赖。仓库包含两套网页的源码、测试、固定版本审计资料和参考图，不依赖原来的 sharing 工作区，也不包含模型权重。
 
+## 两个网页分别用来做什么？
+
+### 1. DeepSeek 架构交互页：理解一个真实模型内部怎样计算
+
+入口：[deepseek_v4_1_interactive.html](deepseek_v4_1_interactive.html)。
+
+这个网页适合从模型结构入手学习。它把本项目 DeepSeek-V4.1-Flash 的主要模块画成可点击的架构图，让你沿着数据流理解输入经过哪些模块、矩阵维度怎样变化，以及权重如何参与计算。
+
+点击模块后，可以切换三种说明：
+
+| 模式 | 用来回答的问题 |
+|---|---|
+| 参数量 | 这个模块有哪些可学习权重？矩阵形状是什么？保存了多少参数？ |
+| FLOPs（前向） | 当前 token 从输入得到输出，需要执行哪些运算？计算量怎样推导？ |
+| FLOPs（反向） | 输入梯度、权重梯度如何计算？它们与前向矩阵有什么关系？ |
+
+例如，点击“Query 第一步：压缩”，可以观察 `[1,5120] × [5120,1280] → [1,1280]`，再对照参数量与前向 FLOPs。点击“专家混合 / MoE”，可以理解全部专家参数、当前 token 激活参数、Router 和共享专家的区别。
+
+“信息流 / Data Flow”提供分步演示，用来观察隐藏状态、共享 KV、Local KV 和 Attention 输出怎样流动。其中的矩阵教学演示进一步解释位置拼接、索引读取、分数计算、共同 Softmax 和输出投影。
+
+**适用场景：**学习模型源码、核对局部模块的参数和计算公式、讲解 Dense/MoE 执行路径、在分享时展示真实矩阵形状。图支持缩放、拖动与区域聚焦；不需要逐个点击所有模块。
+
+**阅读边界：**常规模块主要围绕当前一个 token 展开；Attention 的示例历史长度在面板中注明。反向内容是局部数学推导，不能直接作为已验证的完整训练实现或全模型训练 FLOPs。详细假设、来源和未核验项可以展开查看。
+
+### 2. LLM Compute Lab：比较计算开销，理解硬件性能与训练效率
+
+入口：[llm_compute_lab/index.html](llm_compute_lab/index.html)。
+
+这个网页适合在理解矩阵和模块之后，进一步探索“改变架构会减少哪些工作”“为什么 FLOPs 少了却不一定同比例加速”。它提供可调参数、实时计算、图形和数字代入，包含三个 Tab：
+
+| Tab | 主要用途 | 可以做的操作 |
+|---|---|---|
+| Attention Comparison | 比较 MHA、GQA、MLA、SWA、MSA、GDA 的声明范围内 FLOPs、缓存/状态容量和计算量比值 | 修改维度、历史长度与生成数；切换 Single Token / 连续 Decode，以及 Core / Module；查看图表和计算步骤 |
+| Roofline Analysis | 将计算量、估算访存量和硬件规格结合起来，判断理论上更受算力还是带宽限制 | 使用默认 H100 BF16 Dense 模板；点击 AI=100/500 教学点；调整带宽、算力和历史长度，观察屋顶线与瓶颈变化 |
+| MFU Estimator | 理解训练模型计算吞吐量占硬件理论峰值的比例 | 修改假设训练 FLOPs/token、全设备吞吐量、设备数和峰值；演示速度减半，以及计算减半、速度翻倍的情景 |
+
+右上角“演示模式”会将三个 Tab 的主图、关键结果和动态结论集中展示，适合组内分享。切换模式保留输入，完整参数、表格与推导仍能展开。
+
+Roofline 默认自动计算并绘图，访存量来自明确的假设模型。实心 Attention 点表示理想性能上界，菱形表示独立教学假设；只有提供有效、同范围的 Runtime，才会绘制相应空心实测点。MFU 默认 50% 及两个对照情景都是假设训练数据。
+
+**适用场景：**比较不同 Attention 的工作量，解释缓存容量与访存流量的差别，理解 Roofline 的两类限制，练习 MFU 公式，以及现场修改参数说明结果变化。
+
+**阅读边界：**Attention 研究的是单层自回归 Decode；MFU 示例研究的是全模型 Training，二者不能直接混用。各架构有各自的执行路径与统计边界，GDA 完整总量未核验时保持未知。理论 FLOPs 比值、Roofline 理想时间比值与实测速度比值分别解读。
+
+### 两个网页与演讲稿怎样配合？
+
+两个网页的关系是：架构页帮助理解“真实模块如何执行”，Compute Lab 帮助分析“工作量与硬件限制如何共同影响效率”。它们是两个独立教学工具，不会自动把 DeepSeek 全模型的数据传入 Lab。Lab 中的 MLA 等示例也不能直接视为本地 DeepSeek 完整模块的复现。
+
+建议先阅读 [演讲稿](presentation_script.md) 的架构和参数量章节，用 DeepSeek 架构页查看一个投影与一个 MoE 模块；再读 FLOPs 章节，用 Lab 对照 Attention 工作量；最后切到 Roofline 和 MFU，理解性能上界与训练吞吐的区别。只想做现场分享时，可直接打开两个成品网页，启用 Lab 演示模式。
+
 ## 目录与修改入口
+
+```text
+llm-compute-presentation/
+├─ README.md                         仓库导航、网页用途与运行说明
+├─ presentation_script.md            五章中文演讲稿
+├─ deepseek_v4_1_interactive.html     DeepSeek 离线网页成品
+├─ llm_compute_lab/
+│  ├─ index.html                     Compute Lab 离线网页成品
+│  ├─ page.html / style.css          页面模板与样式
+│  ├─ model.js                       纯计算与输入校验
+│  ├─ ui.js / extension.js           Attention、Roofline 等交互
+│  ├─ learning.js / presentation.js  教学解读与演示模式
+│  ├─ build.py                       单文件 HTML 打包
+│  └─ 测试脚本、验证文档、qa/         回归测试与图形检查记录
+├─ interactive_work/
+│  ├─ teaching_data.py / audited_data.py  教学内容与审计绑定
+│  ├─ build_diagram.py / build.py     架构图生成与网页打包
+│  ├─ page_template.html / *_ui.html 页面与分步演示交互
+│  ├─ audit_sources/                 固定版本参考资料
+│  └─ verify_* / JSON / PNG          计算、浏览器测试与基线
+├─ DeepSeek-V4.1-Flash/              静态分析用模型源码与配置
+├─ FLOPs_calculation_verify.py      根目录计算复核
+├─ 计算报告与审计文档                公式依据、假设和边界
+└─ requirements*.txt / package*.json 开发依赖与安装锁定
+```
 
 | 路径 | 内容 |
 |---|---|
