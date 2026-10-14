@@ -4,7 +4,9 @@
 
 - [DeepSeek 架构交互页](deepseek_v4_1_interactive.html)：参数、前向、局部反向与信息流。
 - [LLM Compute Lab](llm_compute_lab/index.html)：六种 Attention 对比、Roofline、MFU 与演示模式。
-- [完整演讲稿](presentation_script.md)。
+- [12–15 分钟主讲稿](presentation_script_short.md)：小矩阵开场，六段口语讲述与网页演示。
+- [演讲支持附录](presentation_script_appendix.md)：复杂公式、详细结果与统计边界。
+- [原始技术底稿](presentation_script.md)：保留完整五章讲义，供学习和查阅。
 
 下载后可直接双击 HTML；阅读成品不需要安装依赖。仓库包含两套网页的源码、测试、固定版本审计资料和参考图，不依赖原来的 sharing 工作区，也不包含模型权重。
 
@@ -56,14 +58,16 @@ Roofline 默认自动计算并绘图，访存量来自明确的假设模型。�
 
 两个网页的关系是：架构页帮助理解“真实模块如何执行”，Compute Lab 帮助分析“工作量与硬件限制如何共同影响效率”。它们是两个独立教学工具，不会自动把 DeepSeek 全模型的数据传入 Lab。Lab 中的 MLA 等示例也不能直接视为本地 DeepSeek 完整模块的复现。
 
-建议先阅读 [演讲稿](presentation_script.md) 的架构和参数量章节，用 DeepSeek 架构页查看一个投影与一个 MoE 模块；再读 FLOPs 章节，用 Lab 对照 Attention 工作量；最后切到 Roofline 和 MFU，理解性能上界与训练吞吐的区别。只想做现场分享时，可直接打开两个成品网页，启用 Lab 演示模式。
+建议先按 [主讲稿](presentation_script_short.md) 从小矩阵讲起，用 DeepSeek 架构页展示投影与 MoE，再用 Lab 展示 MHA/GQA、Roofline 和 MFU。复杂公式查 [附录](presentation_script_appendix.md)，完整学习材料仍保留在 [技术底稿](presentation_script.md) 中。现场分享可启用 Lab 演示模式，操作提示与预计时间均写在主讲稿内。
 
 ## 目录与修改入口
 
 ```text
 llm-compute-presentation/
 ├─ README.md                         仓库导航、网页用途与运行说明
-├─ presentation_script.md            五章中文演讲稿
+├─ presentation_script_short.md      12–15 分钟主讲稿
+├─ presentation_script_appendix.md   推导、数值与边界附录
+├─ presentation_script.md            保留的五章技术底稿
 ├─ deepseek_v4_1_interactive.html     DeepSeek 离线网页成品
 ├─ llm_compute_lab/
 │  ├─ index.html                     Compute Lab 离线网页成品
