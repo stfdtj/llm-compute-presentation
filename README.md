@@ -4,6 +4,7 @@
 
 - [DeepSeek 架构交互页](deepseek_v4_1_interactive.html)：参数、前向、局部反向与信息流。
 - [LLM Compute Lab](index.html)：六种 Attention 对比、Roofline、MFU 与演示模式。
+- [V3 演讲稿（约 18 分钟）](presentation_script_v3.md)：完整 Dense/MoE 算例与六种 Attention 对比，保留口语主线。
 - [12–15 分钟主讲稿](presentation_script_short.md)：小矩阵开场，六段口语讲述与网页演示。
 - [演讲支持附录](presentation_script_appendix.md)：复杂公式、详细结果与统计边界。
 - [原始技术底稿](presentation_script.md)：保留完整五章讲义，供学习和查阅。
@@ -68,6 +69,7 @@ Roofline 默认自动计算并绘图，访存量来自明确的假设模型。�
 llm-compute-presentation/
 ├─ index.html                        Compute Lab 网页成品
 ├─ deepseek_v4_1_interactive.html     DeepSeek 网页成品
+├─ presentation_script_v3.md         约 18 分钟的 V3 演讲稿
 ├─ presentation_script_short.md      12–15 分钟主讲稿
 ├─ presentation_script_appendix.md   支持附录
 ├─ presentation_script.md            原始技术底稿
