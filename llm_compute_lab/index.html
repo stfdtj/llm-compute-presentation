@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LLM Compute Lab — Attention, Roofline & MFU</title><meta name="description" content="调节模型参数，探索六种 Attention 的 Decode FLOPs、KV Cache 与递归状态。离线交互式计算教学工具。"><style>:root{color-scheme:light;--ink:#182b42;--muted:#718092;--line:#e1e7ed;--blue:#2563eb;--bg:#f5f7fa;--panel:#fff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 'Segoe UI','Microsoft YaHei',Arial,sans-serif}button,input,select{font:inherit;color:inherit}button,a,summary,select{cursor:pointer}button{background:#fff;border:1px solid var(--line);border-radius:7px;padding:7px 12px}button:hover{background:#eef4ff;border-color:#b9cbee}button:disabled,input:disabled{cursor:default;color:#8894a5;background:#f6f8fa}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #95b7ff;outline-offset:3px}a{color:var(--blue)}header{display:flex;justify-content:space-between;align-items:center;padding:18px 4%;background:#fff;border-bottom:1px solid var(--line)}.brand{display:flex;gap:12px;align-items:center;text-decoration:none;color:var(--ink);font-size:20px;letter-spacing:-.5px}.brand small{display:block;font-size:9px;letter-spacing:2px;color:var(--muted)}.brand-icon{display:grid;place-items:center;width:40px;height:40px;background:var(--blue);color:white;border-radius:10px;font-size:27px}.header-right{display:flex;gap:20px;align-items:center}.tag{color:var(--muted);font-size:12px}.tabs{display:flex;gap:28px;background:#fff;padding:0 4%;border-bottom:1px solid var(--line)}.tabs button{border:0;border-radius:0;padding:17px 0;color:var(--muted);border-bottom:3px solid transparent;background:none;font-size:12px}.tabs b{margin-left:8px;font-size:14px;font-weight:600}.tabs span{margin-left:10px;font-size:10px;background:#f0f3f7;border-radius:4px;padding:3px 5px}.tabs button[aria-selected=true]{color:var(--blue);border-bottom-color:var(--blue)}main{max-width:1600px;margin:auto;padding:30px 4%}.intro{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:20px}.eyebrow{color:var(--blue);font-size:10px;letter-spacing:1.7px;font-weight:700}h1{font-size:32px;letter-spacing:-1px;margin:8px 0;font-weight:650}p{margin:5px 0 12px}h2{font-size:16px;margin:0;font-weight:650}.intro p{color:var(--muted)}.scenario{display:grid;grid-template-columns:auto auto;gap:4px 15px;border-left:2px solid #c6d8fb;padding-left:18px;font-size:12px;white-space:nowrap}.scenario b{color:var(--blue)}.scenario button{font-size:10px;padding:2px 5px}.workspace{display:grid;grid-template-columns:255px minmax(0,1fr);gap:28px}.parameters{background:white;border:1px solid var(--line);border-radius:10px;padding:18px;height:max-content;position:sticky;top:15px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:14px}.muted{color:var(--muted);font-size:12px;margin:3px 0 15px}.text-button{border:0;padding:3px;color:var(--blue);font-size:12px;background:transparent}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:block;font-size:11px;color:#596c81;margin-bottom:12px}.field span{display:block;font-size:10px;color:var(--muted)}input[type=number],select{display:block;width:100%;border:1px solid #d9e1eb;border-radius:5px;padding:6px 8px;background:#fff;min-width:0}input[type=number]{font-variant-numeric:tabular-nums;font-size:13px;margin-top:3px}.check{display:flex;gap:7px;align-items:center;font-size:12px;margin:14px 0}input[type=checkbox]{accent-color:var(--blue)}details{border-top:1px solid var(--line);margin-top:16px;padding-top:12px}summary{font-size:13px;font-weight:600;margin-bottom:10px}.parameter-foot{border-top:1px solid var(--line);margin-top:15px;padding-top:15px;font-size:11px;color:var(--muted)}.parameter-foot b{color:#566980}.error{background:#fff0ee;color:#aa3333;padding:10px;font-size:12px;border-radius:5px}.results>.section-head select{width:auto;min-width:215px;font-size:12px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:12px 0 18px}.metric{border-left:2px solid #d5e1fa;padding:4px 16px}.metric small{color:var(--muted);font-size:11px}.metric strong{font-size:27px;font-weight:650;display:block;letter-spacing:-.6px}.metric span{font-size:11px;color:var(--muted)}.chart-panel{background:white;border:1px solid var(--line);border-radius:10px;padding:16px 20px}.legend{display:flex;flex-wrap:wrap;gap:8px 19px;font-size:12px;margin-bottom:5px}.legend label{display:flex;align-items:center;gap:3px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}.chart-panel svg{width:100%;display:block;touch-action:none}.chart-footer{display:flex;justify-content:space-between;gap:15px;align-items:center;font-size:11px;color:var(--muted)}.chart-footer label{display:flex;gap:8px;align-items:center;white-space:nowrap}.chart-footer select{font-size:11px;padding:3px;width:auto}.caption{font-size:11px;color:var(--muted);margin:12px 0 2px}.comparison-head{margin:26px 0 12px}.comparison-head button{font-size:11px}.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:white}table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:12px;font-variant-numeric:tabular-nums}th,td{padding:12px 14px;border-bottom:1px solid #edf0f4;text-align:right}th{font-size:10px;color:var(--muted);background:#f9fbfd;font-weight:500}th:first-child,td:first-child{text-align:left}tbody tr:last-child td{border-bottom:0}tbody tr.selected{background:#eef4ff}td button{padding:0;border:0;background:none;font-weight:600}td small{display:block;font-size:9px;color:var(--muted)}.explorer,.memory-panel{background:white;border:1px solid var(--line);border-radius:10px;padding:20px;margin-top:24px}.architecture-buttons{display:flex;gap:4px;flex-wrap:wrap}.architecture-buttons button{font-size:10px;padding:4px 7px}.architecture-buttons button.active{background:var(--blue);color:white;border-color:var(--blue)}#architectureDiagram svg{width:100%;display:block;margin-top:14px}.explanation{font-size:12px;color:#596e82;line-height:1.9;margin:8px 0 12px}.detail-intro{background:#f4f7fc;border-radius:5px;font-size:11px;padding:10px}.step{padding:12px 0;border-bottom:1px solid var(--line)}.step .step-head{display:flex;justify-content:space-between;gap:10px;font-size:12px}.step-head span{color:var(--blue);font-variant-numeric:tabular-nums}.step p{font-size:11px;color:#67798c;margin:4px 0}.matrix-flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font:11px/1.6 Consolas,monospace;background:#f6f8fb;padding:10px;border-radius:5px}.matrix-box{border:1px solid #d6e1f2;border-radius:3px;background:#fff;padding:3px 9px}.step code{font-size:11px;overflow-wrap:anywhere}.memory-row{display:grid;grid-template-columns:60px 1fr 85px 65px;gap:12px;align-items:center;font-size:12px;margin:13px 0}.bar-track{height:7px;background:#f0f3f7;border-radius:4px;overflow:hidden}.bar-fill{height:100%;border-radius:4px}.memory-value{text-align:right;font-variant-numeric:tabular-nums}.memory-note{font-size:10px;color:var(--muted);grid-column:2/5;margin-top:-7px}.memory-panel details p{font-size:12px;color:var(--muted)}.insight{display:flex;gap:15px;padding:20px 0;align-items:center}.insight>span{font-size:27px;color:var(--blue)}.insight b{font-size:12px}.insight p{font-size:11px;color:var(--muted);margin:4px 0}.insight button{white-space:nowrap;font-size:11px}footer{border-top:1px solid var(--line);padding:18px 4%;display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.stage{padding:24px 0 60px}.stage>p{color:var(--muted)}.formula-band{background:#eaf1ff;border-left:3px solid var(--blue);padding:22px;margin:30px 0;font:18px/2 Consolas,monospace}.formula-band small{font-size:12px}.future-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.future-grid article{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px}.future-grid h2{margin-bottom:16px}.future-grid p,.future-grid label{font-size:12px;color:#63768a}.future-grid label{display:block;margin-bottom:15px}.future-grid button{margin:8px 0;font-size:12px}pre{font:11px/1.7 Consolas,monospace;background:#f4f7fb;border-radius:5px;padding:14px;white-space:pre-wrap;overflow-wrap:anywhere}.notice{border-left:2px solid #e7b45f;padding-left:12px}input[type=file]{font-size:11px;max-width:100%}dialog{max-width:850px;width:calc(100% - 32px);max-height:85vh;border:1px solid var(--line);border-radius:12px;padding:25px;color:var(--ink)}dialog::backdrop{background:#14243b77;backdrop-filter:blur(3px)}dialog h3{font-size:14px;margin-top:24px}dialog p,dialog li{font-size:12px;color:#566b80}dialog .section-head{position:sticky;top:-25px;background:white;padding:10px 0}dialog a{overflow-wrap:anywhere}[hidden]{display:none!important}.diagram-text{font:12px 'Segoe UI','Microsoft YaHei',sans-serif;fill:var(--ink)}
+@media(min-width:1700px){main{padding-left:35px;padding-right:35px}}@media(max-width:1100px){.workspace{grid-template-columns:220px minmax(0,1fr);gap:18px}main{padding:25px 3%}.tabs{gap:20px}.metrics{gap:0}.metric{padding:4px 10px}.metric strong{font-size:23px}.explorer>.section-head{align-items:flex-start;flex-direction:column}.chart-footer{align-items:flex-start;flex-direction:column}.future-grid{grid-template-columns:1fr}}@media(max-width:760px){header{padding:15px}.header-right .tag{display:none}.brand{font-size:16px}.tabs{gap:15px;overflow-x:auto;white-space:nowrap;padding:0 15px}.tabs b{font-size:12px}.tabs span{display:none}main{padding:22px 15px}.intro{align-items:flex-start;flex-direction:column}h1{font-size:27px}.scenario{grid-template-columns:auto auto}.workspace{display:block}.parameters{position:static;margin-bottom:24px}.field-grid{grid-template-columns:repeat(4,1fr);gap:10px}.parameters #specialFields .field-grid{grid-template-columns:1fr 1fr}.parameter-foot{display:none}.results>.section-head{align-items:flex-start;flex-direction:column}.metrics{margin-top:18px}.metric strong{font-size:20px}.metric small,.metric span{font-size:9px}.chart-panel{padding:12px 8px}.comparison-head{flex-direction:column;align-items:flex-start}.explorer,.memory-panel{padding:15px}.insight{align-items:flex-start;flex-wrap:wrap}.memory-row{grid-template-columns:43px 1fr 78px 58px;gap:7px}.formula-band{font-size:13px}.header-right button{font-size:11px}footer{gap:15px}.future-grid{grid-template-columns:1fr}}
+
+.chart-controls{display:flex;flex-wrap:wrap;gap:8px 15px}.chart-footer{flex-wrap:wrap}#hoverReadout{overflow-wrap:anywhere}.field input{line-height:1.5}.field span{padding-top:2px}.field-grid{align-items:start}@media(max-width:760px){.parameters #commonFields{grid-template-columns:1fr 1fr}.chart-controls{gap:8px}.chart-footer{font-size:10px}}
+.sequence-panel,.cumulative-panel,.speedup-panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:18px 0}.sequence-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.sequence-metrics small,.time-cards small{display:block;font-size:10px;color:var(--muted)}.sequence-metrics b{font-size:16px;font-weight:600}.sequence-panel p,.speedup-panel details p,.roof-detail p,.roof-results details p{font-size:12px;color:#607387}.sequence-panel code,.roof-detail code{font-size:11px;overflow-wrap:anywhere}.sequence-panel .field{max-width:220px}.cumulative-panel svg{width:100%;display:block}.speed-row{display:grid;grid-template-columns:52px 1fr 65px 105px;gap:12px;align-items:center;font-size:12px;margin:13px 0}.speed-row button{border:0;padding:0;font-weight:600;text-align:left}.speed-row small{font-size:11px;text-align:right;color:#63768a}.speed-row b{text-align:right;font-variant-numeric:tabular-nums}.speed-track{height:15px;position:relative;background:#f2f5fa;border-radius:3px}.speed-track i{display:block;height:100%;border-radius:3px}.baseline-marker{position:absolute;width:1px;top:-3px;bottom:-3px;background:#718399;z-index:1}.speedup-panel .table-scroll{margin-top:20px}.roof-workspace{display:grid;grid-template-columns:285px minmax(0,1fr);gap:24px}.roof-controls{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px;height:max-content}.roof-controls h2{margin-bottom:18px}.roof-controls input[type=text]{width:100%;border:1px solid #d9e1eb;border-radius:5px;padding:7px 8px;margin-top:4px}.roof-controls .field{margin-bottom:15px}.roof-concepts{display:flex;gap:30px;flex-wrap:wrap;margin:22px 0 30px;font-size:12px;color:#708297}.roof-concepts b{display:block;color:#31475f;font-weight:600}.roof-chart-panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px}.roof-chart-panel svg{width:100%;display:block}.roof-chart-panel [data-roof]{cursor:pointer;outline:none}.roof-chart-panel [data-roof]:focus-visible circle{stroke:#182b42;stroke-width:3}.roof-detail,.roof-speedup{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px;margin:20px 0}.time-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}.time-cards b{font-size:20px}.roof-point-table{overflow-x:auto}.roof-results>.section-head{margin-bottom:18px}.roof-results>.section-head button{font-size:11px}.roof-results input[type=number]{min-width:110px;width:100%}.contrast-row{display:grid;grid-template-columns:180px 1fr 65px;gap:12px;font-size:11px;align-items:center;margin:12px 0}.contrast-row b{text-align:right}.roof-speedup .table-scroll{margin:16px 0 22px}.roof-results .metric strong{font-size:25px}.roof-results{min-width:0}.roof-controls .error{font-size:11px}.parameters{position:static}.stage{padding-top:4px}#sequenceProof,#inspectResult,#roofDetails{overflow-wrap:anywhere}
+@media(max-width:1100px){.roof-workspace{grid-template-columns:235px minmax(0,1fr);gap:18px}.roof-results>.section-head{flex-wrap:wrap}.roof-controls{padding:15px}.time-cards b{font-size:16px}.speed-row{gap:8px;grid-template-columns:45px 1fr 55px 90px}.contrast-row{grid-template-columns:150px 1fr 60px}}@media(max-width:760px){.roof-workspace{display:block}.roof-controls{margin-bottom:22px}.roof-results .metrics{grid-template-columns:1fr 1fr 1fr}.roof-concepts{gap:15px}.sequence-panel,.cumulative-panel,.speedup-panel{padding:15px}.sequence-metrics b{font-size:13px}.sequence-panel>.section-head,.cumulative-panel>.section-head,.speedup-panel>.section-head{align-items:flex-start;flex-direction:column}.speed-row{grid-template-columns:40px 1fr 49px 82px;gap:6px;font-size:11px}.speed-row small{font-size:10px}.contrast-row{grid-template-columns:128px 1fr 58px;gap:8px}.time-cards{gap:8px}.time-cards b{font-size:14px}.roof-detail,.roof-speedup{padding:15px}.roof-chart-panel{padding:10px}.roof-results .metric strong{font-size:19px}}
+@media(max-width:760px){.scenario{max-width:100%;white-space:normal;grid-template-columns:1fr;gap:4px}.scenario button{width:max-content}.scenario span{overflow-wrap:anywhere}.results,.speedup-panel,.cumulative-panel,.sequence-panel{min-width:0}.table-scroll{max-width:100%}}
+.learn-intro{background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px;margin:18px 0 24px;min-width:0;overflow-wrap:anywhere}.learn-intro h2{margin-bottom:12px}.learn-intro h3{font-size:14px;margin:0 0 8px}.learn-intro p{color:#536c83;font-size:13px;line-height:1.85}.lesson-kicker{font-size:11px;color:var(--blue);margin-bottom:8px;font-weight:600}.concept-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:20px 0 12px}.concept-grid article{border-left:2px solid #dce7fb;padding-left:14px}.concept-grid p{margin:0}.lesson-result{border-left:3px solid var(--blue);background:#f0f5ff;padding:12px 16px!important;color:#294765!important;font-size:13px!important}.learn-intro details{margin-top:18px}.learn-intro summary{font-size:12px;color:#536c83}.glossary{white-space:normal;min-width:540px}.glossary th,.glossary td{text-align:left;vertical-align:top;min-width:110px}.glossary td:nth-child(2),.glossary td:nth-child(3){min-width:200px}.evidence{font-size:12px;color:#536c83;background:#f1f6ff;padding:12px;border-radius:6px;overflow-wrap:anywhere}.evidence summary{font-size:11px;margin-top:8px}.evidence details p{font-size:11px}.number-flow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f6f9ff;border-radius:7px;padding:16px;margin:16px 0}.number-flow div{min-width:0}.number-flow small,.number-flow span{display:block;color:#6b8197;font-size:11px}.number-flow b{display:block;font-size:18px;font-variant-numeric:tabular-nums}.number-flow>span{font-size:23px;color:var(--blue)}.formula-steps{display:grid;gap:12px;margin-top:16px}.formula-steps article{border-left:2px solid #cbdcf8;padding:4px 14px;min-width:0}.formula-steps b{font-size:13px}.substitution{font-size:13px;line-height:1.9;margin:6px 0;color:#254f87;background:#f4f8ff;padding:10px 12px;border-radius:5px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.formula-steps p{font-size:12px;margin:4px 0}.chart-guide{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin:16px 0}.chart-guide p{font-size:12px;color:#62788d;margin:0}.chart-guide b{color:#263e58}.point-hint{padding:10px 14px;background:#f0f5ff;color:#325679;font-size:12px;border-radius:6px;min-height:58px}.demo-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:20px}.demo-controls b{width:100%;font-size:13px}.demo-controls button{font-size:12px}.architecture-insights{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px}.architecture-insights p{border-bottom:1px solid #edf1f6;padding-bottom:10px;font-size:12px}.assumption-tag{background:#fff3d9;border:1px solid #eed9a4;border-radius:5px;padding:3px 8px;color:#815d1d;font-size:11px;white-space:nowrap}.mfu-workspace{display:grid;grid-template-columns:minmax(250px,330px) minmax(0,1fr);gap:30px;margin-top:20px}.mfu-workspace form{background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:20px;height:max-content}.mfu-score{background:#eff5ff;border-radius:8px;padding:22px}.mfu-score small{font-size:12px;color:#536c83}.mfu-score strong{display:block;font-size:40px;color:var(--blue);font-weight:600;line-height:1.5}.mfu-score p{font-size:12px;margin:10px 0 0}.mfu-meter{height:10px;background:#d9e4f5;overflow:hidden;border-radius:5px;margin-top:8px}.mfu-meter span{display:block;height:100%;background:var(--blue)}.roof-controls .field-grid,.mfu-workspace .field-grid{grid-template-columns:1fr 1fr}.roof-controls details{margin:12px 0}.roof-controls summary{font-size:12px}.roof-controls details .field:first-of-type{margin-top:15px}.roof-detail>summary{font-size:13px;color:#536c83}.roof-detail>h2{margin-top:14px}.parameters #commonFields{grid-template-columns:1fr 1fr}.parameters details summary{font-size:12px}.parameters .field span{font-size:11px}.parameters .parameter-foot{display:block!important}#contextField input{width:100%}.roof-results .learn-intro{margin-top:0}.roof-chart-panel h2{margin-bottom:12px}.mfu-workspace .field input[type=number]{width:100%}
+@media(max-width:1100px){.number-flow b{font-size:15px}.number-flow{padding:12px}.concept-grid{gap:15px}.mfu-workspace{grid-template-columns:280px minmax(0,1fr);gap:20px}}
+@media(max-width:760px){.learn-intro{padding:17px;margin:16px 0}.concept-grid{grid-template-columns:1fr;gap:16px}.number-flow{flex-wrap:wrap;justify-content:flex-start;gap:10px}.number-flow div{flex:1 1 80px}.number-flow b{font-size:14px}.number-flow small,.number-flow span{font-size:10px}.chart-guide,.architecture-insights{grid-template-columns:1fr}.mfu-workspace{grid-template-columns:1fr;gap:20px}.learn-intro>.section-head{align-items:flex-start;flex-direction:column;gap:8px}.mfu-workspace form{padding:16px}.mfu-score strong{font-size:34px}.substitution{font-size:12px;padding:9px}.parameters .parameter-foot{margin-top:12px}.roof-workspace{display:flex;flex-direction:column}.roof-controls{order:1}.roof-results{order:0}.roof-results .learn-intro p{font-size:12px}.demo-controls button{font-size:11px}.point-hint{font-size:11px}}
+@media(max-width:760px){.roof-workspace{display:block}.tabs{gap:10px;padding:0 12px}.tabs b{font-size:11px;margin-left:4px}.tabs button{font-size:10px}}
+.plot-key{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:11px;color:#566c82;margin:10px 0}.roof-operator-note{font-size:11px;color:#78613b;border-left:2px solid #d9ba76;padding-left:9px;margin:8px 0}.teaching-points{background:#fffcf4;border:1px solid #eadfbf;border-radius:7px;padding:16px;margin:16px 0}.teaching-points h3,.mfu-experiments h3{font-size:14px;margin:0 0 8px}.teaching-points p{font-size:12px;line-height:1.8;color:#56697c}.teaching-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.teaching-choices button{text-align:left;font-size:13px}.teaching-choices small{display:block;font-size:11px;color:#63758a;margin-top:4px}.teaching-choices [aria-pressed=true]{border-color:#b68b3c;background:#fff5dc}#roofChart [data-roof-teaching]{cursor:pointer}#roofChart [data-roof-teaching]:focus-visible path,#roofChart [data-roof-teaching][aria-pressed=true] path{stroke-width:3;stroke:#714a06}#roofMeasurement details{margin:10px 0}#roofMeasurement p{font-size:12px}#roofMeasurement:empty{display:none}.demo-error{background:#fff0ee!important;color:#a4352d!important;border-color:#b3443d!important}.compact-formula{padding:14px 18px;background:#eef4ff;border-left:3px solid var(--blue);border-radius:5px;font-size:17px;margin:16px 0}.compact-formula small{font-size:12px;color:#5c748e}.mfu-experiments{border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0;background:#fafcff}.mfu-experiments .demo-controls{margin:10px 0}.scenario-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.scenario-pair>div{background:#f0f5ff;border-radius:5px;padding:12px}.scenario-pair small{font-size:11px;color:#677e95}.scenario-pair p{font-size:12px;overflow-wrap:anywhere;margin:4px 0}.scenario-pair b{color:var(--blue)}
+.presentation-more{border:0;padding:0;margin:0}.presentation-more>summary{display:none}.presentation-panel{min-width:0}.presentation-grid{display:grid;gap:20px;align-items:start}.presentation-grid>div,.presentation-grid>aside{min-width:0}.attention-deck{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}.roof-deck{grid-template-columns:minmax(0,1.8fr) minmax(310px,1fr)}.mfu-deck{grid-template-columns:minmax(280px,.85fr) minmax(0,1.5fr)}.presentation-heading{display:flex;justify-content:space-between;gap:15px;align-items:center}.presentation-heading h1{font-size:26px;margin:0 0 3px}.presentation-heading p{font-size:12px;color:#61768d;margin:0}.presentation-takeaway{padding:11px 16px;margin:12px 0;border-left:3px solid var(--blue);background:#eaf1ff;font-size:15px;line-height:1.7}.present-scope{font-size:12px;color:#63768b;min-width:215px}.presentation-options{margin:10px 0 15px;padding:8px 12px;border:1px solid var(--line);border-radius:7px;background:white}.presentation-options>summary{margin:0;font-size:12px}.presentation-options[open]>summary{margin-bottom:12px}.presentation #presentRoofOptions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}.presentation #presentMfuOptions .field-grid{grid-template-columns:1fr 1fr}.presentation #presentMfuOptions{max-width:620px}.presentation .parameters{max-width:580px}.presentation .presentation-more{border-top:1px solid var(--line);padding-top:12px;margin-top:18px}.presentation .presentation-more>summary{display:list-item;font-size:12px;color:#63768a}.presentation .presentation-more[open]>.study-content{margin-top:22px}.presentation header{padding-top:10px;padding-bottom:10px}.presentation .tabs button{padding:11px 0}.presentation main{padding-top:18px}.presentation .speedup-panel{margin:0;padding:16px}.presentation .speedup-panel>.table-scroll,.presentation .speedup-panel>details{display:none}.presentation .speedup-panel>.section-head{align-items:flex-start}.presentation .speedup-panel .muted{margin-bottom:8px}.presentation .speed-row{grid-template-columns:42px 1fr 59px 90px;margin:17px 0;gap:8px}.presentation .chart-panel{padding:14px}.presentation .chart-controls{gap:6px}.presentation .chart-footer{gap:6px}.presentation .roof-chart-panel{padding:14px}.presentation .roof-chart-panel>h2,.presentation .roof-chart-panel>.chart-guide{display:none}.presentation .roof-chart-panel .demo-controls{margin-top:10px}.presentation .roof-chart-panel .demo-controls>b{display:none}.presentation #roofPointHint{min-height:0;font-size:11px;margin:8px 0}.presentation #roofDemoResult{font-size:12px!important;padding:10px!important;margin:8px 0 0}.presentation .plot-key{font-size:10px;gap:4px 12px}.presentation #roofChartNote{font-size:10px;margin-top:4px}.presentation #roofMetrics{grid-template-columns:1fr 1fr;margin:0 0 12px;gap:10px}.presentation #roofMetrics .metric{padding:3px 10px}.presentation #roofMetrics .metric:last-child{grid-column:1/3}.presentation #roofMetrics .metric strong{font-size:23px}.presentation .teaching-points{margin:0;padding:12px}.presentation .teaching-points .section-head{display:block}.presentation .teaching-points .assumption-tag{display:inline-block;margin-bottom:6px}.presentation .teaching-choices{grid-template-columns:1fr 1fr}.presentation .teaching-points .substitution{font-size:12px;padding:8px}.presentation .teaching-points p{font-size:12px;margin-bottom:8px}.presentation .mfu-experiments{margin:0}.presentation .mfu-score{padding:20px}.presentation .mfu-score strong{font-size:44px}.presentation .compact-formula{margin:12px 0}.presentation .mfu-deck .lesson-result{font-size:13px!important}.presentation .header-right .tag{display:none}#presentationToggle[aria-pressed=true]{border-color:#8cb0ef;background:#edf4ff;color:#1d56b4}
+@media(max-width:1050px){.roof-deck{grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr)}.presentation .speed-row{grid-template-columns:40px 1fr 52px 74px;font-size:11px}.presentation .speed-row small{font-size:10px}.presentation .chart-controls{font-size:10px}}
+@media(max-width:760px){.header-right{gap:6px}.header-right #methodButton{display:none}.header-right #presentationToggle{font-size:10px;padding:6px}.presentation-grid{grid-template-columns:1fr}.presentation-heading{align-items:flex-start;flex-direction:column}.presentation-heading h1{font-size:23px}.presentation-takeaway{font-size:13px}.teaching-points .section-head{display:block}.teaching-points .assumption-tag{display:inline-block;margin-bottom:7px}.scenario-pair{grid-template-columns:1fr}.presentation #presentRoofOptions{grid-template-columns:1fr}.compact-formula{font-size:14px}.presentation main{padding-top:16px}.presentation .teaching-points{margin-top:10px}}
+.presentation-inline-more{border:0;padding:0;margin:0}.presentation-inline-more>summary{display:none}.presentation .speedup-panel>.presentation-inline-more{display:block}.presentation .presentation-inline-more{border-top:1px solid var(--line);padding-top:8px;margin-top:10px}.presentation .presentation-inline-more>summary{display:list-item;font-size:11px;color:#657c92;margin-bottom:0}.presentation .presentation-inline-more[open]>summary{margin-bottom:12px}
+.presentation-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0 15px}.presentation-toolbar>.presentation-options{margin:0;flex:1;min-width:240px}.presentation-toolbar>.presentation-options[open]{flex-basis:100%}#presentRoofActions .demo-controls{margin:0;gap:6px}#presentRoofActions .demo-controls>b{display:none}#presentRoofActions button{font-size:11px;padding:7px 9px}.presentation #roofChart{max-height:265px}.presentation #roofChart text{font-size:13px}.presentation #roofPointHint{display:none}.presentation #roofMetrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-bottom:12px}.presentation #roofMetrics .metric:last-child{grid-column:auto}.presentation #roofMetrics .metric{padding:2px 8px}.presentation #roofMetrics .metric strong{font-size:21px}.presentation #roofMetrics .metric span,.presentation #roofMetrics .metric small{font-size:10px}.presentation .teaching-points .assumption-tag{display:none}.presentation .teaching-points h3{font-size:13px}.presentation .teaching-choices button{font-size:12px;padding:7px}.presentation .teaching-choices small{font-size:10px}.presentation #roofDemoResult{line-height:1.7}
+@media(max-width:760px){.presentation-toolbar{display:block}.presentation-toolbar>.presentation-options{margin-bottom:10px}#presentRoofActions .demo-controls{gap:6px}.presentation #roofChart{max-height:none}.presentation #roofMetrics{margin-top:12px}.presentation #roofChart text{font-size:12px}}
+</style></head>
+<body>
+<header><a class="brand" href="#"><span class="brand-icon">∑</span><span>LLM <b>Compute Lab</b><small>ATTENTION · ROOFLINE · MFU</small></span></a><div class="header-right"><button id="presentationToggle" type="button" aria-pressed="false">演示模式 · 关闭</button><button id="methodButton">计数方法 ↗</button></div></header>
+<nav aria-label="主导航" class="tabs" role="tablist"><button role="tab" aria-selected="true" aria-controls="attention" id="tab-attention" data-tab="attention">01 <b>Attention 计算量</b></button><button role="tab" aria-selected="false" aria-controls="roofline" id="tab-roofline" data-tab="roofline">02 <b>Roofline 性能上界</b></button><button role="tab" aria-selected="false" aria-controls="mfu" id="tab-mfu" data-tab="mfu">03 <b>MFU 训练效率</b><span>教学示例</span></button></nav>
+<main>
+<section id="attention" role="tabpanel" aria-labelledby="tab-attention">
+<div class="intro"><div><div class="eyebrow">EXPERIMENT 01 / AUTOREGRESSIVE DECODE</div><h1>逐个生成，逐步计算。</h1><p>比较六种 Attention 的计算量、访存需求与理想性能上界。</p></div><div class="scenario"><b>Decode</b><span>每步当前 token = 1</span><span id="scenarioText"></span><button disabled title="Prefill 需要独立的因果矩阵公式，本轮未实现">Prefill · 待实现</button></div></div>
+<section class="learn-intro" aria-label="从零认识 Attention">
+<div class="lesson-kicker">先认识问题</div><h2>模型生成一个词之前，需要“回看”哪些内容？</h2>
+<p>Token（文本单元）可以是一个字、词或词的一部分。Attention（注意力）让当前 token 从历史内容里找出有用的信息。Decode（逐个生成）每次生成一个新 token，再把它加入历史；生成 1024 个 token，需要连续做 1024 步。</p>
+<div class="concept-grid"><article><h3>① 需要做多少计算？</h3><p>FLOPs（浮点运算次数）数的是计算总量。一次乘法或加法通常各算 1 次；它没有“每秒”的含义。下方比较六种组织注意力的方式。</p></article><article><h3>② 怎样比较？</h3><p>先固定相同输入，再算每一步的运算量并求和。FLOPs 加速比 = MHA 计算量 ÷ 当前架构计算量。MHA 是普通多头注意力，作为对照。</p></article><article><h3>③ 数字能说明什么？</h3><p>比值 2× 表示在声明范围内计算量减半。运行速度还受数据搬运影响；下一页用 Roofline 检查两种限制。</p></article></div>
+<p id="attentionLesson" class="lesson-result" aria-live="polite"></p>
+<details><summary>认识六种架构与图表中的术语</summary><p>MHA（Multi-Head Attention，多头注意力）；GQA（Grouped-Query Attention，分组查询注意力，共享 Key/Value）；MLA（Multi-head Latent Attention，多头潜在注意力，压缩历史表示）；SWA（Sliding Window Attention，滑动窗口注意力，只回看附近位置）；MSA（这里指 Mini-Sparse Attention，以块为单位选择部分历史）；GDA（Gated Delta Attention，门控 Delta 注意力，用递归状态保存历史信息）。</p><p>Query / Key / Value（查询 / 索引 / 内容）用来匹配并汇总历史；KV Cache（键值缓存）存历史表示，避免重复生成它们。Projection（投影）改变表示维度；Core（核心）匹配并汇总历史；Extra（附加）指索引等其他已计运算。图中 S 是已有历史长度，G 是将要生成的 token 数，H 是注意力头数。“每层”指模型里的一个注意力模块，不能当作整个模型。</p></details>
+</section><div class="workspace">
+<aside class="parameters"><div class="section-head"><h2>实验参数</h2><button id="reset" class="text-button">重置</button></div><p class="muted">先用默认示例，再改历史长度或生成数量。</p><form id="parameters" novalidate><label class="field">生成方式<select id="tokenMode"><option value="autoregressive" selected>逐个连续生成（Decode）</option><option value="single">只生成 1 个 token</option><option value="prefill" disabled>Prefill · 待实现</option></select></label><label class="field" id="generatedField">生成数量 · G<input type="number" id="generated" value="1024" min="1" max="65536"><span>串行生成；不是并行 Prefill</span></label><div id="contextField"></div><details><summary>进阶：模型维度与计数设置</summary><div id="commonFields" class="field-grid"></div><label class="field">数据精度<select id="precision"><option>BF16</option><option>FP16</option><option>FP32</option><option>FP8</option></select></label><label class="check"><input type="checkbox" id="scalar" checked>计入明示的标量运算</label></details><details><summary>进阶：架构专属参数</summary><div id="specialFields"></div></details></form><p id="error" class="error" role="alert" hidden></p><details class="parameter-foot"><summary>实验边界与精度</summary><p>每步 X: [1, D]，历史依次为 S, S+1, …。主表按单层、每序列、生成区间累计；缓存显示末步整批容量。</p><p>FP8 只改变逻辑存储字节；不代表内核精度或加速比例。</p></details></aside>
+<div class="results">
+<div class="section-head"><div><h2>上下文增长，会发生什么？</h2><p class="muted">横轴是已有历史长度，纵轴是生成下一 token 的计算量。</p></div><select id="scope" aria-label="对比口径"><option value="total">整个 Attention 模块（已声明范围）</option><option value="core">只看核心运算（Core）</option></select></div>
+<div class="metrics" id="metrics"></div><p class="caption">数字缩写：K = 10³，M = 10⁶，G = 10⁹，T = 10¹²；缓存的 MiB / GiB 使用二进制字节单位。FLOPs 是工作量，FLOP/s 是每秒速度。</p>
+<section class="sequence-panel"><div class="section-head"><h2 id="sequenceHeading">1024 Tokens · 逐步累计</h2><span class="tag">PER LAYER / PER SEQUENCE</span></div><div id="sequenceMetrics" class="sequence-metrics"></div><details><summary>查看求和公式、代入过程与逐步检查</summary><div id="sequenceProof"></div><label class="field">检查第几步（从 1 开始）<input id="inspectStep" type="number" min="1" value="1" max="1024"></label><div id="inspectResult"></div></details></section>
+<div class="chart-panel"><div id="legend" class="legend"></div><svg id="chart" viewBox="0 0 900 310" role="img" aria-label="历史 Context 长度与每 token FLOPs 曲线"></svg><div class="chart-footer"><div class="chart-controls"><label>显示<select id="chartMode"><option value="flops">FLOPs / token</option><option value="memory">Cache / State Capacity</option></select></label><label>Y 轴<select id="yScale"><option value="linear">线性</option><option value="log">对数</option></select></label><label>最大 S <select id="chartMax"><option value="16384">16,384</option><option value="65536" selected>65,536</option><option value="262144">262,144</option><option value="1048576">1,048,576</option></select></label></div><span id="hoverReadout" aria-live="polite">在图上移动查看数值</span></div><p class="caption" id="chartNote"></p></div>
+<section class="cumulative-panel"><div class="section-head"><h2>生成越多，累计计算量怎样变化？</h2><span class="tag">累计算量 · Context 每步增长</span></div><svg id="cumulativeChart" viewBox="0 0 900 285" role="img" aria-label="生成 token 数与累计 FLOPs"></svg><p id="cumulativeReadout" class="caption">与上图的每 Token 计算量不同：这里是从初始 S 开始的逐步总和。</p></section>
+<section class="speedup-panel"><div class="section-head"><div><h2>减少了多少计算？与 MHA 对照</h2><p class="muted">水平柱状图 · 与主表共享 Core / Module 口径</p></div><span class="tag">MHA = 1.00×</span></div><div id="speedupBars"></div><div class="table-scroll"><table><thead><tr><th>Architecture</th><th>FLOPs</th><th>Speedup vs MHA</th><th>FLOPs Reduction</th></tr></thead><tbody id="speedupTable"></tbody></table></div><details><summary>查看加速比公式与当前代入</summary><div id="speedupProof"></div></details><p class="caption">大于 1×：计算量减少；小于 1×：计算量增加。FLOPs Speedup 不等于实际运行速度加速比。</p><details><summary>四种减少量 / 加速比，分别说明什么？</summary><p>FLOPs Reduction = 1 − 当前 FLOPs / MHA FLOPs，表示计算量减少的百分比；FLOPs Speedup = MHA FLOPs / 当前 FLOPs，表示理论计算量比值。Roofline Speedup = MHA 理想时间下界 / 当前理想时间下界。Measured Speedup = MHA 实测时间 / 当前实测时间，必须测量相同范围和运行条件。四者不能互相替代。</p></details><p class="caption"></p></section>
+<div class="section-head comparison-head"><div><h2>同一组参数，逐项对照</h2><p class="muted">点击架构查看计算路径；Ratio 是理论 FLOPs 比值</p></div><button id="export">导出实验 JSON ↓</button></div>
+<div class="table-scroll"><table id="comparison"><thead><tr><th>Architecture</th><th>Projection</th><th>Core</th><th>Extra</th><th>Total</th><th id="ratioHeading">MHA / Total</th></tr></thead><tbody></tbody></table></div><p class="caption">Total 指本工具声明范围内的小计。GDA 完整模块未核验，以「未知」呈现；MLA 采用保留因子的 latent-space Decode，配置与 MHA 不天然等价。</p>
+<div class="explorer"><div class="section-head"><h2>追踪第一步计算路径</h2><div id="architectureButtons" class="architecture-buttons"></div></div><div id="architectureDiagram"></div><p id="architectureSummary" class="explanation"></p><details id="calculationDetails"><summary>展开第一步矩阵维度与 FLOPs <span id="detailCount"></span></summary><div class="detail-intro" id="detailIntro"></div><div id="steps"></div></details></div>
+<div class="memory-panel"><div class="section-head"><div><h2>计算之外，还需要多少记忆？</h2><p class="muted">KV Cache / Recurrent State · 当前 token 写入后 · 单层整批</p></div></div><div id="memoryBars"></div><details><summary>缓存容量、访存、权重：三个不同的量</summary><p>这里计算逻辑缓存或递归状态容量。它不是每 token 的 HBM Bytes Moved。实际访存还受缓存命中、各头复用、分块、融合和重读影响；权重读取要单独测量或建模。缓存容量与搬运量分开记录；Roofline 页按可查看的假设模型估算搬运量。</p><p>GDA 递归状态默认 FP32；ShortConv 缓冲未知。SWA 使用可淘汰旧行的窗口缓存；MSA 主分支读取少量位置，但保留全部历史 KV 和 Index Key。未计分配器对齐、量化 scales、临时激活与训练状态。</p></details></div>
+<div class="insight"><span>↗</span><div><b>FLOPs 比值不能直接预测运行时间。</b><p>索引选择、数据搬运、权重读取和内核利用率也会影响速度。下一步需要结合 HBM 访存与硬件上限，而后通过实际运行验证。</p></div><button data-go="roofline">了解 Roofline →</button></div>
+</div></div>
+</section>
+<section id="roofline" role="tabpanel" aria-labelledby="tab-roofline" hidden><div class="stage"><div class="eyebrow">EXPERIMENT 02 / HBM ROOFLINE</div><h1>计算少了，为什么未必更快？</h1><p>Roofline（屋顶线模型）分析一个任务更可能卡在计算，还是卡在数据搬运。FLOPs 更少，程序也未必按同样比例变快。</p>
+<section class="learn-intro"><div class="lesson-kicker">1 · 先认识两种限制</div>
+<div class="concept-grid"><article><h3>算力：每秒能算多少？</h3><p>Peak Compute（理论算力峰值）是芯片最快的计算速度，单位 FLOP/s。Compute-bound（算力限制）像厨师已经忙不过来，再加快送菜也未必有用。</p></article><article><h3>带宽：每秒能送多少数据？</h3><p>HBM（高带宽显存）保存权重和历史数据。Bandwidth（带宽）是每秒最多搬运的字节数。Memory-bound（带宽限制）像厨师在等食材；只减少计算，未必缩短等待。</p></article><article><h3>计算密度：每字节做多少计算？</h3><p>Arithmetic Intensity（计算密度，记作 AI，与“人工智能”缩写无关）= FLOPs ÷ Bytes Moved（搬运总字节）。每搬运 1 字节，能完成多少次浮点运算？这个比值把计算和搬运联系起来。</p></article></div>
+<details><summary>五个变量的单位、含义与来源</summary><div class="table-scroll"><table class="glossary"><thead><tr><th>变量</th><th>是什么 / 为什么需要</th><th>单位 / 从哪里来</th></tr></thead><tbody><tr><td>FLOPs · F</td><td>任务的计算总量，确定需要做多少工作</td><td>次数；由当前 Attention 架构逐步求和，单层整批</td></tr><tr><td>Peak Compute · P_peak</td><td>设备每秒理论最多完成多少计算</td><td>FLOP/s；官方规格或自定义假设，需精度、Dense/Sparse 一致</td></tr><tr><td>Bandwidth · BW</td><td>HBM 每秒最多传输多少字节</td><td>B/s；官方规格或自定义假设，1 TB/s = 10¹² B/s</td></tr><tr><td>Bytes Moved · M</td><td>整个任务搬运的总字节数；同一数据反复读取要多次计入</td><td>B；本页默认是假设模型估算，另可输入自定义估计</td></tr><tr><td>Arithmetic Intensity · AI</td><td>每搬运一个字节执行的计算量，用来判断先碰到哪个上限</td><td>FLOPs/B；F ÷ M，区别于缓存容量</td></tr></tbody></table></div></details></section><div class="roof-workspace"><aside class="roof-controls"><h2>硬件与 HBM 假设</h2><form id="roofForm" novalidate><label class="field">硬件模板<select id="hardwareTemplate"><option value="h100" selected>NVIDIA H100 SXM 80GB · BF16 Dense</option><option value="custom">自定义硬件 / 教学假设</option></select></label><div id="hardwareEvidence" class="evidence"></div><details><summary>查看或修改硬件规格</summary><label class="field">Hardware Name<input id="hardwareName" type="text" placeholder="填写设备型号与计算类型"></label><div class="field-grid"><label class="field">Peak（TFLOP/s，Dense）<input id="peakTF" type="number" min="0" step="any" placeholder="对应精度的峰值"></label><label class="field">Bandwidth<input id="bandwidth" type="number" min="0" step="any" placeholder="HBM 带宽"></label></div><div class="field-grid"><label class="field">带宽单位<select id="bandwidthUnit"><option>GB/s</option><option>TB/s</option></select></label><label class="field">Device Count<input id="deviceCount" type="number" value="1" min="1" step="1"></label></div><label class="field">峰值计算精度<select id="hardwarePrecision"><option>BF16</option><option>FP16</option><option>FP32</option><option>FP8</option></select></label><p class="caption">峰值是单设备的对应精度与 Dense / Sparse 口径；设备数默认 1。多设备只模拟 Batch 中独立序列均分，权重各设备复制，峰值与带宽理想求和；不模拟张量并行或通信。</p></details><details><summary>进阶：访存假设与计算范围</summary><label class="field">Roofline FLOPs 口径<select id="roofScope"><option value="total">整个 Attention 模块（已声明范围）</option><option value="core">只看核心运算（Core）</option></select></label><label class="field">Bytes Moved 来源<select id="trafficMode"><option value="model">声明假设的 HBM 模型估算</option><option value="custom">用户输入整批区间总字节</option><option value="unknown">未知 · 不绘制数据点</option></select></label><div id="modelTrafficFields"><div class="field-grid"><label class="field">权重片上命中率（%）<input id="weightHitRate" type="number" min="0" max="100" value="0" step="any"></label><label class="field">历史 KV 命中率（%）<input id="kvHitRate" type="number" min="0" max="100" value="0" step="any"></label></div><label class="field">历史数据在头之间复用<select id="headReuse"><option value="shared">组内 / latent 头之间理想共享</option><option value="none">按 Query Head 重读</option></select></label><label class="field">中间张量<select id="intermediate"><option value="fused">片上融合 · 无 score 回写</option><option value="materialized">score / probability 写回 HBM</option></select></label></div></details></form><p id="roofError" class="error" role="alert"></p><p class="caption">权重默认每步从 HBM 读取，每设备一份，不将连续 Decode 当成一次大 GEMM。100% 命中是已驻留片上的理想假设，不代表冷启动只加载一次。</p></aside><div class="roof-results"><div class="section-head"><div><h2>2 · 从当前示例开始</h2><p id="roofContext" class="muted"></p></div><button id="exportRoofline">导出分析 JSON ↓</button></div><section id="roofLesson" class="learn-intro" aria-live="polite"></section><div class="roof-chart-panel"><h2>3 · 把计算密度放到图上</h2><div id="roofLegend" class="legend"></div><div class="plot-key"><span>━ 屋顶线：理论性能上界</span><span>● 实心圆：Attention 理想上界</span><span>○ 空心圆：用户提供 Runtime 后计算的性能</span><span>◆ 菱形：教学假设点</span></div><svg id="roofChart" viewBox="0 0 900 380" role="img" aria-label="Log–Log Roofline 图"></svg><p id="roofChartNote" class="caption"></p><p class="roof-operator-note">当前图使用统一的理论算力峰值进行教学估算，不代表每个算子都能达到这一速度。</p><div id="roofMeasurement" aria-live="polite"></div><p id="roofPointHint" class="point-hint" role="status">悬停、点击或用 Tab / Enter 选择数据点。</p>
+<section id="roofTeachingComparison" class="teaching-points"><div class="section-head"><h3>两个教学假设点 · 只假设 AI</h3><span class="assumption-tag">独立于 Attention 数据</span></div><div id="roofTeachingChoices" class="teaching-choices"></div><div id="roofTeachingDetail" aria-live="polite"></div></section><div class="chart-guide"><p><b>横轴 →</b> 每搬运 1 字节做多少计算；向右表示计算密度更高。</p><p><b>纵轴 ↑</b> 每秒最多能做多少计算（TFLOP/s）；越高表示理论上界越快。</p><p><b>斜线</b> 是 AI × 带宽。同样的传输速度，数据每字节能做更多计算，性能上界就向上增长。</p><p><b>水平线</b> 是算力峰值。送再多数据，也不能超过芯片每秒能算的总量。</p><p><b>交点</b> 是 AI_ridge（转折计算密度）：左边更可能等数据，右边更可能等计算。两轴用对数刻度，相邻数量级相差 10 倍。</p><p><b>彩色点</b> 放在当前假设的理想屋顶上，表示性能上界，不是实测运行性能。</p></div>
+<div class="demo-controls"><b>试一试，屋顶会怎样变化？</b><button id="demoBandwidth" type="button">带宽 × 2</button><button id="demoCompute" type="button">算力 × 2</button><button id="restoreHardware" type="button">恢复 H100 规格</button><button id="demoContext" type="button">历史长度 × 2</button><button id="restoreAttention" type="button">重置 Attention 配置</button></div><p id="roofDemoResult" class="lesson-result" aria-live="polite">改变带宽会抬高斜线；改变算力会抬高水平线。改变历史长度会改变 FLOPs、字节和数据点的位置。对数坐标会自动调整，结合数字对照观察。</p></div><section id="roofWorkedExample" class="learn-intro" aria-live="polite"></section><div id="roofMetrics" class="metrics"></div><div class="table-scroll"><table><thead><tr><th>Architecture</th><th>FLOPs · 整批</th><th>Estimated Bytes</th><th>AI</th><th>Bottleneck</th><th>Upper Bound</th></tr></thead><tbody id="roofPointTable"></tbody></table></div><section class="learn-intro"><h2>4 · 如何解读结果？</h2><div id="roofInterpretation" aria-live="polite"></div><p>带宽限制时，只减少 FLOPs 而不减少搬运量，时间下界可能保持不变；算力限制时，只增加带宽而不改变计算量，也可能无效。比较两种 Attention，要同时看 FLOPs 和 Bytes Moved。</p><p class="notice">Roofline 是理论性能上界 / 时间下界。真实运行还有启动、串行阶段、算子效率和通信等开销；本页用一个 Tensor Core 峰值近似不同算子，且访存是假设模型，不能把这些结果称作硬件实测。区间合并下界可能比各步下界相加更宽松。</p></section><details class="roof-detail"><summary>进阶：完整公式与访存分项</summary><h2 id="roofDetailHeading">点击数据点查看公式与字节分解</h2><div id="roofDetails"></div></details><details id="customTrafficDetails"><summary>逐架构输入总访存量 / 实测 Runtime</summary><p class="caption">访存量单位 MiB，指当前整批、单层、全部生成步、所选 Core / Module 范围的 HBM 总量。Runtime 单位 ms，须使用同一范围；不作为模型预测。</p><div class="table-scroll"><table><thead><tr><th>Architecture</th><th>用户 Estimated MiB</th><th>实测 Runtime（ms）</th></tr></thead><tbody id="customTrafficInputs"></tbody></table></div></details><section class="roof-speedup"><h2>计算量比值与理论时间比值，为什么不同？</h2><p class="muted">下界时间比值是理想模型对比，不保证实际达到。</p><div class="table-scroll"><table><thead><tr><th>Attention</th><th>FLOPs Ratio</th><th>Estimated Time Lower Bound</th><th>Roofline Speedup</th></tr></thead><tbody id="roofSpeedupTable"></tbody></table></div><div id="roofContrast"></div><p id="roofExplanation" class="explanation"></p></section><details><summary>Roofline 假设、计数范围与证据</summary><div id="roofAssumptions"></div><p class="caption">Performance ≤ min(Ppeak, AI×BW)；AIridge=Ppeak/BW。这里使用 HBM 层级。时间下界为 max(总 FLOPs/Ppeak, 总 Bytes/BW)，累计区间的合并下界可能比逐步下界之和更宽松；未计串行内核阶段、启动、通信、非浮点选择成本和实际利用率。不会推导实测训练 MFU。</p><a href="https://amcr.lbl.gov/departments/computer-science-department/ppan/roofline-performance-model/" target="_blank" rel="noopener noreferrer">Berkeley Lab · Roofline Model</a></details><pre id="rooflineSchema" hidden></pre></div></div></div></section>
+<section id="mfu" role="tabpanel" aria-labelledby="tab-mfu" hidden><div class="stage">
+<div class="eyebrow">EXPERIMENT 03 / TRAINING ONLY</div><h1>训练吞吐量，离理论峰值还有多远？</h1>
+<p>MFU = Model FLOPs Utilization（模型浮点运算利用率）。它衡量训练中模型计算吞吐量占硬件理论峰值的比例，帮助判断训练系统的计算效率。</p>
+<section class="learn-intro"><div class="lesson-kicker">1 · 先分清三个概念</div><div class="concept-grid">
+<article><h3>FLOPs 是工作量</h3><p>模型训练一个 token 需要多少浮点运算？包括 Forward（前向，产生预测）和 Backward（反向，计算梯度）。理论工作量可以从模型架构推导。</p></article>
+<article><h3>FLOP/s 是速度</h3><p>每秒完成多少模型运算 = 每 token 理论工作量 × 全设备实测 Tokens/s（每秒训练 token 数）。真实吞吐量通常来自训练日志或计时。</p></article>
+<article><h3>MFU 是比例</h3><p>把模型运算速度除以全部设备的理论峰值。它不是模型预测准确率，也不是直接测得的 GPU / NPU 忙碌百分比；没有真实训练速度，就没有真实 MFU。</p></article></div>
+<p class="lesson-result">同一模型、精度与计数口径下，MFU 越高通常表示越接近硬件理论算力。但训练质量还取决于数据、模型和优化方法，不能用 MFU 判断学得好不好。</p></section>
+<section class="learn-intro"><div class="section-head"><h2>2 · 用简单数字试算</h2><span class="assumption-tag">全部为教学假设数据</span></div><p>以下数字仅解释公式，不代表 H100、Ascend 或任何模型的实际训练性能。“训练速度”栏也是假设值，修改后会实时重算。</p>
+<div id="mfuMainFormula" class="compact-formula">MFU = 模型训练 FLOPs/s ÷ 全部硬件峰值 FLOP/s<br><small>模型 FLOPs/s = 每 token 训练 FLOPs × 全设备 Tokens/s</small></div>
+<section id="mfuExperiments" class="mfu-experiments"><h3>一键对照：训练更快，MFU 就更高吗？</h3><p class="caption">以下两种情景均从默认 50% 假设示例出发；点击会载入整组教学输入。</p><div class="demo-controls"><button id="mfuSlow" type="button">A · 训练速度减半</button><button id="mfuLessWork" type="button">B · 计算减半、速度翻倍</button><button id="mfuScenarioReset" type="button">恢复初始情景</button></div><div id="mfuScenarioComparison" aria-live="polite"></div></section><div class="mfu-workspace"><form id="mfuForm" novalidate>
+<label class="field">Training FLOPs/token · 每 token 训练计算量<input id="mfuTrainingTF" type="number" min="0" step="any" value="1"><span>单位：TFLOPs/token；1 = 1 × 10¹² 次。包含前向 + 反向；本示例不推导具体模型。</span></label>
+<label class="field">训练吞吐量输入方式<select id="mfuRateMode"><option value="rate">直接填写全设备 Tokens/s</option><option value="step">用每步 token 数 ÷ 每步时间</option></select></label>
+<label id="mfuRateField" class="field">全设备训练吞吐量 · Tokens/s<input id="mfuTokensRate" type="number" min="0" step="any" value="2000"><span>教学假设；实际使用应测量所有设备的总量，不要重复乘设备数。</span></label>
+<div id="mfuStepFields" hidden><label class="field">Tokens/Step · 全设备每训练步 token 数<input id="mfuTokensStep" type="number" min="0" step="any" value="8000"></label><label class="field">Step Time · 完整训练步时间（秒）<input id="mfuStepSeconds" type="number" min="0" step="any" value="4"><span>实际测量应覆盖同一训练区间及梯度累积口径。</span></label></div>
+<div class="field-grid"><label class="field">Device Count · 设备数<input id="mfuDevices" type="number" min="1" step="1" value="4"></label><label class="field">单设备 Peak Compute<input id="mfuPeakTF" type="number" min="0" step="any" value="1000"><span>TFLOP/s，假设同一种精度的 Dense 峰值</span></label></div>
+<button id="mfuReset" type="button">恢复 50% 教学示例</button><p id="mfuError" class="error" role="alert" hidden></p></form>
+<div><div id="mfuResult" aria-live="polite"></div><h2>3 · 一步一步代入公式</h2><div id="mfuCalculation" class="formula-steps"></div><p class="caption">1 TFLOP/s = 10¹² FLOP/s。分子是全部设备的模型计算吞吐量；分母是全部设备的峰值，二者使用同一训练精度和 Dense / Sparse 口径。</p></div></div></section>
+<section class="learn-intro"><h2>4 · 如何解读 MFU？</h2><div class="concept-grid"><article><h3>为什么常常不到 100%？</h3><p>数据准备与传输、显存读取、设备间通信、Kernel Launch（启动计算内核）和算子效率都会占时间。同样的 token 数用时增加，Tokens/s 变小，MFU 随之降低。</p></article><article><h3>算得更少，会怎样？</h3><p>工作量减少可能让训练更快，但 MFU 看的是“工作量 × 速度”。例如本示例计算量减半、Tokens/s 翻倍，MFU 不变；若速度只提高 50%，MFU 反而下降。</p></article><article><h3>它与 Roofline 有何关系？</h3><p>两者都用硬件理论上限做参照。Roofline 结合搬运量分析任务受什么限制；训练 MFU 需要实测吞吐量，汇总整个训练系统达到峰值的多少。本页 Roofline 估计并不能代替训练测量。</p></article></div>
+<p class="notice"><b>Decode 与 Training（训练）不能混用。</b>Attention 页面计算单层、逐个生成的前向运算；训练还涉及全模型、前向 + 反向和批量序列。当前单层 Decode FLOPs 不能直接作为 Training FLOPs/token，也不能由理论 Decode 时间下界推出真实训练 MFU。</p>
+<details><summary>进阶：模型 FLOPs、MoE 与实测口径</summary><p>6 × Total Parameters（全部参数量）只是在特定稠密矩阵计算口径下的近似，还需要考虑 Attention 等计算。MoE（Mixture of Experts，混合专家）每个 token 通常只激活部分专家；共享层、路由、激活专家、序列长度与反向计算都影响实际理论模型工作量，不能拿全部专家参数直接精确计算训练 FLOPs。</p><p>Model FLOPs（模型所需运算）与硬件实际执行 FLOPs 不相同。激活重计算会重复前向以节省内存，在常见 MFU 定义中不加入模型所需前向 + 反向的分子，但会增加实际用时。不同报告必须对齐这些口径、精度、设备数与测量时间范围。</p><p>MFU 超过 100% 时先检查单位、单卡 / 全设备吞吐量、精度、Dense / Sparse 与 FLOPs 计数；本工具展示原始比例并提示检查，不把结果强行截断。</p><a href="https://arxiv.org/html/2204.02311v5#S4.SS1" target="_blank" rel="noopener noreferrer">PaLM 论文 §4.1 与 Appendix B · MFU 定义及计数边界</a></details>
+<details><summary>保留接口：导入已核验的训练计算量</summary><p>导入数据独立保留；不会覆盖上方的教学假设，也不会读取 Decode 结果。此轮未接入真实训练测量或自动 MFU 分析。</p><input type="file" id="trainingFile" accept=".json,application/json"><button id="trainingTemplate">下载 JSON 模板</button><p id="importStatus" role="status">尚未导入。</p><pre id="trainingSchema"></pre></details></section>
+</div></section>
+</main>
+<footer><span>LLM Compute Lab / 离线可用 · 无外部依赖</span><button id="footerMethod" class="text-button">Methodology & Sources</button></footer>
+<dialog id="methodology"><div class="section-head"><h2>Methodology / Assumptions</h2><button id="closeMethod" aria-label="关闭计数方法">✕</button></div><div id="methodContent"></div></dialog>
+<script>/* Pure arithmetic model. Browser + Node; no UI, no external dependencies. */
+(function (root) {
+  'use strict';
+  const defaults = {D:4096,H:32,Hkv:8,dk:128,dv:128,S:8192,W:1024,topk:8,block:128,di:32,rank:512,qrank:1024,rope:64,batch:1,precision:'BF16',statePrecision:'FP32',scalar:true,mlaImplementation:'factorized'};
+  const scenarioDefaults={mode:'autoregressive',generated:1024};
+  const trafficDefaults={mode:'model',weightHitRate:0,kvHitRate:0,headReuse:'shared',intermediate:'fused',customBytes:{},runtimesMs:{}};
+  const architectures = ['MHA','GQA','MLA','SWA','MSA','GDA'];
+  const colors = {MHA:'#2563eb',GQA:'#10a090',MLA:'#8659d4',SWA:'#e58b23',MSA:'#dc537f',GDA:'#526578'};
+  const sources = {
+    MHA:['Attention Is All You Need','https://arxiv.org/abs/1706.03762'],
+    GQA:['GQA · §2','https://arxiv.org/abs/2305.13245'],
+    SWA:['Mistral 7B · §2','https://arxiv.org/abs/2310.06825'],
+    MLA:['DeepSeek-V2 · §2.1','https://arxiv.org/html/2405.04434v5#S2.SS1'],
+    MSA:['MiniMax Sparse Attention · §3.1, §4.1','https://arxiv.org/html/2606.13392v1#S3.SS1'],
+    GDA:['Gated Delta Networks · Eq.10, §3.4','https://arxiv.org/html/2412.06464v3#S3.SS1']
+  };
+  const bytes = {FP32:4,BF16:2,FP16:2,FP8:1};
+  function validate(p) {
+    const errors=[];
+    for(const k of Object.keys(defaults).filter(k=>typeof defaults[k]==='number')) {
+      const min=k==='S'?0:1, max=k==='S'?1048576:k==='batch'?1024:65536;
+      if(!Number.isSafeInteger(p[k])||p[k]<min||p[k]>max) errors.push(`${k} 必须是 ${min}–${max} 范围内的整数`);
+    }
+    if(p.Hkv>p.H || p.H%p.Hkv!==0) errors.push('GQA / SWA / MSA 要求 H ≥ Hkv 且 H 能被 Hkv 整除');
+    if(p.rope%2!==0) errors.push('MLA 的 RoPE 维度必须为偶数');
+    if(p.rank>p.D || p.qrank>p.D) errors.push('本实验要求 MLA 的 KV / Query 压缩秩不大于 D');
+    if(!bytes[p.precision] || !bytes[p.statePrecision]) errors.push('请选择支持的数据精度');
+    if(typeof p.scalar!=='boolean') errors.push('scalar 必须是布尔值');
+    if(p.mlaImplementation!=null&&!['factorized','absorbed-query','absorbed-qo'].includes(p.mlaImplementation)) errors.push('MLA 执行路径不受支持');
+    // Conservative bound keeps displayed integer operation counts exact in JS Number.
+    const bound=8*(p.D*p.H*(p.dk+p.dv+p.rank+p.rope)+p.D*(p.rank+p.qrank+p.Hkv*p.di+p.di)+p.qrank*p.H*(p.dk+p.rope)+p.H*p.dk*p.rank+p.H*p.rank*p.dv+1048577*(p.H*(p.dk+p.dv+2*p.rank+p.rope+8)+p.Hkv*(p.di+1))+p.H*p.dk*p.dv);
+    if(Number.isFinite(bound)&&bound*p.batch>Number.MAX_SAFE_INTEGER) errors.push('此配置超过 JavaScript 安全整数计数范围，请减小维度或 Batch');
+    return errors;
+  }
+  function matmul(m,k,n,groups=1) {return {approx:2*m*k*n*groups,exact:m*n*(2*k-1)*groups};}
+  function calculate(name,p) {
+    const errors=validate(p); if(errors.length) throw new Error(errors.join('；'));
+    if(!architectures.includes(name)) throw new Error('未知架构');
+    const {D,H,Hkv,dk,dv,S,W,topk,block,di,rank:r,qrank:rq,rope:dr}=p;
+    const N=S+1, b=bytes[p.precision], rows=[];
+    function mm(label,category,m,k,n,groups,purpose,formula) {
+      const f=matmul(m,k,n,groups);
+      rows.push({label,category,purpose,formula,input:`[${m}, ${k}]`,weight:`[${k}, ${n}]`,output:`[${m}, ${n}]`,groups,...f,kind:'matmul'});
+    }
+    function op(label,category,f,formula,shape,purpose) {
+      rows.push({label,category,purpose,formula,input:shape,weight:'逐元素 / 标量',output:shape,groups:1,approx:p.scalar?f:0,exact:p.scalar?f:0,excluded:!p.scalar,kind:'scalar'});
+    }
+    function projections(h) {
+      mm('Q Projection','projection',1,D,H*dk,1,'把当前隐藏向量变成每个 Query Head 的查询','Q = X WQ');
+      mm('K Projection','projection',1,D,h*dk,1,'只为当前 token 生成 Key，历史 Key 已缓存','Knew = X WK');
+      mm('V Projection','projection',1,D,h*dv,1,'只为当前 token 生成 Value','Vnew = X WV');
+      mm('O Projection','projection',1,H*dv,D,1,'把拼接的各头输出映射回隐藏空间','Y = concat(Oheads) WO');
+    }
+    function softmax(n) {
+      op('Scale','core',H*n,'H × L；每个 score 乘预计算 scale',`[H, ${n}]`,'把分数缩放到稳定范围');
+      op('Softmax','core',H*(4*n-1),'H × (4L−1)：减最大值 L + exp L + 求和 L−1 + 除法 L',`[H, ${n}]`,'把每个头的分数变成权重；max 比较单独排除');
+    }
+    let active=N, memory, memoryNote, complete=true, unknown=[];
+    if(['MHA','GQA','SWA','MSA'].includes(name)) {
+      const h=name==='MHA'?H:Hkv;
+      if(name==='SWA') active=Math.min(N,W);
+      if(name==='MSA') {
+        // k INCLUDES the forced current/local block; all preceding blocks are full.
+        const blocks=Math.ceil(N/block), local=(N-1)%block+1;
+        active=local+(Math.min(topk,blocks)-1)*block;
+      }
+      projections(h);
+      mm('QKᵀ','core',1,dk,active,H,'每个 Query Head 对映射的 KV Head 计算相似度','score[h] = Q[h] K[g(h)]ᵀ；g(h)=floor(h/(H/Hkv))，MHA 为 g(h)=h');
+      softmax(active);
+      mm('Attention × V','core',1,active,dv,H,'用权重对读取的 Value 加权求和','O[h] = P[h] V[g(h)]');
+      memory=active*h*(dk+dv)*b;
+      memoryNote=name==='SWA'?'仅保留最近 W 个位置的滚动 KV Cache':'完整历史 KV Cache，含当前 token';
+      if(name==='MSA') {
+        mm('Index Q Projection','projection',1,D,Hkv*di,1,'每个 GQA group 生成一个小维度索引查询','Qidx = X WQidx');
+        mm('Index K Projection','projection',1,D,di,1,'所有 group 共享一个索引 Key；仅新增当前行','Kidx,new = X WKidx');
+        mm('Index scores','extra',1,di,N,Hkv,'索引查询扫描全部 N 个 index key，再进行 block max pooling','scoreidx[g] = Qidx[g] Kidxᵀ');
+        op('Index scale','extra',Hkv*N,'Hkv × N；显式缩放约定',`[${Hkv}, ${N}]`,'exp-free Top-K 不做索引 Softmax；正 scale 也可由实际实现省略');
+        memory=N*(Hkv*(dk+dv)+di)*b;
+        memoryNote='全部 GQA KV + 一个共享 Index Key Cache；稀疏读取不等于稀疏存储';
+      }
+    } else if(name==='MLA') {
+      mm('Query down','projection',1,D,rq,1,'先把当前 Query 压缩到低秩空间','cQ = X WDQ');
+      const absorbed=p.mlaImplementation&&p.mlaImplementation!=='factorized';
+      if(!absorbed) mm('Query content up','projection',1,rq,H*dk,1,'恢复每个头的内容查询','qC = cQ WUQ');
+      mm('Query RoPE branch','projection',1,rq,H*dr,1,'单独生成位置查询（旋转操作不在本计数范围）','qR = cQ WQR');
+      mm('KV Compression','projection',1,D,r,1,'一份 latent 同时承载历史 Key / Value 内容','cKV = X WDKV');
+      mm('Key RoPE branch','projection',1,D,dr,1,'生成所有头共享的位置 Key','kR = X WKR');
+      if(absorbed) mm('Absorbed Query → latent','projection',1,rq,H*r,1,'离线合并 WUQ[h] 与 WUK[h]ᵀ；Decode 只读融合权重，不重复做 Query content up','qLat = cQ WQabsorbed；WQabsorbed[h] = WUQ[h] WUK[h]ᵀ');
+      else mm('Query → latent','projection',1,dk,r,H,'按头把内容 Query 变到 latent 空间，历史 Key 无需展开','qLat[h] = qC[h] WUK[h]ᵀ');
+      mm('Latent scores','core',1,r,N,H,'在缓存的 latent 上计算内容相似度','scoreC[h] = qLat[h] Ccacheᵀ');
+      mm('Position scores','core',1,dr,N,H,'加入解耦的位置相似度','scoreR[h] = qR[h] KRcacheᵀ');
+      op('Combine scores','core',H*N,'H × N；scoreC + scoreR',`[H, ${N}]`,'内容与位置两部分相加');
+      softmax(N);
+      mm('Attention × latent','core',1,N,r,H,'直接对 latent 加权，不展开历史 Value','z[h] = P[h] Ccache');
+      if(p.mlaImplementation==='absorbed-qo') mm('Absorbed O Projection','projection',1,H*r,D,1,'离线把每头 Value up 合并入 O，Decode 不再单独执行 Value up','Y = concat(z) WOabsorbed；WOabsorbed[h] = WUV[h] WO[h]');
+      else {
+        mm('Value up','projection',1,r,dv,H,'仅把当前聚合结果恢复成 Value Head 维度','O[h] = z[h] WUV[h]');
+        mm('O Projection','projection',1,H*dv,D,1,'把各头当前结果映射回隐藏空间','Y = concat(O) WO');
+      }
+      memory=N*(r+dr)*b;
+      memoryNote='latent cKV + 共享解耦 RoPE Key；不缓存展开后的 K/V';
+    } else {
+      projections(H);
+      mm('α / β Projection','projection',1,D,2*H,1,'为每个递归头生成两种门的原始参数；激活尚未核验','[a,b] = X Wgate');
+      mm('Output gate Projection','projection',1,D,H*dv,1,'生成论文输出门的原始向量；激活/归一化尚未计入','g = X Woutgate');
+      op('State decay','core',H*dk*dv,'H dk dv；A = α Rprev',`[${H}, ${dv}, ${dk}]`,'先衰减旧记忆；R 为论文状态矩阵 S，避免与历史长度 S 混淆');
+      mm('Read prediction','core',1,dk,dv,H,'用当前 Key 读取旧记忆的预测；A 的布局在此取转置','u = A k');
+      op('Delta residual / gate','core',2*H*dv,'2 H dv；δ = β (v − u)',`[${H}, ${dv}]`,'只写入预测误差，而非重复写入全部 Value');
+      // Outer product is scalar multiplication, not a length-k dot product.
+      op('Outer product + update','core',2*H*dk*dv,'2 H dk dv；Rnew = A + δ kᵀ',`[${H}, ${dv}, ${dk}]`,'外积逐元素一次乘法加一次加法');
+      mm('Read output','core',1,dk,dv,H,'从更新后的状态取出当前 Query 的输出','o = Rnew q');
+      memory=H*dk*dv*bytes[p.statePrecision];
+      memoryNote=`仅递归状态 R，使用 ${p.statePrecision}；ShortConv 缓冲未核验`;
+      complete=false;
+      unknown=['ShortConv 的核长度与缓冲布局','Q/K L2 Norm、SiLU、α/β 参数化','输出 Norm、门激活与门乘法'];
+    }
+    const sum=(category,field='approx')=>rows.filter(x=>x.category===category).reduce((a,x)=>a+x[field],0);
+    const projection=sum('projection'), core=sum('core'), extra=sum('extra'), known=projection+core+extra;
+    return {name,projection,core,extra:complete?extra:null,known,knownExtra:extra,total:complete?known:null,exactKnown:rows.reduce((a,x)=>a+x.exact,0),complete,unknown,rows,active,visible:N,memoryBytes:memory*p.batch,memoryComplete:complete,memoryNote,batchFlops:complete?known*p.batch:null,scope:'单层、每序列、当前 1 token；排除位置旋转、全局 Norm、Bias、残差和 FFN',trafficBytes:null,weightTrafficBytes:null};
+  }
+  function results(p) {return architectures.map(n=>calculate(n,p));}
+  function validateScenario(p,s) {
+    const errors=validate(p),g=s.mode==='single'?1:s.generated;
+    if(!['single','autoregressive','prefill'].includes(s.mode)) errors.push('未知 Token Mode');
+    if(!Number.isSafeInteger(g)||g<1||g>65536) errors.push('Generated Tokens 必须是 1–65,536 的整数');
+    if(p.S+g-1>1048576) errors.push('最后一步历史 S+G−1 不得超过 1,048,576');
+    if(s.mode==='prefill') errors.push('Prefill 尚未验证，不输出 Decode 结果');
+    return errors;
+  }
+  const triangular=n=>n*(n+1)/2;
+  function activePrefix(name,t,p) {
+    if(name==='SWA') {const a=Math.min(t,p.W);return triangular(a)+(t-a)*p.W;}
+    if(name==='MSA') {
+      const cutoff=p.topk*p.block;
+      if(t<=cutoff)return triangular(t);
+      const periodic=n=>Math.floor(n/p.block)*triangular(p.block)+triangular(n%p.block);
+      return triangular(cutoff)+(t-cutoff)*(p.topk-1)*p.block+periodic(t)-periodic(cutoff);
+    }
+    return triangular(t);
+  }
+  function aggregate(name,p,s=scenarioDefaults) {
+    const errors=validateScenario(p,s);if(errors.length)throw new Error(errors.join('；'));
+    const g=s.mode==='single'?1:s.generated,first=calculate(name,p),last=calculate(name,{...p,S:p.S+g-1});
+    const sumVisible=g*(2*(p.S+1)+g-1)/2,sumActive=activePrefix(name,p.S+g,p)-activePrefix(name,p.S,p),sc=p.scalar?1:0;
+    let core,exactCore;
+    if(name==='GDA'){core=g*first.core;exactCore=g*first.rows.filter(x=>x.category==='core').reduce((v,x)=>v+x.exact,0);}
+    else if(name==='MLA'){
+      core=2*p.H*(2*p.rank+p.rope)*sumVisible+sc*p.H*(6*sumVisible-g);
+      exactCore=p.H*((4*p.rank+2*p.rope-2)*sumVisible-p.rank*g)+sc*p.H*(6*sumVisible-g);
+    }else{
+      core=2*p.H*(p.dk+p.dv)*sumActive+sc*p.H*(5*sumActive-g);
+      exactCore=p.H*((2*p.dk-1+2*p.dv)*sumActive-p.dv*g)+sc*p.H*(5*sumActive-g);
+    }
+    const projection=g*first.projection,knownExtra=name==='MSA'?p.Hkv*(2*p.di+sc)*sumVisible:0;
+    const known=projection+core+knownExtra,total=first.complete?known:null;
+    const exactKnown=g*first.rows.filter(x=>x.category==='projection').reduce((v,x)=>v+x.exact,0)+exactCore+(name==='MSA'?p.Hkv*(2*p.di-1+sc)*sumVisible:0);
+    if(!Number.isSafeInteger(known*p.batch)||!Number.isSafeInteger(exactKnown*p.batch))throw new Error('累计 FLOPs 超过安全整数范围，请减小维度、Token 数或 Batch');
+    return {...first,projection,core,knownExtra,extra:first.complete?knownExtra:null,total,known,exactKnown,averageFlops:total==null?null:total/g,averageCore:core/g,firstFlops:first.total,lastFlops:last.total,first,last,steps:g,sumVisible,sumActive,memoryBytes:last.memoryBytes,memoryNote:last.memoryNote,batchFlops:total==null?null:total*p.batch,scope:'单层、每序列、当前生成区间累计；不是完整模型或 Prefill'};
+  }
+  function sequenceResults(p,s=scenarioDefaults){return architectures.map(n=>aggregate(n,p,s));}
+  function speedup(base,flops){return flops==null||base==null||flops<=0?{ratio:null,reduction:null}:{ratio:base/flops,reduction:(1-flops/base)*100};}
+  function exportSequence(p,s=scenarioDefaults){return {...exportAttention(p),schemaVersion:2,scenario:s.mode,currentTokensPerStep:1,generatedTokens:s.mode==='single'?1:s.generated,lastHistoryTokens:p.S+(s.mode==='single'?1:s.generated)-1,flopsUnit:'FLOPs/generated-interval/layer/sequence',tokenResults:results(p),results:sequenceResults(p,s)};}
+  function validateHardware(h,p) {
+    const errors=[];
+    if(!h.name?.trim())errors.push('请填写 Hardware Name');
+    if(!Number.isFinite(h.peakTF)||h.peakTF<=0)errors.push('Peak Compute 必须为正数，单位 TFLOP/s');
+    if(!Number.isFinite(h.bandwidth)||h.bandwidth<=0)errors.push('Memory Bandwidth 必须为正数');
+    if(!['GB/s','TB/s'].includes(h.bandwidthUnit))errors.push('带宽单位必须为 GB/s 或 TB/s');
+    if(h.precision!==p.precision)errors.push('硬件峰值精度必须与当前 Attention 精度相同');
+    if(!Number.isSafeInteger(h.devices)||h.devices<1||h.devices>p.batch||p.batch%h.devices!==0)errors.push('本页多设备采用独立序列均分：Device Count 必须整除 Batch，且不得超过 Batch');
+    const peak=h.peakTF*1e12*h.devices,bw=h.bandwidth*(h.bandwidthUnit==='TB/s'?1e12:1e9)*h.devices;
+    if(![peak,bw,peak/bw].every(v=>Number.isFinite(v)&&v>=1e-280&&v<=1e280))errors.push('硬件参数换算后超出可计算 / 绘图范围，请使用有限的合理数值');
+    return errors;
+  }
+  function roofline(flops,moved,h,runtimeMs=null){
+    const peak=h.peakTF*1e12*h.devices,bw=h.bandwidth*(h.bandwidthUnit==='TB/s'?1e12:1e9)*h.devices;
+    if(!(Number.isFinite(peak)&&peak>0&&Number.isFinite(bw)&&bw>0))throw new Error('硬件算力或带宽无效');
+    const ridge=peak/bw;
+    if(!(Number.isFinite(flops)&&flops>0&&Number.isFinite(moved)&&moved>0))return {ai:null,ridge,performance:null,computeSeconds:null,memorySeconds:null,lowerSeconds:null,bottleneck:'N/A',measuredPerformance:null};
+    const ai=flops/moved,computeSeconds=flops/peak,memorySeconds=moved/bw,lowerSeconds=Math.max(computeSeconds,memorySeconds),performance=Math.min(peak,ai*bw);
+    if(runtimeMs!=null&&(!Number.isFinite(runtimeMs)||runtimeMs<=0))throw new Error('实测 Runtime 必须是有限正数，单位 ms');
+    const measuredPerformance=runtimeMs==null?null:flops/(runtimeMs/1000);
+    if(![ai,ridge,performance,computeSeconds,memorySeconds,lowerSeconds,...(measuredPerformance==null?[]:[measuredPerformance])].every(v=>Number.isFinite(v)&&v>=1e-280&&v<=1e280))throw new Error('计算结果超出可表示范围，请检查数值和单位');
+    return {ai,ridge,performance,computeSeconds,memorySeconds,lowerSeconds,bottleneck:ai<ridge?'Memory-Bound':'Compute-Bound',measuredPerformance};
+  }
+  function rooflineTeachingPoints(h){
+    // A one-byte hypothetical workload reuses exactly the same roofline formula.
+    return [100,500].map(ai=>({id:String(ai),kind:'hypothetical-ai',...roofline(ai,1,h)}));
+  }
+  function estimateTraffic(name,p,s,scope='total',o=trafficDefaults,devices=1){
+    if(!['core','total'].includes(scope))throw new Error('Roofline FLOPs 口径不受支持');
+    const r=aggregate(name,p,s),g=r.steps,B=p.batch,b=bytes[p.precision],v=r.sumVisible-g,a=r.sumActive-g;
+    const opts={...trafficDefaults,...o};
+    if(!['model','custom','unknown'].includes(opts.mode))throw new Error('访存模式无效');
+    for(const k of ['weightHitRate','kvHitRate'])if(!Number.isFinite(opts[k])||opts[k]<0||opts[k]>100)throw new Error(`${k} 必须为 0–100%`);
+    if(!['shared','none'].includes(opts.headReuse)||!['fused','materialized'].includes(opts.intermediate))throw new Error('访存复用或融合选项无效');
+    if(opts.mode!=='model'){
+      const supplied=opts.customBytes?.[name],valid=opts.mode==='custom'&&Number.isFinite(supplied)&&supplied>0;
+      return {totalBytes:valid?supplied:null,weightBytes:null,kvReadBytes:null,cacheWriteBytes:null,intermediateBytes:null,stateBytes:null,kind:valid?'user-estimate':'unknown',assumptions:['用户输入为当前整批、单层、全部生成步的 HBM 总字节；与缓存容量独立'],complete:valid};
+    }
+    const factor=opts.headReuse==='shared'?(name==='MHA'?p.H:p.Hkv):p.H,hit=1-opts.kvHitRate/100;
+    const weightElements=r.first.rows.filter(x=>x.category==='projection').reduce((v,x)=>v+x.approx/2,0);
+    let weightBytes=scope==='core'?0:weightElements*b*g*devices*(1-opts.weightHitRate/100),kvReadBytes=0,cacheWriteBytes=0,stateBytes=0;
+    if(['MHA','GQA','SWA'].includes(name)){
+      kvReadBytes=a*factor*(p.dk+p.dv)*b*B*hit;
+      cacheWriteBytes=g*(name==='MHA'?p.H:p.Hkv)*(p.dk+p.dv)*b*B;
+    }else if(name==='MSA'){
+      kvReadBytes=(a*factor*(p.dk+p.dv)+v*p.di*(opts.headReuse==='shared'?1:p.Hkv))*b*B*hit;
+      cacheWriteBytes=g*(p.Hkv*(p.dk+p.dv)+p.di)*b*B;
+      // Core-only refers to MAIN attention, so exclude index-cache read/write.
+      if(scope==='core'){kvReadBytes=a*factor*(p.dk+p.dv)*b*B*hit;cacheWriteBytes=g*p.Hkv*(p.dk+p.dv)*b*B;}
+    }else if(name==='MLA'){
+      const repeat=opts.headReuse==='shared'?1:p.H;
+      kvReadBytes=v*(2*p.rank+p.rope)*repeat*b*B*hit;
+      cacheWriteBytes=g*(p.rank+p.rope)*b*B;
+    }else stateBytes=2*p.H*p.dk*p.dv*bytes[p.statePrecision]*B*g;
+    const io=scope==='core'?0:2*p.D*b*B*g;
+    const spills=opts.intermediate==='materialized'&&name!=='GDA'?(4*p.H*r.sumActive+(name==='MSA'&&scope==='total'?2*p.Hkv*r.sumVisible:0))*b*B:0;
+    const intermediateBytes=io+spills,knownBytes=weightBytes+kvReadBytes+cacheWriteBytes+stateBytes+intermediateBytes;
+    const complete=scope==='core'||r.complete;
+    const readExpression=name==='GDA'?'不读取 KV Cache':name==='MLA'?`${v} 历史行 × (2×${p.rank}+${p.rope}) × ${opts.headReuse==='shared'?1:p.H} 复用系数 × ${b} B × ${B} Batch × ${hit}`:name==='MSA'&&scope==='total'?`[${a} 已选历史位置 × ${factor} 头 × (${p.dk}+${p.dv}) + ${v} 全历史位置 × ${p.di} 索引维度 × ${opts.headReuse==='shared'?1:p.Hkv}] × ${b} B × ${B} Batch × ${hit}`:`${a} 历史读取位置 × ${factor} 头 × (${p.dk}+${p.dv}) × ${b} B × ${B} Batch × ${hit}`;
+    const equations=[`Σ历史可见行 = Σvisible − G = ${r.sumVisible} − ${g} = ${v}；Σ已选历史行 = ${r.sumActive} − ${g} = ${a}`,`Weight Traffic = ${scope==='core'?'0（Core 不执行投影）':`${weightElements} 权重元素 × ${b} B × ${g} 步 × ${devices} 设备 × ${1-opts.weightHitRate/100}`} = ${weightBytes} B`,`Historical KV Read = ${readExpression} = ${kvReadBytes} B`,`Cache Write = 每步新增缓存元素 × ${b} B × ${B} Batch × ${g} 步 = ${cacheWriteBytes} B`,`Recurrent State Read+Write = ${name==='GDA'?`2 × ${p.H} × ${p.dk} × ${p.dv} × ${bytes[p.statePrecision]} B × ${B} Batch × ${g} 步`:'0（本架构无递归状态）'} = ${stateBytes} B`,`Intermediate / I/O = ${io} B 隐藏输入输出 + ${spills} B score/probability 回写 = ${intermediateBytes} B`];
+    return {totalBytes:complete?knownBytes:null,knownBytes,weightBytes,kvReadBytes,cacheWriteBytes,stateBytes,intermediateBytes,weightElements,equations,kind:'modeled-estimate',complete,assumptions:[`HBM；权重每步按 ${100-opts.weightHitRate}% 从 HBM 读取（每设备一份；不乘每设备 Batch）`,`历史 KV 缓存 HBM 未命中比例 ${100-opts.kvHitRate}%；${opts.headReuse==='shared'?'组内 / latent 各头理想复用':'按查询头重读'}；GDA 状态独立按每步完整读写建模`, `当前 K/V 或 latent 留在片上使用，但每步写入 HBM；${opts.intermediate==='fused'?'中间 score / probability 在片上融合':'score / probability 各写回并读取一次'}`,scope==='core'?'Core 边界：不读投影权重，Q/新 K/V 与输出经片上接口传递；MSA 不包含索引分支':'Module 边界：隐藏输入读取一次、输出写一次',name==='MLA'?'latent 内容按 score 与 value 两遍读取；RoPE key 一遍，跨遍未命中由统一命中率控制':'缓存历史读取随每步 Context / Window / Block 变化','模型忽略分配对齐、量化 scales、通信；MSA 选择索引假定片上完成；GDA 全模块缺少卷积和门开销']};
+  }
+  function analyzeRoofline(p,s,h,o=trafficDefaults,scope='total'){
+    const errors=validateHardware(h,p);if(errors.length)throw new Error(errors.join('；'));
+    const data=sequenceResults(p,s).map(r=>{const flops=(scope==='core'?r.core:r.total);const traffic=estimateTraffic(r.name,p,s,scope,o,h.devices);return {name:r.name,flops:flops==null?null:flops*p.batch,traffic,...roofline(flops==null?null:flops*p.batch,traffic.totalBytes,h,o.runtimesMs?.[r.name])};});
+    const base=data[0];return {schemaVersion:2,storageLevel:'HBM',hardware:{...h},scope,tokenMode:s.mode,generatedTokens:s.mode==='single'?1:s.generated,initialContext:p.S,parameters:{...p},assumptions:{...o},results:data.map(r=>({...r,flopsSpeedup:speedup(base.flops,r.flops).ratio,rooflineSpeedup:r.lowerSeconds&&base.lowerSeconds?base.lowerSeconds/r.lowerSeconds:null}))};
+  }
+  function exportAttention(p) {return {schemaVersion:1,scenario:'decode',currentTokens:1,historyTokens:p.S,visibleTokens:p.S+1,parameters:{...p},flopsUnit:'FLOPs/token/layer/sequence',memoryUnit:'bytes/batch/layer',counting:p.scalar?'2MKN + 明示标量约定':'仅矩阵 2MKN（不含外积/逐元素）',results:results(p)};}
+  function rooflineInput(p) {return {schemaVersion:1,storageLevel:'HBM',hardware:{vendor:null,peakFlopsPerSecond:null,bandwidthBytesPerSecond:null,precision:p.precision},attention:exportAttention(p),bytesMoved:null,bytesEvidence:null,status:'awaiting-traffic-model'};}
+  function validateTraining(data) {
+    const required=['architecture','source','precision','forwardFlopsPerToken','backwardFlopsPerToken'];
+    if(!data || typeof data!=='object'||Array.isArray(data)) throw new Error('训练数据必须是 JSON 对象');
+    if(data.schemaVersion!=null&&data.schemaVersion!==1) throw new Error('仅支持 schemaVersion: 1');
+    for(const k of required) if(data[k]==null) throw new Error(`训练数据缺少 ${k}`);
+    for(const k of ['architecture','source','precision']) if(typeof data[k]!=='string'||!data[k].trim()) throw new Error(`${k} 必须为非空文本`);
+    for(const k of ['forwardFlopsPerToken','backwardFlopsPerToken']) if(!Number.isFinite(data[k])||data[k]<=0) throw new Error(`${k} 必须为正数，单位 FLOPs/token`);
+    if(!['FP32','BF16','FP16','FP8'].includes(data.precision)) throw new Error('训练精度不受支持');
+    if(data.verified!==true) throw new Error('仅接收 verified: true 的已核验数据；该标签由提供者负责');
+    for(const k of ['tokensPerSecond','tokensPerStep','stepSeconds','deviceCount','peakFlopsPerSecondPerDevice']) {
+      if(data[k]!=null&&(!Number.isFinite(data[k])||data[k]<=0)) throw new Error(`${k} 必须为正数`);
+    }
+    if(data.deviceCount!=null&&!Number.isInteger(data.deviceCount)) throw new Error('deviceCount 必须为整数');
+    return {...data,schemaVersion:1,kind:'model-training',status:'imported-not-estimated'};
+  }
+  // Official product bandwidth + NVIDIA's explicit BF16 dense convention.
+  // The product page's 1,979 TFLOP/s is WITH sparsity, not our dense ceiling.
+  const hardwarePresets=Object.freeze({h100:Object.freeze({
+    name:'NVIDIA H100 SXM 80GB',peakTF:989,bandwidth:3.35,bandwidthUnit:'TB/s',precision:'BF16',devices:1,
+    computeType:'Dense Tensor Core',memoryGB:80,verifiedOn:'2026-10-13',
+    bandwidthSource:'https://www.nvidia.com/en-us/data-center/h100/',
+    computeSource:'https://github.com/NVIDIA/recsys-examples/blob/main/examples/hstu/training/benchmark/E2E_BENCHMARK.md',
+    sparsePeakTF:1979
+  })});
+  function hardwarePreset(id){if(!hardwarePresets[id])throw new Error('未知硬件模板');return {...hardwarePresets[id]};}
+  const mfuDefaults=Object.freeze({trainingFlopsPerToken:1e12,tokensPerSecond:2000,tokensPerStep:8000,stepSeconds:4,deviceCount:4,peakTF:1000,rateMode:'rate'});
+  function calculateMfu(input){
+    const p={...input};
+    if(!['rate','step'].includes(p.rateMode))throw new Error('吞吐量模式应为 rate 或 step');
+    for(const k of ['trainingFlopsPerToken','deviceCount','peakTF',...(p.rateMode==='step'?['tokensPerStep','stepSeconds']:['tokensPerSecond'])])
+      if(!Number.isFinite(p[k])||p[k]<=0)throw new Error(`${k} 必须为有限正数`);
+    if(!Number.isSafeInteger(p.deviceCount))throw new Error('设备数量必须为正整数');
+    const tokensPerSecond=p.rateMode==='step'?p.tokensPerStep/p.stepSeconds:p.tokensPerSecond;
+    const modelFlopsPerSecond=p.trainingFlopsPerToken*tokensPerSecond,hardwarePeak=p.peakTF*1e12*p.deviceCount,mfu=modelFlopsPerSecond/hardwarePeak;
+    if(![tokensPerSecond,modelFlopsPerSecond,hardwarePeak,mfu,100*mfu].every(v=>Number.isFinite(v)&&v>0))throw new Error('数值超出可计算范围');
+    return {kind:'training-mfu-teaching',dataKind:'hypothetical',tokensPerSecond,modelFlopsPerSecond,hardwarePeak,mfu,percent:100*mfu,exceedsPeak:mfu>1};
+  }
+  const api={defaults,scenarioDefaults,trafficDefaults,architectures,colors,sources,bytes,validate,matmul,calculate,results,exportAttention,rooflineInput,validateTraining,validateScenario,activePrefix,aggregate,sequenceResults,speedup,exportSequence,validateHardware,roofline,estimateTraffic,analyzeRoofline,hardwarePresets,hardwarePreset,mfuDefaults,calculateMfu,rooflineTeachingPoints};
+  if(typeof module==='object'&&module.exports) module.exports=api;
+  root.ComputeLab=api;
+})(typeof globalThis==='object'?globalThis:this);
+</script><script>(function(){
+  'use strict';
+  const C=ComputeLab, $=id=>document.getElementById(id), names=C.architectures;
+  let parameters={...C.defaults}, scenario={...C.scenarioDefaults}, selected='GQA', visible=new Set(names), all=[], training=null, plot=null;
+  const metadata={
+    D:['Hidden Size · D','隐藏维度'],H:['Query Heads · H','查询头数'],Hkv:['KV Heads · Hkv','共享 KV 头数'],dk:['Q/K Head · dk','MLA 为内容维度'],dv:['Value Head · dv','每头 Value 维度'],S:['Initial Context · S','第一步之前的历史'],batch:['Batch Size','独立序列数量'],
+    W:['Window · W','含当前 token 的窗口'],topk:['Top-K Blocks','含强制保留的 local block'],block:['Block Size','每个 KV block 的位置数'],di:['Index Head · di','每 group 一头 / 共享 index key'],rank:['KV Latent Rank · r','缓存压缩维度'],qrank:['Query Rank · rq','查询压缩维度'],rope:['RoPE Head · dr','解耦位置维度，偶数']};
+  const fmt=n=>n==null?'未知':n>=1e12?(n/1e12).toFixed(3)+' T':n>=1e9?(n/1e9).toFixed(3)+' G':n>=1e6?(n/1e6).toFixed(2)+' M':n>=1e3?(n/1e3).toFixed(2)+' K':n.toLocaleString('en-US');
+  const mem=n=>n>=2**30?(n/2**30).toFixed(2)+' GiB':n>=2**20?(n/2**20).toFixed(2)+' MiB':n>=1024?(n/1024).toFixed(2)+' KiB':n+' B';
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function field(k){const [label,note]=metadata[k];return `<label class="field" for="${k}">${label}<input id="${k}" name="${k}" type="number" min="${k==='S'?0:1}" max="${k==='S'?1048576:k==='batch'?1024:65536}" step="${k==='rope'?2:1}" value="${parameters[k]}"><span>${note}</span></label>`;}
+  $('contextField').innerHTML=field('S');
+  $('commonFields').innerHTML=['D','H','Hkv','dk','dv','batch'].map(field).join('');
+  function special(){
+    const keys=selected==='MLA'?['rank','qrank','rope']:selected==='SWA'?['W']:selected==='MSA'?['topk','block','di']:[];
+    $('specialFields').innerHTML=keys.length?`<div class="field-grid">${keys.map(field).join('')}</div>`:selected==='GDA'?`<label class="field">递归状态精度<select id="statePrecision">${Object.keys(C.bytes).map(x=>`<option ${parameters.statePrecision===x?'selected':''}>${x}</option>`).join('')}</select></label><p class="caption">每头状态 [dv, dk]。Hkv 不参与本递归定义。</p>`:'<p class="caption">此架构使用基础参数；窗口、索引与 latent 参数不适用。</p>';
+    if(selected==='MLA')$('specialFields').insertAdjacentHTML('beforeend',`<label class="field">MLA 执行路径<select id="mlaImplementation"><option value="factorized">保留因子 · 原有路径</option><option value="absorbed-query">吸收 Query 权重</option><option value="absorbed-qo">吸收 Query + O 权重</option></select></label><p class="caption">离线融合不计入每步；融合矩阵可能更大，不保证 FLOPs 更少。</p>`);
+    if($('mlaImplementation'))$('mlaImplementation').value=parameters.mlaImplementation;
+  }
+  function value(r){return $('scope').value==='core'?r.core:r.total;}
+  function update(){
+    const candidate={...parameters};
+    for(const k of Object.keys(C.defaults)) if($(k)) candidate[k]=typeof C.defaults[k]==='number'?Number($(k).value):k==='scalar'?$(k).checked:$(k).value;
+    // Empty number fields are invalid, including S (Number('') would be zero).
+    const empty=Object.keys(metadata).filter(k=>$(k)&&$(k).value.trim()==='');
+    const nextScenario={mode:$('tokenMode').value,generated:Number($('generated').value)};
+    const errors=[...empty.map(k=>`${k} 不能为空`),...C.validateScenario(candidate,nextScenario)];
+    if(nextScenario.mode!=='single'&&$('generated').value.trim()==='')errors.push('Generated Tokens 不能为空');
+    let nextResults;
+    if(!errors.length)try{nextResults=C.sequenceResults(candidate,nextScenario);}catch(e){errors.push(e.message);}
+    $('error').hidden=!errors.length;
+    $('error').textContent=errors.join('；');
+    $('parameters').querySelectorAll('input[type=number]').forEach(e=>e.setAttribute('aria-invalid',String(empty.includes(e.id)||!Number.isSafeInteger(candidate[e.id]))));
+    document.querySelectorAll('#export,#exportRoofline').forEach(e=>e.disabled=!!errors.length);
+    if(errors.length){$('error').textContent+='。Attention 结果保留上一次有效配置；请修正输入后再比较。';document.dispatchEvent(new Event('compute-lab-invalid'));return;}
+    parameters=candidate;scenario=nextScenario;all=nextResults;$('generatedField').hidden=scenario.mode==='single';render();
+  }
+  function render(){
+    const p=parameters, current=all.find(r=>r.name===selected), baseline=all[0], v=value(current), base=value(baseline);
+    $('scenarioText').textContent=`初始 S = ${p.S.toLocaleString()} · 生成 G = ${current.steps.toLocaleString()} · 首步可见 ${(p.S+1).toLocaleString()}`;
+    const ratio=v==null?'未核验':(base/v).toFixed(2)+'×';
+    const reduction=v==null?'理论计算量比值 · 非实测加速':v<=base?`较 MHA 减少 ${(100*(1-v/base)).toFixed(1)}% FLOPs`:`较 MHA 增加 ${(100*(v/base-1)).toFixed(1)}% FLOPs`;
+    $('metrics').innerHTML=`<div class="metric"><small>${selected} / ${current.steps} Tokens · ${$('scope').value==='core'?'Core':'Module'}</small><strong>${fmt(v)}</strong><span>${selected==='GDA'&&v==null?'已知小计 '+fmt(current.known):'累计 FLOPs / layer / sequence'}</span></div><div class="metric"><small>MHA / ${selected}</small><strong>${ratio}</strong><span>${reduction}</span></div><div class="metric"><small>${selected} / ${current.name==='GDA'?'递归状态':'KV Cache'}</small><strong>${mem(current.memoryBytes)}</strong><span>末步整批容量${current.memoryComplete?'':' · 部分'}</span></div>`;
+    $('ratioHeading').textContent='MHA / '+($('scope').value==='core'?'Core':'Total');
+    $('comparison').querySelector('tbody').innerHTML=all.map(r=>`<tr class="${r.name===selected?'selected':''}"><td><button data-arch="${r.name}"><i class="dot" style="background:${C.colors[r.name]}"></i>${r.name}</button><small>${r.complete?r.name==='MLA'?'选定路径小计':'声明范围内': '完整模块未核验'}</small></td><td>${fmt(r.projection)}</td><td>${fmt(r.core)}</td><td>${fmt(r.extra)}</td><td>${fmt(r.total)}${!r.complete?`<small>已知 ${fmt(r.known)}</small>`:''}</td><td>${value(r)==null?'—':(base/value(r)).toFixed(2)+'×'}</td></tr>`).join('');
+    $('architectureButtons').innerHTML=names.map(n=>`<button data-arch="${n}" class="${n===selected?'active':''}" aria-pressed="${n===selected}">${n}</button>`).join('');
+    diagram(current.first);steps(current.first);memory();chart();
+    $('architectureSummary').innerHTML=summary(current.first);
+    $('rooflineSchema').textContent=JSON.stringify({schemaVersion:1,scenario:'decode',historyTokens:p.S,storageLevel:'HBM',precision:p.precision,flopsPerToken:current.total,bytesMoved:null,bytesEvidence:null},null,2);
+    document.dispatchEvent(new CustomEvent('compute-lab-change'));
+  }
+  function summary(r){const p=parameters,ratio=(C.calculate('MHA',p).memoryBytes/r.memoryBytes).toFixed(2), L=r.active;
+    const s={
+      MHA:`每个 Query Head 拥有独立 K/V，读取全部 ${L.toLocaleString()} 个位置，作为全注意力基线。没有稀疏选择开销，但计算与缓存都随历史长度线性增长。`,
+      GQA:`每 ${p.H/p.Hkv} 个 Query Head 共享一组 KV：KV 投影与缓存减少，当前容量比 MHA 小 ${ratio} 倍。所有 ${p.H} 个 Query Head 仍计算各自分数，所以核心 FLOPs 与 MHA 相同。长上下文、缓存受限时更有价值；共享 KV 改变模型表示能力。`,
+      MLA:`历史只存 ${p.rank} 维 latent 和 ${p.rope} 维位置 Key。当前路径：${{'factorized':'保留 Query / Value 因子','absorbed-query':'吸收 Query 权重；保留 Value / O 因子','absorbed-qo':'吸收 Query 与 Value→O 权重'}[p.mlaImplementation]}。计算在 latent 空间进行；大秩可能增加核心 FLOPs。离线融合与原有因子路径在实数代数中等价，不重复执行已吸收的投影；有限精度舍入与实际性能不保证相同。`,
+      SWA:`只读取最近 min(S+1, W) = ${L.toLocaleString()} 个位置。超过 W=${p.W.toLocaleString()} 后，核心 FLOPs 与滚动缓存不再随 S 增长。使用 GQA 投影；没有索引分支，但窗口之外的信息无法在本层直接访问。`,
+      MSA:`每组独立选择至多 ${p.topk} 个 block（包括 local block），主分支当前读取 ${L.toLocaleString()} 个位置。${p.Hkv} 个 ${p.di} 维索引 Query 仍扫描全部 ${(p.S+1).toLocaleString()} 个 Index Key，因此总量不是完全常数。长上下文可减少主注意力计算；需支付索引、选择与不规则读取开销，缓存仍保留全部历史。`,
+      GDA:`每头以 [${p.dv}, ${p.dk}] 状态递归更新，无需读取历史 KV；递归核心不随 S 增长。通过衰减与预测误差控制写入，状态占用 ${mem(r.memoryBytes)}（${p.statePrecision}）。固定状态可能限制历史检索能力。ShortConv、归一化和非线性门尚未核验，完整模块 FLOPs 与完整缓存未知。`
+    };return s[r.name];
+  }
+  function diagram(r){
+    const p=parameters, color=C.colors[r.name];
+    const rect=(x,y,w,h,title,subtitle,fill='#f1f6ff')=>`<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fill}" stroke="#cddbf1"/><text x="${x+w/2}" y="${y+21}" text-anchor="middle" class="diagram-text">${esc(title)}</text><text x="${x+w/2}" y="${y+39}" text-anchor="middle" font-size="10" fill="#718092">${esc(subtitle)}</text></g>`;
+    const arrow=(x1,y1,x2,y2)=>`<path d="M${x1},${y1} L${x2},${y2}" fill="none" stroke="${color}" stroke-width="1.5" marker-end="url(#arrow)"/>`;
+    let body='';
+    if(['MHA','GQA'].includes(r.name)){
+      const h=r.name==='MHA'?p.H:p.Hkv, count=Math.min(p.H,8), groups=new Set(Array.from({length:count},(_,i)=>r.name==='MHA'?i:Math.floor(i/(p.H/p.Hkv))));
+      body+=rect(5,50,105,55,'当前 X',`[1, ${p.D}]`)+arrow(110,78,148,78);
+      for(let i=0;i<count;i++){
+        const x=153+i*77,g=r.name==='MHA'?i:Math.floor(i/(p.H/p.Hkv));
+        body+=rect(x,10,65,49,`Q${i}`,`[1, ${p.dk}]`);
+        const gx=153+([...groups].indexOf(g))*77;
+        body+=arrow(x+32,60,gx+32,111);
+      }
+      [...groups].forEach((g,i)=>{body+=rect(153+i*77,117,66,49,`KV${g}`,`${r.visible} × K/V`,'#e9f7f2');});
+      body+=`<text x="153" y="198" class="diagram-text">${p.H} Query Heads → ${h} KV Heads；${p.H>8?'示例显示前 8 头；':''}每组 ${p.H/h} 个 Query Head</text>`;
+    }else if(r.name==='MLA'){
+      body=rect(5,55,115,55,'当前 X',`[1, ${p.D}]`)+arrow(120,82,154,82)+rect(156,55,145,55,'Compression',`cKV: [1, ${p.rank}]`)+arrow(301,82,334,82)+rect(336,55,195,55,'历史 Latent Cache',`[${r.visible}, ${p.rank}] + KR: ${p.rope}`,'#f2edff')+arrow(531,82,566,82)+rect(568,55,180,55,'Latent Attention',`${p.H} heads → Value up`);
+      body+=`<text x="5" y="155" class="diagram-text">Query: D → ${p.qrank} → ${p.mlaImplementation==='factorized'?`H×${p.dk} → `:''}H×${p.rank}；${p.mlaImplementation==='absorbed-qo'?'聚合 latent → 融合 O':'Value up → O'}；不展开历史 K/V。</text>`;
+    }else if(r.name==='SWA'){
+      const count=24;body+=`<text x="5" y="25" class="diagram-text">历史 + 当前：${r.visible} 个位置 / 窗口读取：${r.active} 个位置</text>`;
+      for(let i=0;i<count;i++){const active=i>=count-Math.max(1,Math.round(count*r.active/r.visible));body+=`<rect x="${6+i*30}" y="52" width="24" height="43" rx="4" fill="${active?'#f5ac51':'#e8edf3'}"/>`;}
+      body+=arrow(724,76,757,76)+`<text x="7" y="127" class="diagram-text">灰色：窗口外；橙色：最近 min(N, W) = ${r.active} 个位置</text><text x="7" y="155" font-size="11" fill="#718092">格子为比例示意；KV Heads = ${p.Hkv}，每头 dk=${p.dk}, dv=${p.dv}</text>`;
+    }else if(r.name==='MSA'){
+      body=rect(5,40,185,60,'Index Branch',`${p.Hkv} × ${p.di}；扫描 N=${r.visible}`)+arrow(190,70,225,70)+rect(227,40,240,60,'Block Max → Top-K',`k=${p.topk}, block=${p.block}；含 local`,'#fff0f5')+arrow(467,70,504,70)+rect(506,40,245,60,'Main Attention',`${r.active} positions × ${p.H} Query Heads`);
+      const blocks=Math.ceil(r.visible/p.block), shown=Math.min(blocks,16), picks=Math.min(p.topk,blocks);
+      for(let i=0;i<shown;i++)body+=`<rect x="${8+i*35}" y="132" width="29" height="18" rx="3" fill="${i>=shown-Math.min(picks,shown)?'#dc537f':'#e8edf3'}"/>`;
+      body+=`<text x="8" y="184" font-size="11" fill="#718092">共 ${blocks} blocks；末块可见 ${p.S%p.block+1} 个位置；色块仅示意选择预算，不模拟实际索引分数。</text>`;
+    }else{
+      body=rect(5,48,150,62,'Recurrent State',`Rprev: [${p.H}, ${p.dv}, ${p.dk}]`,'#eff2f5')+arrow(155,79,190,79)+rect(192,48,180,62,'Decay & Read',`A = αRprev；u = A k`)+arrow(372,79,407,79)+rect(409,48,182,62,'Delta Update',`Rnew = A + β(v−u)kᵀ`)+arrow(591,79,625,79)+rect(627,48,135,62,'Output',`o = Rnew q`);
+      body+=`<path d="M496,111 V145 H80 V113" fill="none" stroke="${color}" stroke-dasharray="4 3" marker-end="url(#arrow)"/><text x="235" y="174" class="diagram-text">传给下一个 token；状态尺寸不依赖历史 S</text>`;
+    }
+    $('architectureDiagram').innerHTML=`<svg viewBox="0 0 780 210" role="img" aria-label="${r.name} 参数驱动架构图"><defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="${color}"/></marker></defs>${body}</svg>`;
+  }
+  function steps(r){
+    $('detailCount').textContent=` · ${r.rows.length} 步`;
+    $('detailIntro').innerHTML=`FMA = 2 FLOPs；主计数为 2MKN；严格乘加 MN(2K−1) 只适用于矩阵点积。当前可见 N=S+1=${r.visible}，实际读取 L=${r.active}。<br>D=${parameters.D}，H=${parameters.H}，Hkv=${parameters.Hkv}，dk=${parameters.dk}，dv=${parameters.dv}，r=${parameters.rank}，rq=${parameters.qrank}，dr=${parameters.rope}，di=${parameters.di}；维度均为元素数。<br>当前已知小计 ${fmt(r.known)} FLOPs；整批已知小计 ${fmt(r.known*parameters.batch)} FLOPs。${r.complete?'':`完整模块未知：${r.unknown.join('；')}。`}`;
+    $('steps').innerHTML=r.rows.map((s,i)=>`<article class="step"><div class="step-head"><b>${i+1}. ${s.label} <small>· ${{projection:'Projection',core:'Core',extra:'Additional'}[s.category]}</small></b><span>${fmt(s.approx)} FLOPs${s.excluded?' · 本口径排除':''}</span></div><p>${s.purpose}</p><div class="matrix-flow"><span class="matrix-box">${s.input}</span><span>${s.kind==='matmul'?'×':'→'}</span><span class="matrix-box">${s.weight}</span><span>→</span><span class="matrix-box">${s.output}</span>${s.groups>1?`<span>× ${s.groups} heads</span>`:''}</div><p><code>${esc(s.formula)}</code></p>${s.kind==='matmul'?`<p>近似：2 × ${s.input.slice(1,-1).replace(', ',' × ')} × ${s.weight.slice(1,-1).split(', ')[1]} × ${s.groups} = ${s.approx.toLocaleString('en-US')} FLOPs<br>严格标量乘加：MN(2K−1) × ${s.groups} = ${s.exact.toLocaleString('en-US')} FLOPs</p>`:`<p>按上方明示计数约定：${s.approx.toLocaleString('en-US')} FLOPs；不是硬件指令计数。</p>`}</article>`).join('');
+  }
+  function memory(){const max=Math.max(...all.map(r=>r.memoryBytes)), base=all[0].memoryBytes;
+    $('memoryBars').innerHTML=all.map(r=>`<div class="memory-row"><b>${r.name}</b><div class="bar-track"><div class="bar-fill" style="background:${C.colors[r.name]};width:${Math.max(.5,100*r.memoryBytes/max)}%"></div></div><span class="memory-value">${mem(r.memoryBytes)}</span><span class="memory-value">${(100*r.memoryBytes/base).toFixed(1)}%</span><span class="memory-note">${r.memoryNote} · ${r.name==='SWA'?'O(min(N,W))':r.name==='GDA'?'O(H dk dv)，部分状态':'O(N)'}；百分比为 MHA 容量占比</span></div>`).join('');
+  }
+  function chart(){
+    const isMemory=$('chartMode').value==='memory',log=$('yScale').value==='log',getValue=r=>isMemory?r.memoryBytes:value(r),format=isMemory?mem:fmt;
+    const maxS=Math.max(Number($('chartMax').value),parameters.S,1), left=68,right=880,top=24,bottom=262;
+    const points=new Set([0,maxS,parameters.S,Math.min(maxS,parameters.W-1)]);
+    for(let i=0;i<=120;i++)points.add(Math.round(i*maxS/120));
+    if(maxS/parameters.block<=512) for(let s=parameters.block;s<=maxS;s+=parameters.block){points.add(s-1);points.add(s);}
+    const ss=[...points].sort((a,b)=>a-b), series=names.filter(n=>visible.has(n)).map(n=>({name:n,points:ss.map(s=>({s,v:getValue(C.calculate(n,{...parameters,S:s}))})).filter(a=>a.v!=null)})).filter(a=>a.points.length);
+    const ymax=Math.max(1,...series.flatMap(a=>a.points.map(p=>p.v)))*1.12;
+    const ymin=log?Math.max(1,Math.min(...series.flatMap(a=>a.points.map(p=>p.v)),ymax/10)*.8):0;
+    const x=s=>left+s/maxS*(right-left),y=v=>bottom-(log?(Math.log10(v)-Math.log10(ymin))/(Math.log10(ymax)-Math.log10(ymin)):v/ymax)*(bottom-top);
+    plot={maxS,left,right,top,bottom,ymax,x,y,isMemory};
+    let svg=`<text x="${left}" y="13" font-size="10" fill="#718092">${isMemory?'Cache / State bytes / batch / layer':'FLOPs / token / layer / sequence'}${log?' · log scale':''}</text>`;
+    for(let i=0;i<=4;i++){const yy=bottom-(bottom-top)*i/4,v=log?10**(Math.log10(ymin)+(Math.log10(ymax)-Math.log10(ymin))*i/4):ymax*i/4;svg+=`<path d="M${left},${yy}H${right}" stroke="#e9eef4"/><text x="${left-9}" y="${yy+4}" text-anchor="end" font-size="10" fill="#718092">${format(v)}</text>`;}
+    for(let i=0;i<=4;i++){const s=maxS*i/4;svg+=`<text x="${x(s)}" y="285" text-anchor="middle" font-size="10" fill="#718092">${Math.round(s).toLocaleString()}</text>`;}
+    svg+=`<text x="${(left+right)/2}" y="307" text-anchor="middle" font-size="10" fill="#718092">History Context Length · S（可见位置 N = S + 1）</text>`;
+    series.forEach(a=>{svg+=`<path d="${a.points.map((p,i)=>(i?'L':'M')+x(p.s).toFixed(2)+','+y(p.v).toFixed(2)).join(' ')}" fill="none" stroke="${C.colors[a.name]}" stroke-width="${a.name==='GQA'?2:2.4}" ${a.name==='GQA'?'stroke-dasharray="7 5"':''}/>`;});
+    const currentX=x(parameters.S);svg+=`<path d="M${currentX},${top}V${bottom}" stroke="#b7c5d7" stroke-dasharray="3 4"/><text x="${Math.min(currentX+5,right-100)}" y="${top+10}" font-size="10" fill="#7b8ca0">当前 S=${parameters.S.toLocaleString()}</text><g id="hoverMarker"></g>`;
+    if(!series.length)svg+=`<text x="450" y="140" text-anchor="middle" font-size="14" fill="#718092">当前没有可绘制的已知曲线</text>`;
+    $('chart').innerHTML=svg;
+    $('chart').setAttribute('aria-label',isMemory?'历史 Context 长度与缓存 / 状态容量曲线':'历史 Context 长度与每 token FLOPs 曲线');
+    $('chartNote').textContent=isMemory?'容量按整批单层计算：MSA 仍保留完整历史；SWA 可淘汰窗口外 KV；GDA 只绘制递归状态，未含 ShortConv 缓冲。容量不是 HBM Bytes Moved。':$('scope').value==='core'?'GQA 虚线与 MHA 重合。MSA 为主分支核心，不含索引；GDA 核心包含衰减、误差、状态更新与输出读取。':'MSA 总量含索引扫描，仍随 S 增长；末块长度导致锯齿变化。GDA 完整模块未核验，不绘制 Total 曲线。';
+    if(!parameters.scalar&&!isMemory)$('chartNote').textContent+=' 当前仅统计矩阵运算，GDA 外积与状态逐元素操作未计入。';
+    $('hoverReadout').textContent='在图上移动查看数值';
+  }
+  $('chart').addEventListener('pointermove',e=>{if(!plot)return;const bounds=$('chart').getBoundingClientRect(), px=(e.clientX-bounds.left)*900/bounds.width,s=Math.max(0,Math.min(plot.maxS,Math.round((px-plot.left)/(plot.right-plot.left)*plot.maxS)));
+    const data=names.filter(n=>visible.has(n)).map(n=>{const r=C.calculate(n,{...parameters,S:s});return {n,v:plot.isMemory?r.memoryBytes:value(r)};});
+    $('hoverReadout').textContent=`S=${s.toLocaleString()} · `+data.map(a=>a.n+' '+(plot.isMemory?mem:fmt)(a.v)).join(' / ');
+    $('hoverMarker').innerHTML=`<path d="M${plot.x(s)},${plot.top}V${plot.bottom}" stroke="#8ba0ba"/>`+data.filter(a=>a.v!=null).map(a=>`<circle cx="${plot.x(s)}" cy="${plot.y(a.v)}" r="3.5" fill="${C.colors[a.n]}"/>`).join('');
+  });
+  function selectArchitecture(n){selected=n;special();render();}
+  document.addEventListener('click',e=>{const button=e.target.closest('[data-arch]');if(button)selectArchitecture(button.dataset.arch);const go=e.target.closest('[data-go]');if(go)tab(go.dataset.go);});
+  $('parameters').addEventListener('submit',e=>e.preventDefault());$('parameters').addEventListener('input',update);$('parameters').addEventListener('change',update);
+  $('scope').addEventListener('change',render);for(const id of ['chartMax','chartMode','yScale'])$(id).addEventListener('change',chart);
+  $('legend').innerHTML=names.map(n=>`<label><input type="checkbox" data-series="${n}" checked style="accent-color:${C.colors[n]}"><i class="dot" style="background:${C.colors[n]}"></i>${n}</label>`).join('');
+  $('legend').addEventListener('change',e=>{const n=e.target.dataset.series;if(n){e.target.checked?visible.add(n):visible.delete(n);chart();}});
+  $('reset').addEventListener('click',()=>{parameters={...C.defaults};scenario={...C.scenarioDefaults};$('tokenMode').value=scenario.mode;$('generated').value=scenario.generated;for(const k of Object.keys(C.defaults))if($(k)){if(k==='scalar')$(k).checked=parameters[k];else $(k).value=parameters[k];}special();update();});
+  function tab(id){for(const n of ['attention','roofline','mfu']){$(n).hidden=n!==id;$('tab-'+n).setAttribute('aria-selected',String(n===id));$('tab-'+n).tabIndex=n===id?0:-1;}document.dispatchEvent(new CustomEvent('compute-lab-tab-change',{detail:id}));}
+  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.tab)));
+  document.querySelector('.tabs').addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;const list=[...document.querySelectorAll('[data-tab]')],i=list.indexOf(document.activeElement),j=e.key==='Home'?0:e.key==='End'?2:(i+(e.key==='ArrowRight'?1:2))%3;e.preventDefault();list[j].focus();tab(list[j].dataset.tab);});
+  function download(data,name){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  $('export').addEventListener('click',()=>download(C.exportSequence(parameters,scenario),'attention-experiment.json'));
+  const template={schemaVersion:1,architecture:'请填写模型架构',source:'请填写已核验来源或本地审计文件',verified:false,precision:'BF16',forwardFlopsPerToken:null,backwardFlopsPerToken:null,tokensPerSecond:null,tokensPerStep:null,stepSeconds:null,deviceCount:null,peakFlopsPerSecondPerDevice:null,recomputationExecutionFlopsPerToken:null};
+  $('trainingSchema').textContent=JSON.stringify(template,null,2);$('trainingTemplate').addEventListener('click',()=>download(template,'training-flops-template.json'));
+  $('trainingFile').addEventListener('change',async()=>{const f=$('trainingFile').files[0];if(!f)return;try{if(f.size>1048576)throw new Error('JSON 文件不得超过 1 MiB');training=C.validateTraining(JSON.parse(await f.text()));$('trainingSchema').textContent=JSON.stringify(training,null,2);$('importStatus').textContent='已通过格式校验；verified 是提供者声明，来源仍需人工核验。导入与 MFU 教学假设分开；尚未进行真实训练 MFU 分析。';}catch(e){training=null;$('importStatus').textContent='导入失败：'+e.message;$('trainingSchema').textContent=JSON.stringify(template,null,2);}});
+  $('methodContent').innerHTML=`<h3>统一实验与单位</h3><p>默认只做 Decode：输入 X=[1,D]，历史 S 个 token；生成当前第 S+1 个，当前 K/V 参与注意力。N=S+1；W 与 sparse budget 均包含当前位置。按单层 / 每序列 / 每新 token 输出 FLOPs；内存按整批输出。Batch 扩展量单列，曲线不乘 Batch。</p><h3>计数约定</h3><p>FMA = 2 FLOPs。矩阵乘法 X[M,K] × W[K,N] 默认 2MKN，严格点积为 MN(2K−1)。外积每元素只有一次乘法，不能套用近似 2MKN 来称为严格计数。</p><p>启用标量时：加、减、乘、除、exp 各简化计 1 FLOP。稳定 Softmax 为每头 4L−1（L 次减最大值、L 次 exp、L−1 次求和、L 次除法），另计 L 次 scale。max、Top-K、block max pooling 的比较与整数索引不算浮点 FLOPs，但会消耗时间。关闭标量时总量仅包含矩阵运算，图表同步改变。</p><h3>计算范围与可比性</h3><p>MHA / GQA / SWA 是 Q、K、V、O 投影与注意力核心。统一排除位置旋转、Bias、残差、全局归一化、FFN、量化 / 反量化与通信。Total 是这个声明范围内的 Attention 小计，不是模型整体 FLOPs 或硬件指令数。</p><p>MLA 保留 rq 查询压缩、dk 内容查询、dr 解耦位置查询，先将 Query 按头变换至 r 维 latent，直接在 latent Cache 上做注意力，再做 Value up 和 O 投影；不展开历史 K/V，不完全预融合 Query / O 权重。dk 在 MLA 中是内容维度，实际 score 还加 dr 维位置部分；未计 RMSNorm 与 RoPE 旋转，不能称为完整 DeepSeek 实现或等容量对比。</p><p>MSA 使用论文 §3.1 的 group-specific Index Q、单个共享 Index K、block max pooling；Decode 采用 exp-free 选择。k 包含 local block，本工具采用总选择预算 k 的强制保留约定。已选 local 块长度 ℓ=(N−1) mod block+1，其余块均完整，L=ℓ+(min(k,ceil(N/block))−1)×block。没有真实索引输入，不声称选出了某些真实 block。索引 score 仍扫描所有 N 行；正 scale 显式计入，可被具体选择内核省去。训练 KL loss 不在 Decode 范围。</p><p>GDA 按 Eq.10：A=αRprev，u=Ak，δ=β(v−u)，Rnew=A+δkᵀ，o=Rnew q。R 的转置布局不影响 FLOPs。完整标量核心为 H(7dkdv+2dv)，仅矩阵时为 4Hdkdv；这是本递归算法的计数。已知投影包括 Q/K/V/O、α/β 与输出门；ShortConv、激活、归一化和输出门乘法未核验，Extra 与 Total 为 null。仅核心比值可比较，且算法语义与 Softmax 不等价。</p><h3>内存与性能</h3><p>逻辑缓存：MHA N H(dk+dv)b；GQA N Hkv(dk+dv)b；SWA min(N,W)Hkv(dk+dv)b；MLA N(r+dr)b；MSA N[Hkv(dk+dv)+di]b；GDA 仅状态 H dk dv bstate。b 为精度字节。均乘 Batch。GDA 的完整记忆还需 ShortConv 缓冲。量化 scales、对齐、临时激活、权重未计入。</p><p>容量不等于 HBM 流量；trafficBytes、weightTrafficBytes 留 null。FLOPs 是运算量，FLOP/s 是速率，Ratio 是理论计算量比值，均不是实测 wall-clock speedup。FP8 仅按 1 字节存储作教学估算。</p><h3>来源与适用条件</h3><ul>${names.map(n=>`<li>${n}：<a href="${C.sources[n][1]}" target="_blank" rel="noopener noreferrer">${C.sources[n][0]}</a></li>`).join('')}</ul><p>架构来源于上述论文；FLOPs 由其矩阵形状与选定执行路径推导。MLA 与 GDA 不是现有 DeepSeek-V4.1 配置。公式验证请参见同目录 tests.js 与验证报告。</p>`;
+  for(const id of ['methodButton','footerMethod'])$(id).addEventListener('click',()=>$('methodology').showModal());$('closeMethod').addEventListener('click',()=>$('methodology').close());
+  $('methodology').addEventListener('click',e=>{if(e.target===$('methodology')){const r=$('methodology').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('methodology').close();}});
+  window.LLMComputeLab={getExperiment:()=>C.exportSequence(parameters,scenario),getParameters:()=>({...parameters}),getScenario:()=>({...scenario}),getSelection:()=>selected,getScope:()=>$('scope').value,getVisible:()=>[...visible],getRooflineInput:()=>C.rooflineInput(parameters),getTrainingInput:()=>training,importTraining:data=>{training=C.validateTraining(data);$('trainingSchema').textContent=JSON.stringify(training,null,2);$('importStatus').textContent='已通过格式校验；导入与 MFU 教学假设分开；尚未进行真实训练 MFU 分析。';return training;}};
+  window.LLMComputeLab.applyAttentionParameters=changes=>{
+    const candidate={...parameters,...changes};
+    // Validate the entire scenario and accumulated safe-integer counts before any mutation.
+    const next=C.sequenceResults(candidate,scenario);
+    parameters=candidate;all=next;
+    for(const k of Object.keys(changes))if($(k))$(k).value=parameters[k];
+    $('error').hidden=true;render();
+  };
+  special();tab('attention');update();
+})();
+</script><script>/* Incremental sequence/speedup/Roofline UI. Existing attention explorer stays in ui.js. */
+(function(){
+  'use strict';
+  const C=ComputeLab,A=LLMComputeLab,$=id=>document.getElementById(id),names=C.architectures;
+  const fmt=n=>n==null?'N/A':n>=1e12?(n/1e12).toFixed(3)+' T':n>=1e9?(n/1e9).toFixed(3)+' G':n>=1e6?(n/1e6).toFixed(2)+' M':n>=1e3?(n/1e3).toFixed(2)+' K':n.toLocaleString('en-US');
+  const num=n=>n==null?'N/A':n.toLocaleString('en-US',{maximumFractionDigits:4});
+  const ratio=n=>n==null?'N/A':n.toFixed(2)+'×';
+  const percent=n=>n==null?'N/A':n<0?`增加 ${(-n).toFixed(2)}%`:`减少 ${n.toFixed(2)}%`;
+  const bytes=n=>n==null?'未知':n>=2**30?(n/2**30).toFixed(3)+' GiB':n>=2**20?(n/2**20).toFixed(3)+' MiB':num(n)+' B';
+  const time=n=>n==null?'N/A':n>=1?n.toFixed(4)+' s':n>=.001?(n*1e3).toFixed(3)+' ms':(n*1e6).toFixed(3)+' μs';
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let roofData=null,roofSelected=A.getSelection(),roofVisible=new Set(names),cumulativePlot=null,lastSignature='',lastAttentionSelection=A.getSelection();
+  const choice=scope=>r=>scope==='core'?r.core:r.total;
+  function snapshot(){const p=A.getParameters(),s=A.getScenario(),scope=A.getScope(),records=C.sequenceResults(p,s);return {p,s,scope,records,selected:A.getSelection(),steps:records[0].steps};}
+  function refresh(){
+    const {p,s,scope,records,selected,steps:g}=snapshot(),r=records.find(x=>x.name===selected),value=choice(scope),base=value(records[0]),v=value(r);
+    $('sequenceHeading').textContent=`${g.toLocaleString()} Tokens · ${s.mode==='single'?'单步 Decode':'自回归逐步累计'}`;
+    const first=value(r.first),last=value(r.last);
+    $('sequenceMetrics').innerHTML=[['Average / Token',v==null?null:v/g],['First Token',first],['Last Token',last]].map(([t,n])=>`<div><small>${t}</small><b>${fmt(n)} FLOPs</b></div>`).join('');
+    $('sequenceProof').innerHTML=`<p><code>F_total = Σᵢ₌₀ᴳ⁻¹ F_decode(S+i)</code>；不是 G × F_decode(S)。每步 X=[1,${p.D}]。</p><p>初始 S=${p.S.toLocaleString()}，G=${g.toLocaleString()}。第一步历史 ${p.S.toLocaleString()}，最后一步历史 ${(p.S+g-1).toLocaleString()}；可见位置分别为 ${p.S+1} 与 ${p.S+g}。</p><p><code>Σ visible = G(2(S+1)+G−1)/2 = ${num(r.sumVisible)}</code>。${selected==='SWA'?`Σ min(S+i+1,W) = ${num(r.sumActive)}`:selected==='MSA'?`Σ selected positions = ${num(r.sumActive)}；按 local 末块周期与 k 预算分段求和`:selected==='GDA'?'递归核心恒定，但完整模块未知':`Σ active positions = ${num(r.sumActive)}`}。</p><p>累计 Projection=${fmt(r.projection)}；Core=${fmt(r.core)}；Additional=${fmt(r.extra)}；Module=${fmt(r.total)} FLOPs。Average=${fmt(v)} / ${g} = ${fmt(v==null?null:v/g)} FLOPs/token。整批所选口径=${fmt(v==null?null:v*p.batch)} FLOPs；均为单层。</p><p>内部使用解析前缀和，已与逐步调用单 Token 公式的显式循环核验。MSA 索引按 Σ visible 计算，不省略历史扫描。</p>`;
+    $('inspectStep').max=g;let i=Number($('inspectStep').value);if(!Number.isSafeInteger(i)||i<1||i>g){i=1;$('inspectStep').value=1;}inspect();
+    const maxRatio=Math.max(1,...records.map(x=>C.speedup(base,value(x)).ratio||0));
+    $('speedupBars').innerHTML=records.map(x=>{const q=C.speedup(base,value(x));return `<div class="speed-row"><button data-arch="${x.name}">${x.name}</button><div class="speed-track"><span class="baseline-marker" style="left:${100/maxRatio}%"></span><i style="width:${q.ratio==null?0:100*q.ratio/maxRatio}%;background:${C.colors[x.name]}"></i></div><b>${ratio(q.ratio)}</b><small>${percent(q.reduction)}</small></div>`;}).join('');
+    $('speedupTable').innerHTML=records.map(x=>{const q=C.speedup(base,value(x));return `<tr><td><button data-arch="${x.name}">${x.name}</button></td><td>${fmt(value(x))}</td><td>${ratio(q.ratio)}</td><td>${percent(q.reduction)}</td></tr>`;}).join('');
+    $('speedupProof').innerHTML=records.map(x=>{const q=C.speedup(base,value(x));return `<p><b>${x.name}</b>：${q.ratio==null?'完整模块缺失，不能计算加速比。':`Speedup = ${num(base)} / ${num(value(x))} = ${ratio(q.ratio)}；Reduction = [1 − ${num(value(x))} / ${num(base)}] × 100% = ${num(q.reduction)}%。当前 FLOPs 是 MHA 的 ${(100/q.ratio).toFixed(2)}%，${q.ratio<1?'计算量增加':'计算量减少或持平'}。`}</p>`;}).join('');
+    const signature=JSON.stringify([p,s,scope]);
+    if(lastSignature&&signature!==lastSignature){
+      // Manual bytes/runtime belong to an exact experiment and scope. Invalidate on change.
+      document.querySelectorAll('#customTrafficInputs input').forEach(e=>e.value='');
+      if($('trafficMode').value==='custom')$('roofChartNote').textContent='配置已改变，先前自定义访存量与实测耗时已清空，请为新场景填写。';
+    }
+    lastSignature=signature;
+    if(selected!==lastAttentionSelection)roofSelected=selected;
+    lastAttentionSelection=selected;
+    $('roofScope').value=scope;
+    document.querySelector('.memory-panel .muted').textContent=`KV Cache / State · 最后一步之后 · S+G=${(p.S+g).toLocaleString()} · 单层整批`;
+    cumulative();renderRoofline();
+  }
+  function inspect(){const {p,scope,selected,steps:g}=snapshot(),i=Number($('inspectStep').value);if(!Number.isSafeInteger(i)||i<1||i>g){$('inspectResult').textContent=`请填写 1–${g} 的整数步骤。`;return;}const r=C.calculate(selected,{...p,S:p.S+i-1});$('inspectResult').innerHTML=`<p>第 ${i} 步：History = ${p.S} + ${i} − 1 = ${p.S+i-1}，可见 ${r.visible} 个位置，读取 ${r.active} 个位置；${scope==='core'?'Core':'Module'} = ${fmt(choice(scope)(r))} FLOPs。<br>Projection ${fmt(r.projection)}，Core ${fmt(r.core)}，Additional ${fmt(r.extra)}；缓存 / 状态 ${bytes(r.memoryBytes)}。</p>`;}
+  function cumulative(){
+    const {p,s,scope,steps:g}=snapshot(),shown=A.getVisible(),get=choice(scope),left=72,right=880,top=25,bottom=236,x=n=>left+n/g*(right-left);
+    const counts=new Set([0,g]);for(let i=1;i<=80;i++)counts.add(Math.max(1,Math.round(i*g/80)));
+    const series=shown.map(name=>({name,points:[...counts].sort((a,b)=>a-b).map(n=>({n,v:n===0?0:get(C.aggregate(name,p,{...s,mode:'autoregressive',generated:n}))})).filter(q=>q.v!=null)})).filter(q=>q.points.length>1);
+    const max=Math.max(1,...series.flatMap(q=>q.points.map(t=>t.v)))*1.08,y=v=>bottom-v/max*(bottom-top);cumulativePlot={g,left,right,top,bottom,x,y,p,s,scope};
+    let out=`<text x="${left}" y="13" font-size="10" fill="#718092">累计 FLOPs / layer / sequence · 初始 S=${p.S.toLocaleString()}</text>`;
+    for(let i=0;i<=4;i++){const yy=bottom-i*(bottom-top)/4;out+=`<path d="M${left},${yy}H${right}" stroke="#e9eef4"/><text x="${left-10}" y="${yy+4}" text-anchor="end" font-size="10" fill="#718092">${fmt(max*i/4)}</text><text x="${x(g*i/4)}" y="259" text-anchor="middle" font-size="10" fill="#718092">${Math.round(g*i/4).toLocaleString()}</text>`;}
+    series.forEach(q=>out+=`<path d="${q.points.map((t,i)=>(i?'L':'M')+x(t.n).toFixed(2)+','+y(t.v).toFixed(2)).join(' ')}" fill="none" stroke="${C.colors[q.name]}" stroke-width="2.3" ${q.name==='GQA'?'stroke-dasharray="7 5"':''}/>`);
+    $('cumulativeChart').innerHTML=out+`<text x="475" y="281" text-anchor="middle" font-size="10" fill="#718092">Generated Tokens · 串行生成累计</text><g id="cumulativeHover"></g>`;
+  }
+  $('cumulativeChart').addEventListener('pointermove',e=>{const q=cumulativePlot;if(!q)return;const box=$('cumulativeChart').getBoundingClientRect(),x=(e.clientX-box.left)*900/box.width,n=Math.max(1,Math.min(q.g,Math.round((x-q.left)/(q.right-q.left)*q.g)));const data=A.getVisible().map(name=>({name,v:choice(q.scope)(C.aggregate(name,q.p,{...q.s,mode:'autoregressive',generated:n}))}));$('cumulativeReadout').textContent=`生成 ${n} tokens；最后历史 ${q.p.S+n-1} · `+data.map(x=>x.name+' '+fmt(x.v)).join(' / ');$('cumulativeHover').innerHTML=`<path d="M${q.x(n)},${q.top}V${q.bottom}" stroke="#9daec3"/>`+data.filter(x=>x.v!=null).map(x=>`<circle cx="${q.x(n)}" cy="${q.y(x.v)}" r="3" fill="${C.colors[x.name]}"/>`).join('');});
+  $('inspectStep').addEventListener('input',inspect);
+  function readHardware(){return {name:$('hardwareName').value.trim(),peakTF:Number($('peakTF').value),bandwidth:Number($('bandwidth').value),bandwidthUnit:$('bandwidthUnit').value,precision:$('hardwarePrecision').value,devices:Number($('deviceCount').value),provenance:$('hardwareTemplate').value==='h100'?C.hardwarePreset('h100'):{kind:'user-input',computeType:'user-declared'}};}
+  function readTraffic(){const customBytes={},runtimesMs={};for(const n of names){const input=$('bytes-'+n),runtime=$('runtime-'+n);customBytes[n]=input.value.trim()===''?null:Number(input.value)*2**20;runtimesMs[n]=runtime.value.trim()===''?null:Number(runtime.value);}return {mode:$('trafficMode').value,weightHitRate:Number($('weightHitRate').value),kvHitRate:Number($('kvHitRate').value),headReuse:$('headReuse').value,intermediate:$('intermediate').value,customBytes,runtimesMs};}
+  function renderRoofline(){
+    const {p,s,steps:g}=snapshot(),h=readHardware(),o=readTraffic(),scope=$('roofScope').value;
+    $('roofContext').textContent=`${s.mode==='single'?'Single Token':'Autoregressive'} Decode · G=${g} · S=${p.S} · ${p.precision} · 单层整批 Batch=${p.batch} · ${scope==='core'?'Core':'Module'}`;
+    $('modelTrafficFields').hidden=o.mode!=='model';$('customTrafficDetails').open=o.mode==='custom';
+    let errors=C.validateHardware(h,p);
+    if(!$('error').hidden)errors.push('Attention 输入尚未通过校验，请先修正；Roofline 暂不使用旧结果');
+    if(o.mode==='model')for(const id of ['weightHitRate','kvHitRate'])if($(id).value.trim()==='')errors.push(`${id} 命中率不能为空`);
+    for(const n of names){const a=$('bytes-'+n).value,b=$('runtime-'+n).value;if(a.trim()!==''&&(!Number.isFinite(o.customBytes[n])||o.customBytes[n]<=0))errors.push(`${n} 自定义 MiB 必须为正数`);if(b.trim()!==''&&(!Number.isFinite(o.runtimesMs[n])||o.runtimesMs[n]<=0))errors.push(`${n} 实测 Runtime 必须为正数`);}
+    if(!errors.length)try{roofData=C.analyzeRoofline(p,s,h,o,scope);}catch(e){errors.push(e.message);}
+    $('roofError').hidden=!errors.length;$('roofError').textContent=errors.join('；');$('exportRoofline').disabled=!!errors.length||!$('error').hidden;
+    if(errors.length){roofData=null;emptyRoof();document.dispatchEvent(new Event('compute-lab-roofline-change'));return;}
+    $('rooflineSchema').textContent=JSON.stringify(roofData,null,2);
+    const current=roofData.results.find(x=>x.name===roofSelected),missing=roofData.results.filter(x=>x.ai==null).map(x=>x.name);
+    $('roofChartNote').textContent=`${o.mode==='model'?'数据点为声明假设下的 HBM 模型估算':'数据点依赖用户输入，尚未验证测量依据'}；${missing.length?'缺少完整 FLOPs 或 Bytes：'+missing.join(', ')+'，不绘点。':'全部点具有本范围的 FLOPs 与 Bytes。'} 上界不是实测性能。`;
+    const peak=h.peakTF*1e12*h.devices,bw=h.bandwidth*(h.bandwidthUnit==='TB/s'?1e12:1e9)*h.devices;
+    roofChart(peak,bw);
+    $('roofMetrics').innerHTML=`<div class="metric"><small>转折计算密度 · Ridge</small><strong>${num(peak/bw)}</strong><span>FLOPs / Byte · 两种限制的交点</span></div><div class="metric"><small>${roofSelected} / AI</small><strong>${num(current.ai)}</strong><span>${current.bottleneck}</span></div><div class="metric"><small>上界 · ${roofSelected}</small><strong>${current.performance==null?'N/A':(current.performance/1e12).toFixed(3)}</strong><span>TFLOP/s · 理想上界</span></div>`;
+    $('roofPointTable').innerHTML=roofData.results.map(r=>`<tr class="${r.name===roofSelected?'selected':''}"><td><button data-roof="${r.name}">${r.name}</button></td><td>${fmt(r.flops)}</td><td>${bytes(r.traffic.totalBytes)}</td><td>${num(r.ai)}</td><td>${r.bottleneck}</td><td>${r.performance==null?'N/A':(r.performance/1e12).toFixed(3)+' TFLOP/s'}</td></tr>`).join('');
+    $('roofSpeedupTable').innerHTML=roofData.results.map(r=>`<tr><td><button data-roof="${r.name}">${r.name}</button></td><td>${ratio(r.flopsSpeedup)}</td><td>${time(r.lowerSeconds)}</td><td>${ratio(r.rooflineSpeedup)}</td></tr>`).join('');
+    roofDetails();appendTrafficEquations();contrast();
+    renderMeasurement(current);
+    $('roofAssumptions').innerHTML=current.traffic.assumptions.map(x=>`<p>${esc(x)}</p>`).join('')+'<p>此图用单一峰值近似混合矩阵与标量运算。exp、递归状态等不保证能达到 Tensor Core 峰值；精确分析需按实际算子与计算精度拆分，并测量 HBM 流量。</p>';
+    document.dispatchEvent(new Event('compute-lab-roofline-change'));
+  }
+  function emptyRoof(){
+    $('roofChart').innerHTML='<text x="450" y="150" text-anchor="middle" font-size="16" fill="#718092">填写有效的硬件参数后，绘制 Roofline 上界</text><text x="450" y="181" text-anchor="middle" font-size="12" fill="#718092">Peak Compute 与 HBM Bandwidth 不使用未经核验的预设数值</text>';
+    $('roofChartNote').textContent='当前没有有效硬件配置，不输出数据点或时间估计。';
+    for(const id of ['roofMetrics','roofPointTable','roofSpeedupTable','roofContrast','roofDetails','roofAssumptions','roofMeasurement','rooflineSchema'])$(id).innerHTML='';$('roofExplanation').textContent='';
+  }
+  function roofChart(peak,bw){
+    const ridge=peak/bw,points=roofData.results.filter(r=>r.ai!=null&&roofVisible.has(r.name)),teaching=C.rooflineTeachingPoints(roofData.hardware);
+    const measured=points.filter(r=>r.measuredPerformance!=null);
+    const allAi=[ridge,...points.map(r=>r.ai),...teaching.map(r=>r.ai)];
+    const xmin=10**Math.floor(Math.log10(Math.min(...allAi)/3)),xmax=10**Math.ceil(Math.log10(Math.max(...allAi)*3));
+    const values=[peak,xmin*bw,...points.map(r=>r.performance),...measured.map(r=>r.measuredPerformance),...teaching.map(r=>r.performance)];
+    const ymin=10**Math.floor(Math.log10(Math.min(...values)*.6)),ymax=10**Math.ceil(Math.log10(Math.max(...values)*1.8));
+    const left=80,right=880,top=35,bottom=322,x=v=>left+(Math.log10(v)-Math.log10(xmin))/(Math.log10(xmax)-Math.log10(xmin))*(right-left),y=v=>bottom-(Math.log10(v)-Math.log10(ymin))/(Math.log10(ymax)-Math.log10(ymin))*(bottom-top);
+    $('roofChart').dataset.scale=JSON.stringify({xmin,xmax,ymin,ymax,left,right,top,bottom});
+    let svg='<text x="80" y="17" font-size="11" fill="#718092">纵轴：性能 · TFLOP/s · 对数刻度</text>';
+    // Iterate exponents, not repeated multiplication, to avoid under/overflow loops.
+    for(let k=Math.round(Math.log10(xmin));k<=Math.round(Math.log10(xmax));k++){const v=10**k;svg+=`<path d="M${x(v)},${top}V${bottom}" stroke="#edf1f5"/><text x="${x(v)}" y="345" text-anchor="middle" font-size="10" fill="#718092">${k>=3||k< -3?'10^'+k:num(v)}</text>`;}
+    for(let k=Math.round(Math.log10(ymin));k<=Math.round(Math.log10(ymax));k++){const v=10**k;svg+=`<path d="M${left},${y(v)}H${right}" stroke="#edf1f5"/><text x="${left-10}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="#718092">${num(v/1e12)}</text>`;}
+    svg+=`<path class="roof-ceiling" d="M${x(xmin)},${y(xmin*bw)}L${x(ridge)},${y(peak)}L${x(xmax)},${y(peak)}" fill="none" stroke="#1b2c44" stroke-width="3"/><path d="M${x(ridge)},${top}V${bottom}" stroke="#8fa0b7" stroke-dasharray="5 4"/><text x="${Math.min(x(ridge)+5,right-140)}" y="${top+15}" font-size="11" fill="#62768e">转折 AI: ${num(ridge)}</text><text x="${x(ridge)+(right-x(ridge))/2}" y="${y(peak)-13}" text-anchor="middle" font-size="11" fill="#182b42">算力上限 · 水平线</text><text x="${left+12}" y="${bottom-18}" font-size="11" fill="#182b42">带宽上限 · P = AI × BW</text>`;
+    const labels=[];
+    points.forEach(r=>{const cx=x(r.ai),cy=y(r.performance),lx=Math.min(cx+12,right-45);let ly=cy-16;for(const offset of [-16,25,-36,45,-56,65,-76,85]){const testY=Math.max(top+14,Math.min(bottom-7,cy+offset));if(!labels.some(q=>Math.abs(q.x-lx)<48&&Math.abs(q.y-testY)<16)){ly=testY;break;}}labels.push({x:lx,y:ly});svg+=`<g data-roof="${r.name}" data-upper="${r.name}" tabindex="0" role="button" aria-label="${r.name} 理想上界，AI ${num(r.ai)}，${r.bottleneck}"><path d="M${cx},${cy}L${lx},${ly-4}" stroke="${C.colors[r.name]}" stroke-width=".7" opacity=".6"/><circle cx="${cx}" cy="${cy}" r="${r.name===roofSelected?7:5}" fill="${C.colors[r.name]}" stroke="white" stroke-width="2"/><text x="${lx}" y="${ly}" font-size="11" fill="${C.colors[r.name]}">${r.name}</text><title>${r.name} · 理想上界 · AI=${num(r.ai)} · ${r.bottleneck}</title></g>`;});
+    measured.forEach(r=>{const cx=x(r.ai),cy=y(r.measuredPerformance);svg+=`<path d="M${cx},${y(r.performance)}V${cy}" stroke="${C.colors[r.name]}" stroke-dasharray="3 4"/><g data-roof="${r.name}" data-measured="${r.name}" tabindex="0" role="button" aria-label="${r.name} 用户实测 Runtime 换算的性能 ${num(r.measuredPerformance/1e12)} TFLOP/s"><circle cx="${cx}" cy="${cy}" r="7" fill="white" stroke="${C.colors[r.name]}" stroke-width="2.5"/><text x="${Math.min(cx+11,right-85)}" y="${Math.min(cy+18,bottom-4)}" font-size="10" fill="${C.colors[r.name]}">${r.name} 实测</text><title>${r.name} · FLOPs / 用户实测 Runtime；${num(r.measuredPerformance/1e12)} TFLOP/s；计数和测量范围须一致</title></g>`;});
+    teaching.forEach(r=>{const cx=x(r.ai),cy=y(r.performance);svg+=`<g data-roof-teaching="${r.id}" tabindex="0" role="button" aria-label="教学假设 AI=${r.ai}，${r.bottleneck}"><path d="M${cx},${cy-8}L${cx+8},${cy}L${cx},${cy+8}L${cx-8},${cy}Z" fill="#fff2cc" stroke="#916313" stroke-width="2"/><text x="${cx}" y="${Math.min(cy+29,bottom-4)}" text-anchor="middle" font-size="11" fill="#795618">假设 AI=${r.ai}</text><title>独立教学假设点；不是 Attention 数据</title></g>`;});
+    svg+=`<text x="${left+20}" y="${top+50}" font-size="12" fill="#677d95">Memory-bound · 等数据</text><text x="${right-12}" y="${bottom-35}" text-anchor="end" font-size="10" fill="#677d95">Compute-bound</text><text x="${right-12}" y="${bottom-20}" text-anchor="end" font-size="10" fill="#677d95">等计算</text><text x="480" y="374" text-anchor="middle" font-size="11" fill="#718092">横轴：计算密度 AI · 每搬运 1 Byte 的 FLOPs · 对数刻度</text>`;
+    $('roofChart').innerHTML=svg;
+  }
+  function renderMeasurement(r){
+    if(r.measuredPerformance==null){$('roofMeasurement').innerHTML='';return;}
+    const runtime=readTraffic().runtimesMs[r.name],pct=100*r.measuredPerformance/r.performance,base=roofData.results[0],baseRuntime=readTraffic().runtimesMs.MHA;
+    const measuredRatio=base.measuredPerformance!=null&&baseRuntime>0?baseRuntime/runtime:null;
+    $('roofMeasurement').innerHTML=`<details open><summary>${r.name}：理想上界与用户实测 Runtime 对照</summary><p>P_measured = ${num(r.flops)} FLOPs ÷ (${num(runtime)} ms / 1000) = ${num(r.measuredPerformance/1e12)} TFLOP/s。</p><p>理想上界 ${num(r.performance/1e12)} TFLOP/s；实测换算值约为该上界的 ${num(pct)}%。${pct>100?'超过当前模型上界，请核对 FLOPs、HBM 假设、精度及测量范围。':'差距可能来自算子效率、Kernel Launch、通信、同步或访存模型误差，仅凭此图不能定位原因。'}此比例不是训练 MFU。</p>${measuredRatio==null?'':`<p>Measured Speedup（用户实测时间比值，需相同运行条件）= MHA ${num(baseRuntime)} ms ÷ ${r.name} ${num(runtime)} ms = ${ratio(measuredRatio)}。</p>`}</details>`;
+  }
+  function roofDetails(){
+    if(!roofData)return;const r=roofData.results.find(x=>x.name===roofSelected),h=roofData.hardware,t=r.traffic,peak=h.peakTF*1e12*h.devices,bw=h.bandwidth*(h.bandwidthUnit==='TB/s'?1e12:1e9)*h.devices;
+    $('roofDetailHeading').textContent=`${r.name} · 公式、代入与时间下界`;
+    if(r.ai==null){$('roofDetails').innerHTML=`<p>FLOPs=${fmt(r.flops)}；Bytes=${bytes(t.totalBytes)}。${r.flops==null?'完整 Attention 模块尚未核验，不使用已知小计进行完整模块排名。':'访存量缺失，请提供当前范围的总 Bytes 或选择模型估算。'}</p>`;return;}
+    const parts=[['Weight Traffic',t.weightBytes],['Historical KV Read',t.kvReadBytes],['Cache Write',t.cacheWriteBytes],['Intermediate / Input / Output',t.intermediateBytes],['Other / Recurrent State',t.stateBytes]];
+    $('roofDetails').innerHTML=`<div class="time-cards"><div><small>Compute Time Lower Bound</small><b>${time(r.computeSeconds)}</b></div><div><small>Memory Time Lower Bound</small><b>${time(r.memorySeconds)}</b></div><div><small>Roofline Time Lower Bound</small><b>${time(r.lowerSeconds)}</b></div></div><details open><summary>AI、Performance 与时间的具体代入</summary><p>当前 ${roofData.tokenMode}，初始 S=${roofData.initialContext}，生成 ${roofData.generatedTokens} tokens，Batch=${roofData.parameters.batch}，单层整批 ${roofData.scope} 范围。</p><p><code>AI = ${num(r.flops)} FLOPs / ${num(t.totalBytes)} B = ${num(r.ai)} FLOPs/B</code></p><p><code>Ppeak = ${num(h.peakTF)} × 10¹² × ${h.devices} = ${fmt(peak)} FLOP/s</code><br><code>BW = ${num(h.bandwidth)} × ${h.bandwidthUnit==='TB/s'?'10¹²':'10⁹'} × ${h.devices} = ${num(bw)} B/s</code></p><p><code>Pupper = min(${num(peak)}, ${num(r.ai)} × ${num(bw)}) = ${num(r.performance)} FLOP/s</code>；${r.bottleneck}。</p><p><code>Tcompute = ${num(r.flops)} / ${num(peak)} = ${num(r.computeSeconds)} s</code><br><code>Tmemory = ${num(t.totalBytes)} / ${num(bw)} = ${num(r.memorySeconds)} s</code><br><code>Tlower = max(Tcompute, Tmemory) = ${time(r.lowerSeconds)}</code>；F / Tlower = ${num(r.performance)} FLOP/s。</p><p>${r.measuredPerformance==null?'没有同范围实测 Runtime。':`用户实测 Runtime=${num(readTraffic().runtimesMs[r.name])} ms；实测吞吐量 F/t=${(r.measuredPerformance/1e12).toFixed(3)} TFLOP/s。${r.measuredPerformance>r.performance?'超过当前模型上界，需检查计数范围、HBM 假设、精度或测量。':'实测值与模型上界分别展示。'}`}</p></details><details><summary>Bytes Moved 分解与缓存复用依据</summary><p>来源：${t.kind==='user-estimate'?'用户提供的估计总量；没有分项依据':'基于声明假设的逻辑 HBM 搬运模型，非实际测量'}。</p>${parts.map(([label,v])=>`<p><b>${label}</b>：${bytes(v)}${v==null?' · 分项未知':''}</p>`).join('')}<p><code>Total Bytes = Weight + Historical KV Read + Cache Write + Intermediate + State = ${num(t.totalBytes)} B</code></p>${t.assumptions.map(x=>`<p>${esc(x)}</p>`).join('')}<p>逻辑末步缓存 / 状态容量=${bytes(C.aggregate(r.name,roofData.parameters,A.getScenario()).memoryBytes)}；与区间 HBM 流量分开计算。命中率作用于每步历史读取，写入仍单列。权重元素数来自当前实际执行的 Projection 矩阵尺寸，总权重读取=元素数×精度字节×生成步数×设备数×(1−命中率)。</p></details>`;
+  }
+  function appendTrafficEquations(){const r=roofData?.results.find(x=>x.name===roofSelected);if(!r?.traffic.equations)return;const details=$('roofDetails').querySelector('details:last-child');if(details)details.insertAdjacentHTML('beforeend','<b>逐项字节公式与数值代入</b>'+r.traffic.equations.map(x=>`<p><code>${esc(x)}</code></p>`).join(''));}
+  function contrast(){const baseline=roofData.results[0],r=roofData.results.find(x=>x.name===roofSelected);
+    if(!baseline.lowerSeconds||!r.lowerSeconds){$('roofContrast').innerHTML='';$('roofExplanation').textContent='缺少完整 FLOPs 或访存量，无法计算完整架构的 Roofline 时间加速比。';return;}
+    const ratios=[['FLOPs / MHA',r.flops/baseline.flops],['HBM Bytes / MHA',r.traffic.totalBytes/baseline.traffic.totalBytes],['Time Lower Bound / MHA',r.lowerSeconds/baseline.lowerSeconds]],max=Math.max(1,...ratios.map(x=>x[1]));
+    $('roofContrast').innerHTML=ratios.map(([label,v])=>`<div class="contrast-row"><span>${label}</span><div class="bar-track"><div class="bar-fill" style="background:${C.colors[r.name]};width:${100*v/max}%"></div></div><b>${(v*100).toFixed(2)}%</b></div>`).join('');
+    $('roofExplanation').textContent=`当前 ${r.name} 的理论 FLOPs 比值为 ${ratio(r.flopsSpeedup)}，HBM 流量为 MHA 的 ${(100*r.traffic.totalBytes/baseline.traffic.totalBytes).toFixed(2)}%，理想时间下界比值为 ${ratio(r.rooflineSpeedup)}。${r.bottleneck==='Memory-Bound'?'该估算由访存限制：减少 FLOPs 不会自动按同一比例减少 HBM 流量。':'该估算由计算上限限制：仍需实际内核利用率和运行测量验证。'}两种比值均不是实测加速。`;
+  }
+  $('customTrafficInputs').innerHTML=names.map(n=>`<tr><td>${n}</td><td><input id="bytes-${n}" type="number" min="0" step="any" placeholder="未知" aria-label="${n} 区间 HBM 总 MiB"></td><td><input id="runtime-${n}" type="number" min="0" step="any" placeholder="未测量" aria-label="${n} 同范围实测 ms"></td></tr>`).join('');
+  $('roofLegend').innerHTML=names.map(n=>`<label><input type="checkbox" data-roof-series="${n}" checked style="accent-color:${C.colors[n]}"><i class="dot" style="background:${C.colors[n]}"></i>${n}</label>`).join('');
+  $('roofLegend').addEventListener('change',e=>{const n=e.target.dataset.roofSeries;if(n){e.target.checked?roofVisible.add(n):roofVisible.delete(n);renderRoofline();}});
+  $('roofForm').addEventListener('submit',e=>e.preventDefault());
+  function hardwareChange(e){if(['hardwareName','peakTF','bandwidth','bandwidthUnit','hardwarePrecision','deviceCount','hardwareTemplate'].includes(e.target.id))for(const n of names)$('runtime-'+n).value='';if(e.target.id==='deviceCount')for(const n of names)$('bytes-'+n).value='';if(['hardwareName','peakTF','bandwidth','bandwidthUnit','hardwarePrecision','deviceCount'].includes(e.target.id))$('hardwareTemplate').value='custom';}
+  $('roofForm').addEventListener('input',e=>{hardwareChange(e);renderRoofline();});
+  $('roofForm').addEventListener('change',e=>{hardwareChange(e);if(e.target.id==='roofScope'){$('scope').value=$('roofScope').value;$('scope').dispatchEvent(new Event('change'));}else renderRoofline();});
+  $('customTrafficInputs').addEventListener('input',renderRoofline);
+  function applyHardwareTemplate(id){
+    if(!['h100','custom'].includes(id))throw new Error('未知硬件模板');
+    const previousDevices=Number($('deviceCount').value);
+    $('hardwareTemplate').value=id;
+    for(const n of names)$('runtime-'+n).value='';
+    if(id==='h100'){
+      const h=C.hardwarePreset(id);
+      for(const [field,key] of [['hardwareName','name'],['peakTF','peakTF'],['bandwidth','bandwidth'],['bandwidthUnit','bandwidthUnit'],['hardwarePrecision','precision'],['deviceCount','devices']])$(field).value=h[key];
+      if($('precision').value!==h.precision){$('precision').value=h.precision;$('precision').dispatchEvent(new Event('change',{bubbles:true}));}
+    }else{$('hardwareName').value='';$('peakTF').value='';$('bandwidth').value='';$('bandwidthUnit').value='GB/s';$('deviceCount').value=1;$('hardwarePrecision').value=A.getParameters().precision;}
+    if(previousDevices!==Number($('deviceCount').value))for(const n of names)$('bytes-'+n).value='';
+    renderRoofline();
+  }
+  $('hardwareTemplate').addEventListener('change',()=>applyHardwareTemplate($('hardwareTemplate').value));
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-roof]');if(b){roofSelected=b.dataset.roof;renderRoofline();}});
+  $('roofChart').addEventListener('keydown',e=>{const b=e.target.closest('[data-roof]');if(b&&['Enter',' '].includes(e.key)){e.preventDefault();roofSelected=b.dataset.roof;renderRoofline();}});
+  document.addEventListener('compute-lab-change',refresh);document.addEventListener('compute-lab-invalid',renderRoofline);$('legend').addEventListener('change',cumulative);
+  $('exportRoofline').addEventListener('click',()=>{if(!roofData)return;const url=URL.createObjectURL(new Blob([JSON.stringify(roofData,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='roofline-analysis.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+  A.getRooflineInput=()=>roofData||{schemaVersion:2,status:'awaiting-valid-hardware',attention:A.getExperiment(),bytesMoved:null};
+  A.getRooflineAnalysis=()=>roofData;
+  A.getRooflineSelection=()=>roofSelected;
+  A.getRooflineDraft=()=>({hardware:readHardware(),traffic:readTraffic(),scope:$('roofScope').value});
+  A.applyHardwareTemplate=applyHardwareTemplate;
+  $('methodContent').insertAdjacentHTML('beforeend',`<h3>新增：生成区间与 Weight Absorption</h3><p>G 表示生成 token 数，避免与单步可见位置 N 混淆。默认 G=1024，Ftotal=Σ Fdecode(S+i)，i=0…G−1。MHA/GQA/MLA 的历史项按算术数列求和，SWA 使用 min(N,W) 分段前缀和，MSA 使用 local 末块周期求和，GDA 累计已知递归核心。所有主表与加速比基于单层、每序列的生成区间；展开矩阵默认展示第一步，另有逐步检查。Prefill 禁用。</p><p>MLA 原有路径不重复计算历史 K/V。新增两种离线吸收路径：WUQ[h] WUK[h]ᵀ → [rq,r]，替代内容 Query up 与 Query→latent；WUV[h] WO[h] → [r,D]，替代 Value up 与 O。原因子路径与融合路径经实数矩阵校验；离线预计算不计入每步，融合后的权重大小与 FLOPs 可能增加。此页仍排除 RMSNorm/RoPE，不能声称是完整官方实现。</p><h3>新增：Roofline 的 HBM 流量模型</h3><p>默认每设备每步读取所有当前执行的 Projection 权重，每组 KV 头在 Query Head 内理想复用；MLA latent 按内容 scores 与聚合两遍读取，位置 Key 一遍；MSA 主缓存稀疏读取加完整历史 Index Key 扫描；GDA 核心读写固定状态。当前 token 的 K/V 留在片上参与计算，并计缓存写入。可设置片上命中比例与 score/probability 回写，或输入当前区间总 HBM MiB。所有结果是声明假设的模型估计；完整 GDA 数据缺失时不绘图或排名。</p><p>多设备只按 Batch 中独立序列均分，权重每设备复制，Ppeak 与 BW 理想线性求和；不模拟张量并行。区间时间下界=max(ΣF/Ppeak,ΣBytes/BW)，未计串行阶段和真实利用率。自定义字节与 Runtime 只属于当前实验与范围，配置变化会清空，避免使用旧场景数据。</p>`);
+  applyHardwareTemplate('h100');refresh();
+})();
+</script><script>(function(){
+  'use strict';
+  const C=ComputeLab,A=LLMComputeLab,$=id=>document.getElementById(id);
+  const n=v=>v==null?'未知':v.toLocaleString('en-US',{maximumFractionDigits:4});
+  const sci=v=>{if(v==null)return '未知';if(v===0)return '0';const e=Math.floor(Math.log10(Math.abs(v)));return `${n(v/10**e)} × 10<sup>${e}</sup>`;};
+  const tf=v=>v==null?'未知':n(v/1e12)+' TFLOP/s';
+  const ms=v=>v==null?'未知':n(v*1000)+' ms';
+  const bound=r=>r.bottleneck==='Memory-Bound'?'Memory-bound（带宽限制，等数据）':'Compute-bound（算力限制，等计算）';
+  function step(title,formula,meaning){return `<article><b>${title}</b><div class="substitution">${formula}</div><p>${meaning}</p></article>`;}
+  function currentRoof(){return A.getRooflineAnalysis()?.results.find(r=>r.name===A.getRooflineSelection());}
+  function roofLesson(){
+    $('roofWorkedExample').innerHTML='';
+    $('roofDemoResult').textContent='可调整带宽、算力或历史长度，查看同一架构在修改前后的变化。';
+    $('roofDemoResult').classList.remove('demo-error');
+    roofTeachingLesson();
+    const data=A.getRooflineAnalysis(),h=C.hardwarePreset('h100'),official=$('hardwareTemplate').value==='h100';
+    $('hardwareEvidence').innerHTML=official?`<b>官方规格 · H100 SXM 80GB</b><br>BF16 Dense：989 TFLOP/s<br>HBM：3.35 TB/s · ${n(Number($('deviceCount').value))} 张设备<details><summary>规格来源与 Dense / Sparse 区别</summary><p><a href="${h.bandwidthSource}" target="_blank" rel="noopener noreferrer">NVIDIA H100 产品规格</a>：SXM 80GB，HBM 3.35 TB/s。官网 BFLOAT16 1,979 TFLOP/s 带 “With sparsity” 注脚，属于稀疏加速口径。</p><p><a href="${h.computeSource}" target="_blank" rel="noopener noreferrer">NVIDIA 官方 recsys-examples 基准说明 §2</a>明确以 989 BF16 Dense Tensor Core TFLOP/s / H100 计算。本模板引用此 Dense 值，公开规格为取整值，不使用 1,979 作为 Dense 峰值。</p><p>核验日期：2026-10-13。带宽按十进制单位换算。Ascend 本轮没有同时核验型号、精度、Dense 峰值和 HBM 带宽的完整预设；可在“自定义”填入有依据的规格。</p></details>`:'<b>自定义硬件 / 教学假设</b><br>修改后的数值不再代表已核验的 H100 规格；请说明型号、精度、Dense / Sparse 与来源。';
+    if(!data){$('roofLesson').innerHTML='<h3>等待有效输入</h3><p>查看左侧错误说明，或选择 H100 模板自动填充已核验规格。未计算的数据不会保留为当前示例。</p>';$('roofInterpretation').textContent='参数缺失或不一致，暂时不能给出结论。';$('roofPointHint').textContent='等待有效的硬件参数。';return;}
+    const r=currentRoof(),f=r.flops,m=r.traffic.totalBytes;
+    const p=data.hardware.peakTF*1e12*data.hardware.devices,b=data.hardware.bandwidth*(data.hardware.bandwidthUnit==='TB/s'?1e12:1e9)*data.hardware.devices;
+    const provenance=r.traffic.kind==='modeled-estimate'?'访存为假设模型估算':'访存为用户输入的估计';
+    $('roofLesson').innerHTML=`<h3>${r.name} · ${n(data.generatedTokens)} 个 token 的自回归生成示例</h3><p>初始历史 ${n(data.initialContext)} 个 token；${data.hardware.precision}；${n(data.hardware.devices)} 张设备；单层、整批 ${data.parameters.batch} 个独立序列、${data.scope==='core'?'核心运算':'声明范围内模块'}。输入与 Attention 页同步。</p><div class="number-flow"><div><small>理论工作量 F</small><b>${sci(f)}</b><span>FLOPs · 架构推导</span></div><span>÷</span><div><small>估计搬运量 M</small><b>${sci(m)}</b><span>B · ${r.traffic.kind==='modeled-estimate'?'模型假设':'用户估计'}</span></div><span>＝</span><div><small>计算密度 AI</small><b>${n(r.ai)}</b><span>FLOPs / Byte</span></div></div><p class="caption">${provenance}，不是 HBM 实测数据。默认假设：每步读权重、历史 KV 无片上命中、头间理想复用、中间分数留在片上；左侧可以展开修改。</p>`;
+    if(r.ai==null){$('roofLesson').insertAdjacentHTML('beforeend','<p class="notice">完整 FLOPs 或搬运量未知，无法代入屋顶线；可选择其他架构，或切换已核验的核心范围。</p>');$('roofInterpretation').textContent='所选架构缺少完整数据，不给出当前范围的瓶颈或加速结论。';$('roofPointHint').textContent='当前选择缺少完整数据，不能判断瓶颈。';return;}
+    $('roofWorkedExample').innerHTML=`<h2>把当前示例的数字逐步代入</h2><details class="lesson-formulas" open><summary>用上面的数字，逐步算出性能与时间</summary><div class="formula-steps">${step('① 先算计算密度',`AI = F / M = ${sci(f)} / ${sci(m)} = ${n(r.ai)} FLOPs/B`,`每搬运 1 字节，完成约 ${n(r.ai)} 次浮点运算。`)}${step('② 把硬件单位换成同一口径',`P_peak = ${n(data.hardware.peakTF)} × 10¹² × ${data.hardware.devices} = ${sci(p)} FLOP/s<br>BW = ${n(data.hardware.bandwidth)} × ${data.hardware.bandwidthUnit==='TB/s'?'10¹²':'10⁹'} × ${data.hardware.devices} = ${sci(b)} B/s`,'先换单位，再按设备数求和。TFLOP/s 是速度，TFLOPs 是工作量。')}${step('③ 分别检查两个性能上限',`算力上限 = ${tf(p)}<br>带宽上限 = AI × BW = ${n(r.ai)} × ${sci(b)} = ${tf(r.ai*b)}<br>P = min(P_peak, AI × BW) = ${tf(r.performance)}`,'取两者中较小的数：两个条件都必须满足，才可能完成计算。')}${step('④ 找转折点，判断先碰到哪条线',`AI_ridge = P_peak / BW = ${sci(p)} / ${sci(b)} = ${n(p/b)} FLOPs/B<br>${n(r.ai)} ${r.ai<p/b?'&lt;':'≥'} ${n(p/b)} → ${bound(r)}`,'交点处算力上限和带宽上限相等。交点左侧带宽先限制性能；右侧算力先限制性能。')}${step('⑤ 由工作量和速度，得到理想时间下界',`T_compute = F / P_peak = ${sci(f)} / ${sci(p)} = ${ms(r.computeSeconds)}<br>T_memory = M / BW = ${sci(m)} / ${sci(b)} = ${ms(r.memorySeconds)}<br>T_lower = max(T_compute, T_memory) = ${ms(r.lowerSeconds)}`,'这表示理想模型下至少需要的时间，不是运行预测或实测耗时。')}</div></details>`;
+    const rows=data.results.filter(x=>x.ai!=null);
+    $('roofInterpretation').innerHTML=`<p class="lesson-result">当前 ${r.name}：${bound(r)}。${r.ai<p/b?'搬数据的理论时间比计算更长；优先观察能否减少字节或增加有效带宽。':'计算的理论时间至少同样长；优先观察能否减少运算或提高有效算力。'}这些判断只在当前访存与硬件假设下成立。</p><div class="architecture-insights">${rows.map(x=>`<p><b style="color:${C.colors[x.name]}">${x.name}</b>：AI ${n(x.ai)}，${bound(x)}；时间下界 ${ms(x.lowerSeconds)}。${x.name==='MHA'?'作为对照。':`相对 MHA，计算量比值 ${n(x.flopsSpeedup)}×，理论时间下界比值 ${n(x.rooflineSpeedup)}×，由计算与搬运共同决定。`}</p>`).join('')}</div>${rows.length<6?'<p class="caption">缺少数据的架构不参加当前范围的瓶颈或时间排名；完整模块中的 GDA 不用已知小计代替总量。</p>':''}`;
+    pointHint(r.name);
+  }
+  function pointHint(name,measured=false){const r=A.getRooflineAnalysis()?.results.find(x=>x.name===name);if(!r||r.ai==null)return;$('roofPointHint').textContent=measured?`${name} 空心点：AI=${n(r.ai)} FLOPs/B，用户实测 Runtime 换算性能 ${tf(r.measuredPerformance)}；理想上界 ${tf(r.performance)}。横坐标仍来自估计访存，测量来源与范围由输入者负责。`:`${name} 实心点：横坐标 ${n(r.ai)} FLOPs/B，纵坐标 ${tf(r.performance)}。${r.ai<r.ridge?'在交点左侧，带宽先限制速度。':'在交点右侧或交点处，算力先限制速度。'}这是假设下的上界；点击可把它作为示例逐步代入。`;}
+  for(const event of ['pointerover','focusin'])$('roofChart').addEventListener(event,e=>{const g=e.target.closest('[data-roof]');if(g)pointHint(g.dataset.roof,!!g.dataset.measured);});
+  let teachingSelected='100';
+  function roofTeachingLesson(){
+    const data=A.getRooflineAnalysis();
+    if(!data){$('roofTeachingChoices').innerHTML='';$('roofTeachingDetail').textContent='硬件或场景无效，先修正输入再查看教学点。';return;}
+    const points=C.rooflineTeachingPoints(data.hardware),r=points.find(x=>x.id===teachingSelected),h=data.hardware,peak=h.peakTF*1e12*h.devices,bw=h.bandwidth*(h.bandwidthUnit==='TB/s'?1e12:1e9)*h.devices;
+    $('roofTeachingChoices').innerHTML=points.map(p=>`<button type="button" data-roof-teaching="${p.id}" aria-pressed="${p.id===teachingSelected}">◆ AI ${p.ai}<small>${p.bottleneck==='Memory-Bound'?'带宽限制':'算力限制'} · ${tf(p.performance)}</small></button>`).join('');
+    $('roofTeachingDetail').innerHTML=`<p><b>教学假设 AI = ${r.ai} FLOPs/Byte</b>，沿用当前硬件；没有假设 Attention 测量结果。</p><p class="substitution">AI_ridge = ${tf(peak)} ÷ ${n(bw/1e12)} TB/s = ${n(r.ridge)} FLOPs/B<br>P_upper = min(P_peak, AI × BW)<br>= min(${n(peak/1e12)}, ${r.ai} × ${n(bw/1e12)}) = ${n(r.performance/1e12)} TFLOP/s</p><p>${r.ai} ${r.ai<r.ridge?'小于':'大于或等于'} 转折点 ${n(r.ridge)}，所以是 ${bound(r)}。${r.ai<r.ridge?'搬运 1 字节后可做的计算偏少，数据供给先成为限制。':'每字节带来的计算足够多，先碰到芯片的计算上限。'}修改硬件后会重新判断，不固定两点的瓶颈。</p>`;
+    document.querySelectorAll('#roofChart [data-roof-teaching]').forEach(g=>g.setAttribute('aria-pressed',String(g.dataset.roofTeaching===teachingSelected)));
+  }
+  function chooseTeaching(e){const g=e.target.closest('[data-roof-teaching]');if(!g)return;if(e.type==='keydown'){if(!['Enter',' '].includes(e.key))return;e.preventDefault();}teachingSelected=g.dataset.roofTeaching;roofTeachingLesson();}
+  document.addEventListener('click',chooseTeaching);$('roofChart').addEventListener('keydown',chooseTeaching);
+  document.addEventListener('compute-lab-roofline-change',roofLesson);
+  function attentionLesson(){const data=A.getExperiment(),name=A.getSelection(),r=data.results.find(x=>x.name===name),scope=A.getScope(),f=scope==='core'?r.core:r.total,base=scope==='core'?data.results[0].core:data.results[0].total;
+    $('attentionLesson').innerHTML=f==null?`当前 ${name} 的完整模块尚未核验；保留已知分项，不用未知总量给出加速比。`:`当前示例：已有 ${n(data.historyTokens)} 个历史 token，再生成 ${n(data.generatedTokens)} 个；${name} 单层每序列累计 ${sci(f)} FLOPs。MHA ÷ ${name} = ${sci(base)} ÷ ${sci(f)} = ${n(base/f)}×。${base/f>=1?'数值越大，说明需要的计算越少。':'低于 1×，说明本配置的计算量更多。'}这是理论工作量对照，不是实测速度。`;
+  }
+  document.addEventListener('compute-lab-change',attentionLesson);
+  function demo(kind){
+    const reject=message=>{$('roofDemoResult').textContent=message+' 当前配置与计算结果未修改。';$('roofDemoResult').classList.add('demo-error');document.dispatchEvent(new CustomEvent('compute-lab-demo-change',{detail:{text:$('roofDemoResult').textContent}}));};
+    const before=currentRoof();if(!$('error').hidden||!before||before.ai==null){reject('请先修正无效输入，并选择具有完整 FLOPs 与搬运量的架构。');return;}
+    const a={...before},p=A.getParameters(),s=A.getScenario(),draft=A.getRooflineDraft(),h={...draft.hardware},o={...draft.traffic,runtimesMs:{}};
+    const candidate={...p};
+    if(kind==='context'){
+      candidate.S=p.S*2;
+      const g=s.mode==='single'?1:s.generated;
+      if(candidate.S+g-1>1048576){reject(`无法加倍：S=${n(candidate.S)}，G=${n(g)}，最后一步历史 S+G−1=${n(candidate.S+g-1)} 超过 1,048,576。请先减少历史长度或生成数量。`);return;}
+      if(candidate.S===p.S){reject('当前历史长度为 0，加倍仍为 0；请先输入正的历史长度。');return;}
+      o.customBytes={};
+    }else h[kind==='bandwidth'?'bandwidth':'peakTF']*=2;
+    try{
+      // Evaluate the entire prospective experiment before touching an input or dispatching events.
+      C.sequenceResults(candidate,s);
+      const preview=C.analyzeRoofline(candidate,s,h,o,draft.scope).results.find(r=>r.name===a.name);
+      if(preview.ai==null)throw new Error('新场景缺少访存数据；请先选择模型估算，或为新场景另行提供总字节');
+    }catch(e){reject('无法执行演示：'+e.message+'。');return;}
+    if(kind==='context')A.applyAttentionParameters({S:candidate.S});else input(kind==='bandwidth'?'bandwidth':'peakTF',kind==='bandwidth'?h.bandwidth:h.peakTF);
+    const after=currentRoof(),sameAI=after.ai===a.ai,samePerformance=after.performance===a.performance;
+    const shape=kind==='bandwidth'?'带宽加倍，斜线抬高，水平算力线保持不变。':kind==='compute'?'算力加倍，水平线抬高，斜线保持不变。':'历史长度加倍，硬件屋顶线保持不变；FLOPs 与搬运量重新计算。';
+    const unchanged=samePerformance?(after.bottleneck==='Compute-Bound'?'算力上限仍是较低的上限，所以当前性能上界没有提高。':'带宽上限仍是较低的上限，所以当前性能上界没有提高。'):'较低的性能上限发生变化，因此性能上界随之变化；实际运行仍需测量。';
+    $('roofDemoResult').textContent=`${shape} Ridge ${n(a.ridge)} → ${n(after.ridge)} FLOPs/B。${a.name} 的 AI ${n(a.ai)} → ${n(after.ai)}（${sameAI?'保持不变':'发生变化'}）；${bound(a)} → ${bound(after)}。性能上界 ${tf(a.performance)} → ${tf(after.performance)}；时间下界 ${ms(a.lowerSeconds)} → ${ms(after.lowerSeconds)}。${unchanged}${kind==='context'?'':'修改后的硬件参数是教学假设。'}`;
+    document.dispatchEvent(new CustomEvent('compute-lab-demo-change',{detail:{text:`${shape}Ridge ${n(a.ridge)} → ${n(after.ridge)} FLOPs/B；${a.name} AI ${n(a.ai)} → ${n(after.ai)}，${after.bottleneck===a.bottleneck?'仍为':'变为'}${after.bottleneck==='Memory-Bound'?'带宽':'算力'}限制。上界 ${tf(a.performance)} → ${tf(after.performance)}。${samePerformance?'当前限制未改善，上界保持不变。':''}当前变化仅为假设模型对照。`}}));
+  }
+  const input=(id,value)=>{$(id).value=value;$(id).dispatchEvent(new Event('input',{bubbles:true}));};
+  $('demoBandwidth').addEventListener('click',()=>demo('bandwidth'));
+  $('demoCompute').addEventListener('click',()=>demo('compute'));
+  $('restoreHardware').addEventListener('click',()=>{A.applyHardwareTemplate('h100');$('roofDemoResult').textContent='已恢复 H100 BF16 Dense 989 TFLOP/s、3.35 TB/s、1 张设备，并将 Attention 精度设为 BF16。'+(A.getRooflineAnalysis()?'其余 Attention 维度与访存假设保留。':'Attention 还有无效输入，请先修正。');});
+  $('demoContext').addEventListener('click',()=>demo('context'));
+  $('restoreAttention').addEventListener('click',()=>{$('reset').click();$('roofDemoResult').textContent='已恢复 Attention 默认维度、BF16、初始历史 8192 和连续生成 1024 个 token；自定义硬件输入保留。'+(A.getRooflineAnalysis()?'':'当前硬件与默认 Attention 不匹配，请检查精度及设备数。');});
+
+  let mfuResult=null,previousPercent=null;
+  function readMfu(){return {trainingFlopsPerToken:Number($('mfuTrainingTF').value)*1e12,tokensPerSecond:Number($('mfuTokensRate').value),tokensPerStep:Number($('mfuTokensStep').value),stepSeconds:Number($('mfuStepSeconds').value),deviceCount:Number($('mfuDevices').value),peakTF:Number($('mfuPeakTF').value),rateMode:$('mfuRateMode').value};}
+  function mfuLesson(){
+    const mode=$('mfuRateMode').value;$('mfuRateField').hidden=mode==='step';$('mfuStepFields').hidden=mode!=='step';
+    const data=readMfu();
+    try{
+      const r=C.calculateMfu(data);mfuResult=r;$('mfuError').hidden=true;
+      $('mfuResult').innerHTML=`<div class="mfu-score"><small>MFU · 教学假设结果</small><strong>${n(r.percent)}%</strong><div class="mfu-meter" role="img" aria-label="模型计算吞吐量为理论峰值的 ${n(r.percent)}%"><span style="width:${Math.min(100,r.percent)}%"></span></div><p>${tf(r.modelFlopsPerSecond)} 模型吞吐量 ÷ ${tf(r.hardwarePeak)} 全设备峰值</p></div><p class="lesson-result">每秒假设完成 ${n(r.tokensPerSecond)} 个训练 token，相当于达到理论计算峰值的 ${n(r.percent)}%。${previousPercent!=null&&previousPercent!==r.percent?`上次有效结果 ${n(previousPercent)}% → 本次 ${n(r.percent)}%。`:''}这不是 GPU / NPU 忙碌百分比，也不是训练实测。</p>${r.exceedsPeak?'<p class="notice">比例超过 100%：请检查输入单位、全设备吞吐量、计算精度与 Dense / Sparse 峰值口径。这组假设不一致；原始结果没有被截断。</p>':''}`;
+      $('mfuCalculation').innerHTML=(mode==='step'?step('① 先把每步速度换成每秒速度',`Tokens/s = Tokens/Step ÷ Step Time = ${n(data.tokensPerStep)} ÷ ${n(data.stepSeconds)} = ${n(r.tokensPerSecond)}`,'这里是全设备的总 token 数与同一完整训练步的时间。'):step('① 准备模型工作量与吞吐量',`Training FLOPs/token = ${n(Number($('mfuTrainingTF').value))} × 10¹² = ${sci(data.trainingFlopsPerToken)}<br>Measured Tokens/s = ${n(r.tokensPerSecond)}（本页为假设值）`,'在真实分析中，前者来自全模型前向 + 反向推导，后者必须训练测量。'))+step('② 算模型每秒完成的计算量',`Model FLOP/s = Training FLOPs/token × Tokens/s<br>= ${sci(data.trainingFlopsPerToken)} × ${n(r.tokensPerSecond)} = ${sci(r.modelFlopsPerSecond)} FLOP/s`,'把每 token 的工作量乘以每秒 token 数。')+step('③ 算全部设备的理论峰值',`Hardware Peak = Device Count × Peak/device<br>= ${n(data.deviceCount)} × ${n(data.peakTF)} × 10¹² = ${sci(r.hardwarePeak)} FLOP/s`,'这里假设设备相同，峰值对应训练精度与 Dense 口径。')+step('④ 两种速度相除',`MFU = Model Training FLOPs/s / Total Hardware Peak FLOP/s<br>= ${sci(r.modelFlopsPerSecond)} / ${sci(r.hardwarePeak)} = ${n(r.mfu)} = ${n(r.percent)}%`,'工作量定义与峰值口径一致时，这个比例可以帮助比较训练系统效率。');
+      previousPercent=r.percent;
+    }catch(e){mfuResult=null;$('mfuError').hidden=false;$('mfuError').textContent=e.message;$('mfuResult').textContent='输入不完整或无效，暂不计算 MFU。';$('mfuCalculation').innerHTML='';}
+    document.dispatchEvent(new Event('compute-lab-mfu-change'));
+  }
+  function loadMfuScenario(kind){
+    const before={...C.mfuDefaults},after={...before};
+    if(kind==='slow')after.tokensPerSecond/=2;
+    if(kind==='less'){after.trainingFlopsPerToken/=2;after.tokensPerSecond*=2;}
+    const a=C.calculateMfu(before),b=C.calculateMfu(after);
+    for(const [id,value] of Object.entries({mfuTrainingTF:after.trainingFlopsPerToken/1e12,mfuTokensRate:after.tokensPerSecond,mfuTokensStep:after.tokensPerStep,mfuStepSeconds:after.stepSeconds,mfuDevices:after.deviceCount,mfuPeakTF:after.peakTF,mfuRateMode:after.rateMode}))$(id).value=value;
+    previousPercent=a.percent;mfuLesson();
+    const formula=(p,r)=>`(${sci(p.trainingFlopsPerToken)} FLOPs/token × ${n(r.tokensPerSecond)} token/s) ÷ (${p.deviceCount} × ${p.peakTF} × 10¹² FLOP/s) = <b>${n(r.percent)}%</b>`;
+    $('mfuScenarioComparison').innerHTML=kind==='reset'?'<p class="lesson-result">已恢复初始教学假设：每 token 1 × 10¹² FLOPs、2000 Tokens/s、4 张设备、每设备 1000 TFLOP/s，MFU = 50%。</p>':`<div class="scenario-pair"><div><small>初始教学假设</small><p>${formula(before,a)}</p></div><div><small>情景 ${kind==='slow'?'A':'B'} · 修改后</small><p>${formula(after,b)}</p></div></div><p class="lesson-result">${kind==='slow'?'单位时间完成的模型计算量减少了，因此 MFU 从 50% 降到 25%。可能涉及访存、通信、数据等待或算子效率，但仅凭 MFU 无法确定具体原因。':'模型训练速度翻倍，但每个 token 所需计算减半，模型每秒计算量不变，MFU 仍为 50%。训练更快不一定让 MFU 提高。'}这些都是假设数据，不代表实测训练性能。</p>`;
+  }
+  const manualMfu=()=>{$('mfuScenarioComparison').textContent='当前为手动输入的教学假设；可点击 A / B 重新载入对照情景。';mfuLesson();};
+  $('mfuForm').addEventListener('submit',e=>e.preventDefault());
+  $('mfuForm').addEventListener('input',manualMfu);$('mfuForm').addEventListener('change',manualMfu);
+  $('mfuReset').addEventListener('click',()=>loadMfuScenario('reset'));
+  $('mfuScenarioReset').addEventListener('click',()=>loadMfuScenario('reset'));
+  $('mfuSlow').addEventListener('click',()=>loadMfuScenario('slow'));
+  $('mfuLessWork').addEventListener('click',()=>loadMfuScenario('less'));
+  A.getMfuTeachingExample=()=>mfuResult?{...mfuResult}:null;
+  A.getMfuTeachingInputs=readMfu;
+  roofLesson();attentionLesson();mfuLesson();
+})();
+</script><script>/* Presentation changes only layout. Existing controls/charts move, never clone. */
+(function(){
+  'use strict';
+  const A=LLMComputeLab,C=ComputeLab,$=id=>document.getElementById(id);
+  const slots=[],sections=[],inlineDetails=[];let enabled=false;
+  const n=v=>v==null?'未知':v.toLocaleString('en-US',{maximumFractionDigits:3});
+  function prepare(tab,markup){
+    const section=$(tab),normal=document.createElement('details');normal.className='presentation-more';normal.open=true;
+    const summary=document.createElement('summary');summary.textContent='展开完整学习内容、表格与推导';normal.append(summary);
+    const content=document.createElement('div');content.className='study-content';
+    while(section.firstChild)content.append(section.firstChild);
+    normal.append(content);
+    const panel=document.createElement('div');panel.className='presentation-panel';panel.hidden=true;panel.innerHTML=markup;
+    section.append(panel,normal);sections.push({normal,panel});
+  }
+  function slot(selector,id){const node=document.querySelector(selector),marker=document.createComment('presentation position: '+id);node.before(marker);slots.push({node,marker,target:$(id)});}
+  function foldInline(nodes,title){
+    const d=document.createElement('details'),s=document.createElement('summary');d.className='presentation-inline-more';d.open=true;s.textContent=title;d.append(s);nodes[0].before(d);nodes.forEach(node=>d.append(node));inlineDetails.push(d);
+  }
+  foldInline([...document.querySelectorAll('.speedup-panel > .table-scroll,.speedup-panel > details')],'展开数值表、比值定义与推导');
+  foldInline([document.querySelector('.roof-chart-panel > .chart-guide')],'展开坐标轴与屋顶线读图指南');
+  const options=(id,title)=>`<details class="presentation-options"><summary>${title}</summary><div id="${id}"></div></details>`;
+  prepare('attention',`<div class="presentation-heading"><div><h1>Attention：少算多少？</h1><p id="presentAttentionContext"></p></div><label class="present-scope">比较口径<span id="presentScope"></span></label></div><p id="presentAttentionTakeaway" class="presentation-takeaway" aria-live="polite"></p>${options('presentAttentionOptions','现场修改 Attention 参数')}<div class="presentation-grid attention-deck"><div id="presentAttentionChart"></div><div id="presentSpeedup"></div></div>`);
+  prepare('roofline',`<div class="presentation-heading"><div><h1>Roofline：等数据，还是等计算？</h1><p id="presentRoofContext"></p></div></div><p id="presentRoofTakeaway" class="presentation-takeaway" aria-live="polite"></p><div class="presentation-toolbar">${options('presentRoofOptions','修改硬件 / 访存 / 实测 Runtime')}<div id="presentRoofActions"></div></div><div class="presentation-grid roof-deck"><div id="presentRoofChart"></div><aside><div id="presentRoofMetrics"></div><div id="presentRoofTeaching"></div></aside></div>`);
+  prepare('mfu',`<div class="presentation-heading"><div><h1>MFU：训练速度变化，比例怎样变？</h1><p>全部为教学假设 · 全模型 Training 口径，与单层 Decode 分开</p></div></div><div id="presentMfuFormula"></div><p id="presentMfuTakeaway" class="presentation-takeaway" aria-live="polite"></p>${options('presentMfuOptions','现场修改 MFU 教学输入')}<div class="presentation-grid mfu-deck"><div id="presentMfuResult"></div><div id="presentMfuExperiments"></div></div>`);
+  slot('#scope','presentScope');slot('.parameters','presentAttentionOptions');slot('.chart-panel','presentAttentionChart');slot('.speedup-panel','presentSpeedup');
+  slot('.roof-controls','presentRoofOptions');slot('#customTrafficDetails','presentRoofOptions');slot('.roof-chart-panel','presentRoofChart');slot('#roofMetrics','presentRoofMetrics');slot('#roofTeachingComparison','presentRoofTeaching');
+  slot('.roof-chart-panel .demo-controls','presentRoofActions');
+  slot('#mfuForm','presentMfuOptions');slot('#mfuMainFormula','presentMfuFormula');slot('#mfuResult','presentMfuResult');slot('#mfuExperiments','presentMfuExperiments');
+  function conclusions(){
+    const data=A.getExperiment(),scope=A.getScope(),r=data.results.find(x=>x.name===A.getSelection()),f=scope==='core'?r.core:r.total,base=scope==='core'?data.results[0].core:data.results[0].total;
+    $('presentAttentionContext').textContent=`历史 S=${n(data.historyTokens)} · 生成 G=${n(data.generatedTokens)} · ${data.parameters.precision} · ${scope==='core'?'核心 Core':'声明范围 Module'} · 单层每序列`;
+    $('presentAttentionTakeaway').textContent=!$('error').hidden?'输入尚未通过校验；图表保留上一次有效 Attention 配置，请展开参数修正。':f==null?`${r.name} 的完整 Total 未核验，不能给出完整模块的性能或加速结论。可切到已知 Core 范围。`:`${r.name} 的 FLOPs 为 MHA 的 ${n(f/base*100)}%，计算量比值为 ${n(base/f)}×；运行速度还取决于数据搬运和算子效率，不能按这个比值推断。`;
+    const roof=A.getRooflineAnalysis(),q=roof?.results.find(x=>x.name===A.getRooflineSelection());
+    $('presentRoofContext').textContent=roof?`${roof.hardware.name} · ${roof.hardware.precision} · ${n(roof.hardware.peakTF)} TFLOP/s / 设备 · ${n(roof.hardware.bandwidth)} ${roof.hardware.bandwidthUnit} / 设备 · ${roof.hardware.devices} 设备 · ${roof.scope==='core'?'Core':'Module'} · G=${n(roof.generatedTokens)}`:'当前参数未通过校验；展开设置查看错误。';
+    $('presentRoofTakeaway').textContent=!q?'等待有效场景，暂不判断瓶颈。':q.ai==null?`${q.name} 缺少完整 FLOPs 或访存量，当前范围的瓶颈和时间未知。菱形点仅用于独立教学。`:`${q.name}：AI ${n(q.ai)} ${q.ai<q.ridge?'低于':'达到或超过'} 转折点 ${n(q.ridge)} FLOPs/B，因此在当前假设下受${q.ai<q.ridge?'带宽':'算力'}限制；理想上界 ${n(q.performance/1e12)} TFLOP/s，时间下界 ${n(q.lowerSeconds*1000)} ms。`;
+    const m=A.getMfuTeachingExample();
+    $('presentMfuTakeaway').textContent=!m?'输入不完整，暂不计算 MFU。':m.exceedsPeak?`当前假设得到 ${n(m.percent)}%，超过理论峰值；请核对 FLOPs、全设备吞吐量和硬件口径。`:`假设吞吐量 ${n(m.tokensPerSecond)} Tokens/s 对应 MFU ${n(m.percent)}%。它衡量模型计算吞吐量与理论峰值的比例，不能说明设备忙碌百分比、训练精度或具体性能瓶颈。`;
+  }
+  function setMode(next){
+    enabled=!!next;document.body.classList.toggle('presentation',enabled);
+    for(const s of slots)enabled?s.target.append(s.node):s.marker.after(s.node);
+    for(const s of sections){s.panel.hidden=!enabled;s.normal.open=!enabled;}
+    inlineDetails.forEach(d=>d.open=!enabled);
+    $('presentationToggle').setAttribute('aria-pressed',String(enabled));$('presentationToggle').textContent=enabled?'退出演示模式':'演示模式 · 关闭';
+    conclusions();window.scrollTo(0,0);
+  }
+  $('presentationToggle').addEventListener('click',()=>setMode(!enabled));
+  for(const e of ['compute-lab-change','compute-lab-invalid','compute-lab-roofline-change','compute-lab-mfu-change'])document.addEventListener(e,conclusions);
+  document.addEventListener('compute-lab-tab-change',()=>{if(enabled)window.scrollTo(0,0);});
+  document.addEventListener('compute-lab-demo-change',e=>{if(enabled)$('presentRoofTakeaway').textContent=e.detail.text;});
+  A.getPresentationMode=()=>enabled;
+  conclusions();
+})();
+</script>
+</body></html>
