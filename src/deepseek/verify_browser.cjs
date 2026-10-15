@@ -25,7 +25,7 @@ const file='file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.ht
    const visible=await page.locator('#panel-body').innerText();
    for(const row of d.rows)assert.ok(visible.includes(row[1]));
    assert.ok(d.steps.every(s=>s.formulas.length&&s.dimensions.length&&s.symbols.length));
-   assert.ok(!/Scenario P|Source Verified|Mathematical Estimate|F_B|F_E|\[M[,，]|\[B[,，]|M\s*=\s*B/.test(visible),key+' '+mode+' obsolete teaching text');
+   assert.ok(!/Scenario P|Source Verified|Mathematical Estimate|F_B|F_E/.test(visible),key+' '+mode+' obsolete teaching text');
    assert.ok(await page.locator('#panel-body math').count()>0);
    panels++;
   }
@@ -85,12 +85,11 @@ const file='file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.ht
  await page.locator('.module[data-module="sparse"]').first().dispatchEvent('keydown',{key:'Enter'});
  await page.locator('[data-related="compressor"]').click();
  await page.locator('[data-mode="forward"]').click();
- assert.equal(await page.locator('.teaching-example').count(),3);
- for(const example of await page.locator('.teaching-example').all()){
-  await example.locator('summary').click();
-  assert.ok((await example.innerText()).includes('符号说明'));
- }
- await page.locator('.teaching-example').first().scrollIntoViewIfNeeded();
+ assert.equal(await page.locator('#derivation-scenario').inputValue(),'A');
+ assert.ok((await page.locator('#derivation-walkthrough').innerText()).includes('等待配对'));
+ await page.locator('#derivation-scenario').selectOption('B');
+ assert.ok((await page.locator('#derivation-walkthrough').innerText()).includes('池化'));
+ await page.locator('.derivation-step').first().scrollIntoViewIfNeeded();
  await page.waitForFunction(()=>getComputedStyle(document.getElementById('inspector')).opacity==='1');
  await page.screenshot({path:path.join(out,'compressor_examples.png')});
  await page.keyboard.press('Escape');

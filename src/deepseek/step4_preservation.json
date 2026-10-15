@@ -1,7 +1,8 @@
 {
-  "src/deepseek/module_data.json": "c0119f8f6f262c2186608f778cf4d494224938aa40c84e697d0126a836329466",
-  "src/deepseek/audit_data.json": "2f9ff58827bff99446a5843bed9b2e47cc0631580f559247e180aabff00fdc31",
-  "src/deepseek/architecture.svg": "8861c3b502047b9ba507645343bedf1494cc1719d10060c22ba67072542ec84c",
-  "docs/architecture/calculation_audit.md": "33da7e29e29b09b38d6e06e0d2fa73524654679870f908b1dd7b59dbfc8e5c2d",
-  "docs/architecture/assumptions.md": "3b6e85fd069224f9bfae6f62c5c77ecf882765da6de2f4c2e39aa7eb22442860"
+    "src/deepseek/module_data.json":  "bed33a8bcae35f8fca1b2e1e6c4c0172ee61383405485124605831759ea3f9d8",
+    "src/deepseek/audit_data.json":  "0f23ebb25d6418cbcdb165f29871ad78a3407b2fb3390a2e452d175bbd9df6c4",
+    "src/deepseek/derivation_data.json":  "fff0166c9948530046539e51533c36ba3b1256650d7d4dd3aca944f65e9148e8",
+    "src/deepseek/architecture.svg":  "8861c3b502047b9ba507645343bedf1494cc1719d10060c22ba67072542ec84c",
+    "docs/architecture/calculation_audit.md":  "4990413cdfdd6964a0a8e71d7e63ffa5ffc1bcee989b12f1bdb8b5ad0f4f49f9",
+    "docs/architecture/assumptions.md":  "c337c562ba3996e3f99263ded16f980e7e9029d4e9303b695bb368fe4a6ee48c"
 }

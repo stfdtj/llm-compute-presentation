@@ -15,9 +15,9 @@
   "offline": true,
   "statuses": {
     "Verified": 63,
-    "Estimated": 82,
-    "Unverified": 44,
-    "Mismatch": 0,
+    "Derived": 118,
+    "Estimated": 0,
+    "Unknown": 8,
     "historicalMismatchesCorrected": 38
   }
 }

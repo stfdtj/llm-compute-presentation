@@ -1,3 +1,5 @@
+> 本文为原审计口径与固定源码证据。当前逐步Forward/Backward、A/B场景、Derived/Unknown和特殊操作分账以[新账本](forward_backward_derivations.md)为准；旧“完整反向未推导”说明已由新理论推导补充。
+
 # Assumptions
 
 所有普通计算以当前一个 token 为主例。Configuration 是模型固有设置，Scenario 是演示场景，Approximation 是计数约定，Unverified 为当前证据边界。

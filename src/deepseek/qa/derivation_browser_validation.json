@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "moduleScenarioModes": 252,
+  "priorityModules": 7,
+  "fieldsPerStep": 6,
+  "parameterBinding": true,
+  "originalGeometry": true,
+  "offline": true,
+  "responsive": [
+    1920,
+    1366,
+    768,
+    390
+  ],
+  "errors": []
+}

@@ -205,10 +205,17 @@ def nonlinear():
     return dict(normShapes=5,attentionWidths=[128,640],mainOperationResults=len(expected),specialFunctionPolicy='one operation; memory, comparison and bit operations excluded')
 
 def display():
+    # The preceding tests intentionally audit the legacy kernel-policy baseline.
+    # Current teaching data is generated from that same source audit plus the
+    # new scenario-aware real-valued ledger, which has independent numerical tests.
+    from copy import deepcopy
+    import derivation_ledger
+    current=deepcopy(DATA)
+    derivation_ledger.apply(current,deepcopy(AUDIT))
     raw=json.loads((HERE/'module_data.json').read_text(encoding='utf-8'))
     html=(HERE.parents[1]/'deepseek_v4_1_interactive.html').read_text(encoding='utf-8')
     embedded=json.loads(re.search(r'<script type="application/json" id="module-data">(.*?)</script>',html,re.S).group(1).replace(r'<\/','</'))
-    for k,d in DATA.items():
+    for k,d in current.items():
         assert raw[k]==json.loads(json.dumps(d)),k
         for name in ['parameter','forward','backward']:
             for field in ['rows','totals','audit','linearArithmetic','resultAudits','totalAudits']:

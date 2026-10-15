@@ -52,7 +52,7 @@ const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'qa');
    assert.ok(await page.locator('#panel-body math').count()>0);
    assert.equal(await page.locator('#panel-body [data-related="selection"]').count(),0,'no MoE Top-K link');
    assert.equal(await page.locator('#panel-body [data-related="global"]').count(),1);
-   if(mode==='backward')assert.ok(visible.includes('Unverified'));
+   if(mode==='backward')assert.ok(visible.includes('Unknown'));
    await page.locator('#close-panel').click();
   }
  }

@@ -32,6 +32,7 @@
   "auditHashesPreserved": [
     "src/deepseek/module_data.json",
     "src/deepseek/audit_data.json",
+    "src/deepseek/derivation_data.json",
     "src/deepseek/architecture.svg",
     "docs/architecture/calculation_audit.md",
     "docs/architecture/assumptions.md"

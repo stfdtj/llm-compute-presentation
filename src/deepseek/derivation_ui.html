@@ -1,0 +1,105 @@
+<script type="application/json" id="derivation-data">__DERIVATIONS__</script>
+<style>
+.audit-badge.Derived{background:#e8f2ff;color:#285b91}.audit-badge.Unknown{background:#fff2d7;color:#835b16}
+.derivation-controls{padding:10px 12px;background:#f0f5fc;border:1px solid #d9e3f2;border-radius:7px;margin:0 0 12px}
+.derivation-controls label{font-size:12px;font-weight:600}.derivation-controls select{max-width:none;width:100%;margin:6px 0}.derivation-controls p{font-size:12px;line-height:1.75;margin:4px 0;color:#4c607c}
+.derivation-scope{font-size:12px;line-height:1.8;background:#fff8e8;border-left:3px solid #d7b257;padding:9px 11px;margin:12px 0}
+.derivation-chain{display:flex;gap:5px;flex-wrap:nowrap;overflow-x:auto;align-items:center;padding:6px 0 12px}.derivation-chain>*{flex-shrink:0}.derivation-chain button{font-size:11px;padding:4px 7px;max-width:100%;overflow-wrap:anywhere}
+.derivation-parameter-ref{font-size:12px;margin:9px 0}.derivation-parameter-ref>summary{cursor:pointer;color:#496b99;padding:6px 0}.derivation-parameter-ref .parameter-box{margin-top:8px}
+.derivation-step{border:1px solid #dce5f0;border-radius:7px;margin:8px 0;background:#fff}.derivation-step.current-step{border-color:#93b6e2}
+.derivation-step>summary{cursor:pointer;list-style:none;padding:10px 11px;font-size:13px;font-weight:600;display:flex;gap:8px;align-items:start}.derivation-step>summary::before{content:"▸";color:#6d8ab0}.derivation-step[open]>summary::before{content:"▾"}.derivation-step>summary .derivation-title{flex:1;min-width:0}.derivation-step>summary small{display:block;font-size:11px;font-weight:400;color:#6b7e97;margin-top:3px}
+.derivation-step .derivation-content{padding:0 12px 12px}.derivation-content h3{font-size:11px;color:#6c7b91;margin:12px 0 5px}.derivation-content p,.derivation-content li{font-size:12px;line-height:1.85;margin:4px 0;color:#3f526e}.derivation-content ul{padding-left:18px;margin:0}.derivation-shape{font:11px/1.8 Consolas,"Microsoft YaHei",monospace;background:#f3f7fd;padding:7px 9px;border-radius:5px;overflow-wrap:anywhere}
+.derivation-count{background:#f5f8fc;border-radius:5px;padding:7px 9px;font-size:12px;line-height:1.8;overflow-wrap:anywhere}.derivation-count strong{color:#214e87}.derivation-count small{display:block;color:#6b7890}.derivation-total{border:1px solid #cadbf0;border-radius:7px;background:#edf4fd;padding:12px;margin:14px 0;font-size:12px;line-height:1.9}.derivation-total p{margin:4px 0}.derivation-unknown{font-size:12px;color:#7e5b23;line-height:1.8}.derivation-unknown ul{padding-left:18px}.derivation-conditional{border-top:2px dashed #e1c78e;margin-top:17px;padding-top:9px;color:#735a2d}
+.derivation-policy{font-size:12px;line-height:1.8;margin:9px 0}.derivation-policy summary{cursor:pointer}.derivation-policy ol{padding-left:20px}.derivation-evidence{font-size:10px;overflow-wrap:anywhere;color:#8391a4;margin-top:10px}
+</style>
+<script>
+(()=>{
+ const LEDGER=JSON.parse(document.getElementById('derivation-data').textContent);
+ const n=x=>Number(x).toLocaleString('en-US');
+ const scenarios={forward:'A',backward:'B'};
+ const special=t=>Object.entries(t||{}).filter(([,v])=>v).map(([k,v])=>esc(k)+' '+n(v)+' 次').join('；')||'0';
+ const modeTemplate=new Map();
+ for(const [key,d] of Object.entries(DATA)){
+  for(const mode of ['forward','backward'])modeTemplate.set(key+'/'+mode,{...d[mode]});
+ }
+ function recipe(key,mode){
+  const scenario=scenarios[mode];
+  const flow=LEDGER.flows[LEDGER.modules[key][scenario][mode]],base=modeTemplate.get(key+'/'+mode),t=flow.totals.main;
+  const rs=[['已列实数图 · 普通标量算术',n(t.ordinary)+' FLOPs'],['矩阵2MKN近似 + 其余普通算术',n(t.approximate)+' FLOPs']];
+  if(flow.unknown.length)rs.push(['训练实现 / 完整执行边界','Unknown：见逐步账本']);
+  return {...base,ledgerRef:LEDGER.modules[key][scenario][mode],steps:flow.steps.map(e=>LEDGER.steps[e.ref]),rows:rs,
+   resultAudits:rs.map(([label,value],i)=>({label,value,status:i===2?'Unknown':i===0?'Derived':'Estimated'})),
+   audit:{...base.audit,assumptions:dAssumptions(key),status:base.audit.status},flow};
+ }
+ const dAssumptions=key=>DATA[key].moduleAssumptions;
+ function prepare(){for(const [key,d] of Object.entries(DATA))for(const mode of ['forward','backward'])d[mode]=recipe(key,mode);}
+ prepare();
+ function countBlock(t,cumulative){
+  const title=cumulative?'该路径累计':'本步骤小计';
+  return '<div class="derivation-count"><strong>'+title+'：'+n(t.ordinary||0)+' 普通算术</strong><br>乘 '+n(t.mul||0)+' + 加 '+n(t.add||0)+' + 减 '+n(t.sub||0)+
+   '<small>Derived · 对所列实数图的标量计数；不是GPU指令数</small>矩阵2MKN口径：'+n(t.approximate||0)+' <span class="audit-badge Estimated">Estimated</span><br>特殊函数：'+special(t.special||Object.fromEntries(Object.entries(t).filter(([k])=>k.startsWith('special:')).map(([k,v])=>[k.slice(8),v])))+'</div>';
+ }
+ function details(flow){
+  let conditional=false;
+  return flow.steps.map((entry,i)=>{
+   const s=LEDGER.steps[entry.ref];let head='';
+   if(s.path==='conditional'&&!conditional){conditional=true;head='<div class="derivation-conditional"><strong>给定额外上游梯度的条件VJP</strong><p>以下账目独立累计，不并入主路径，也不代表已有训练算法。</p></div>';}
+   return head+'<details class="derivation-step" data-derivation-index="'+i+'"'+(i===0?' open':'')+'><summary><span class="derivation-title">'+(i+1)+'. '+esc(s.title)+'<small>'+n(s.cost.ordinary)+' 普通算术 · 特殊函数 '+special(s.cost.special)+'</small></span><span class="audit-badge '+esc(s.status)+'">'+esc(s.status)+'</span></summary><div class="derivation-content">'+
+    '<h3>这一步在做什么</h3><p>'+esc(s.purpose)+'</p><h3>输入 / 输出</h3><div class="derivation-shape">输入：'+s.inputs.map(esc).join('<br>')+'<br>↓<br>输出：'+s.outputs.map(esc).join('<br>')+'</div>'+
+    '<h3>执行公式 <span class="audit-badge '+esc(s.formulaStatus)+'">'+esc(s.formulaStatus)+'</span></h3><div class="formulas">'+formulas(s.formulas)+'</div>'+
+    '<h3>FLOPs 怎样推导</h3><p>'+esc(s.work)+'</p>'+countBlock(s.cost,false)+countBlock(entry.cumulative,true)+
+    '<h3>为什么需要这一步 / 梯度如何衔接</h3><p>'+esc(s.why)+'</p>'+
+    (s.source?'<div class="derivation-evidence">固定源码依据：'+esc(s.source)+' · revision '+esc(LEDGER.revision.slice(0,12))+'</div>':'<div class="derivation-evidence">理论实数图推导；训练实现未验证。</div>')+
+    '</div></details>';
+  }).join('');
+ }
+ function totals(flow){
+  let html='<div class="derivation-total teaching-result"><strong>已列步骤总账</strong><p>'+esc(flow.scope)+'</p>'+rows(DATA[selected][mode].rows)+'<p>特殊函数单列：'+special(flow.totals.main.special)+'</p><p>普通算术为 Derived；矩阵2MKN口径为 Estimated；训练边界见 Unknown。</p>';
+  if(flow.steps.some(e=>LEDGER.steps[e.ref].path==='conditional'))html+='<p><strong>条件VJP单独小计</strong></p>'+countBlock(flow.totals.conditional,false);
+  return html+'</div>'+(flow.unknown.length?'<section class="derivation-unknown"><strong>仍然 Unknown 的具体信息</strong><ul>'+flow.unknown.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></section>':'');
+ }
+ const original=drawPanel;
+ drawPanel=function(resetScroll=true){
+  if(selected&&mode!=='parameter')DATA[selected][mode]=recipe(selected,mode);
+  original(resetScroll);if(!selected||mode==='parameter')return;
+  const scenario=scenarios[mode];
+  const flow=DATA[selected][mode].flow;
+  // Replace the former partial prose/results, retaining parameter tables, source
+  // bindings, related-module links and all architecture interactions.
+  body.querySelectorAll('.calc-step,.extra,.simple-note').forEach(e=>e.remove());
+  for(const e of [...body.querySelectorAll('.section')])if(e.querySelector('.teaching-result,.insight'))e.remove();
+  body.querySelector('.parameter-step-picker')?.remove();
+  const parameterBox=body.querySelector('.parameter-box');
+  const content=document.createElement('section');content.id='derivation-walkthrough';
+  content.innerHTML='<div class="derivation-controls"><label>计算场景<select id="derivation-scenario" aria-label="计算场景">'+Object.entries(LEDGER.scenarios).map(([id,s])=>'<option value="'+id+'"'+(id===scenario?' selected':'')+'>'+esc(s.title)+'</option>').join('')+'</select></label><p>'+esc(LEDGER.scenarios[scenario].description)+'</p></div>'+
+   '<details class="derivation-policy"><summary>先看计数约定与 Verified / Derived / Estimated / Unknown</summary><ol>'+LEDGER.policy.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol></details>'+
+   '<p class="derivation-scope">'+esc(flow.scope||'逐步展开当前模块的实数计算图。')+'</p>'+
+   '<div class="derivation-chain" aria-label="计算顺序"><span>'+(mode==='backward'?'输出梯度':'输入')+' →</span>'+flow.steps.map((e,i)=>'<button data-select-step="'+i+'" data-derivation-jump="'+i+'">Step '+(i+1)+'</button>').join('<span>→</span>')+'<span>→ '+(mode==='backward'?'输入 / 参数梯度':'输出')+'</span></div>'+
+   details(flow)+totals(flow);
+  const first=body.querySelector('.section');if(first)first.after(content);else body.prepend(content);
+  if(parameterBox){const reference=document.createElement('details');reference.className='derivation-parameter-ref';reference.innerHTML='<summary>展开参数表与当前步骤的权重联动</summary>';reference.append(parameterBox);content.querySelector('.derivation-chain').before(reference);}
+  content.querySelectorAll('.teaching-result .row').forEach((row,i)=>{row.classList.add('audit-result');const s=i===2?'Unknown':i===0?'Derived':'Estimated';row.querySelector('dd').insertAdjacentHTML('beforeend',' <span class="audit-badge '+s+'">'+s+'</span>');});
+  document.getElementById('panel-scope').textContent=LEDGER.scenarios[scenario].title+' · '+(mode==='backward'?'理论VJP，非推理执行':'所列实数前向图');
+  document.getElementById('panel-mode').textContent=(mode==='backward'?'FLOPs（反向）':'FLOPs（前向）')+' · '+LEDGER.scenarios[scenario].title;
+  document.getElementById('mode-caption').textContent=scenario==='A'?'当前1个token · 历史1024':'理论训练图 · B=1，L=128';
+  const context=body.querySelector('.indexer-context');if(context)context.textContent='架构层选择用于解释Full/Reindex/Reuse。下面的计算场景独立选择：Indexer账本以Full源层为数值主例；复用层不重复Key投影。主损失与额外评分梯度的条件VJP分列。';
+  for(const d of content.querySelectorAll('.derivation-step'))d.addEventListener('toggle',()=>{
+   if(d.open&&selected){window.parameterAudit.selectStep(Number(d.dataset.derivationIndex));content.querySelectorAll('.derivation-step').forEach(e=>e.classList.toggle('current-step',e===d));}
+  });
+  document.getElementById('derivation-scenario').addEventListener('change',e=>{scenarios[mode]=e.target.value;prepare();drawPanel();});
+  if(resetScroll)body.scrollTop=0;
+ };
+ body.addEventListener('click',e=>{
+  const jump=e.target.closest('[data-derivation-jump]');if(!jump)return;
+  const index=Number(jump.dataset.derivationJump),target=body.querySelector('[data-derivation-index="'+index+'"]');target.open=true;
+  window.parameterAudit.selectStep(index);target.scrollIntoView({block:'nearest',behavior:'instant'});
+ });
+ const assumptions=document.getElementById('assumptions-toggle');
+ assumptions.addEventListener('click',()=>{
+  const intro=body.querySelector('.audit-global-intro');if(intro)intro.textContent='当前计算使用A/B两个独立场景。普通乘加、GEMM近似与特殊函数分列；主路径与给定额外梯度的条件VJP分开累计。旧审计的状态和数字属于历史口径。';
+  document.getElementById('panel-scope').textContent='A / B 场景 · Verified / Derived / Estimated / Unknown';
+  const caption=body.querySelector('.audit-counts + .parameter-caption');if(caption)caption.textContent='上方统计主模块/模式的状态，不是每一步。同一模块可同时包含Derived严格计数、Estimated近似与Unknown训练边界；已完成的数学推导不会因训练内核缺失而隐藏。';
+ });
+ window.derivationTeaching={data:LEDGER,get state(){return{scenario:scenarios[mode]||'A',module:selected,mode};}};
+})();
+</script>

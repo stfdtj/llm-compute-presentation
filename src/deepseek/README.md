@@ -1,4 +1,4 @@
-# DeepSeek-V4.1 单 token 交互教学
+# DeepSeek-V4.1 架构与逐步计算教学
 
 直接用浏览器打开 `../../deepseek_v4_1_interactive.html`。这是一个离线单文件，内含 SVG、样式、交互、数据和 MathML 公式，无需启动服务器。
 
@@ -6,13 +6,13 @@
 
 ## 本次教学范围
 
-普通模块只跟踪当前一个 token，输入采用行向量 `[1,5120]`。面板按“作用、计算公式、矩阵维度、符号说明、数值结果、一句话理解”组织，多阶段运算分步展示；跨层合计默认折叠。
+保留 Parameter / Forward / Backward。Forward默认场景A：B=1，当前1个token，缓存历史1024个token。Backward默认场景B：B=1，L=128，从序列起点重算的理论实数训练图。A的Backward仅为当前调用的局部VJP练习，梯度止于历史缓存叶子，不是Decode执行反向，也不是训练估算。
 
-Attention 的数值例子假设此前已有 1024 个历史 token，当前是第 1025 个。历史 KV 从缓存读取，不重新执行历史 token 的投影。Compressor 面板提供 3 / 4 个 token、ratio=2 的分组例子，以及 ratio=1 不等待配对的例子。
+每步可展开目的、变量和实际形状、公式、标量运算拆解、步骤小计、路径累计、操作作用与梯度衔接。用Step按钮跳转，参数表与公式联动折叠在“展开参数表与当前步骤的权重联动”中。HC、MoE、Attention、Indexer、Compressor、Engram均有可推导的完整子图；整数/采样和训练策略边界明确列Unknown。
 
-Shared KV 投影：每层 2,621,440 个参数，当前 token 前向 5,242,880 FLOPs，输入和权重两个局部梯度合计 10,485,760 FLOPs。40 层前向合计 209,715,200 FLOPs。
+Shared KV线性层单行前向：严格5,242,368，2MKN近似5,242,880。单行反向严格dX=5,237,760、dW=2,621,440，合计7,859,200；旧10,485,760是两项都按2MKN的近似，不能称为精确。B场景独立按M=128计算，不把Decode乘3当训练成本。
 
-去重后的逻辑权重：Text Backbone 551,566,180,464；Engram 196,928,504,320；Draft 14,225,362,530；Vision 与对齐 485,268,480；合计 763,205,315,794。原 748,494,684,784 仅为 Text + Engram。固定历史长度下，文本与 Engram 当前一步估算为 35,584,521,265 次操作，与旧数值独立核对一致；修正其“全模型”统计边界，不含 Vision / Draft 执行，不代表实测 GPU 指令数或延迟。反向内容是局部数学推导，完整未确认部分标为 Unverified。
+逻辑参数总账保持不变。普通加/减/乘与exp、log1p、sqrt、rsqrt、除法分账，严格标量图为Derived、GEMM近似为Estimated、源码前向公式为Verified、缺失策略/内核为Unknown。旧35,584,521,265将特殊函数按1混合，并采用分块在线Attention口径，保留在历史审计中；不作为新口径精确总量。见[逐步推导文档](../../docs/architecture/forward_backward_derivations.md)。
 
 原图的图形、位置、颜色、箭头和分组保持不变。Encoder / Decoder Attention Detail 底部新增 Indexer 入口，可展开独立的流程细节区域。
 
@@ -20,6 +20,9 @@ Shared KV 投影：每层 2,621,440 个参数，当前 token 前向 5,242,880 FL
 
 - `teaching_data.py`：当前使用的 63 个教学条目，含三种模式与 Compressor 示例。
 - `module_data.json`：自动导出的可读数据，公式保留 LaTeX。
+- `derivation_ledger.py`：形状驱动的统一计数、HC/MoE等计算图、A/B场景和反向推导；不维护第二套手填数字。
+- `derivation_data.json`：自动导出的规范账本，各场景引用共享步骤，并保留旧行结果的比较记录。
+- `derivation_ui.html`：可展开步骤、场景选择、严格/近似/特殊操作分账，构建时编译并内嵌离线HTML。
 - `build_diagram.py`：SVG 几何与标签。
 - `indexer_diagram.py`、`indexer_ui.html`：Indexer 流程、跨层复用与计算面板入口；配置来自 `references/deepseek/config.json`，计算复用原 `module-data`。
 - `page_template.html`：页面布局、面板样式与交互。
@@ -50,9 +53,11 @@ Shared KV 投影：每层 2,621,440 个参数，当前 token 前向 5,242,880 FL
 
 点击模块即可见 Learnable Parameters，点击阶段按钮或完整公式步骤同步高亮权重、对应 MathML 符号及矩阵示意。梯度是运行时数据，参数表中的权重才是更新对象。详细角色、共享、存储轴与源码位置默认折叠。
 
-工具栏 Assumptions 展示 Configuration / Scenario / Approximation / Unverified。点击任意计算结果可展开该项公式、Shape、近似 / 精确乘加、假设与固定源码证据。线性前向主结果用 2MKN；单 token dW 的精确乘加是 KN，不能称 2KN 为精确数值。推理缓存读取与训练历史梯度边界分别说明。
+工具栏Assumptions提供配置、场景、计数规则与Unknown边界。各步骤直接展开形状、公式、运算拆解和累计；Parameter保留原有权重追踪。主损失路径和给定额外梯度的条件VJP分列，不把整数Top-K当连续可微操作。
 
-根目录 `docs/architecture/calculation_audit.md` 列出旧结果、修正内容、状态、原因与代码位置；`docs/architecture/assumptions.md` 汇总全局和模块条件。状态统计单位为 63 模块 × 3 模式的 189 主记录；当前 Verified 63 / Estimated 82 / Unverified 44 / Mismatch 0，38 项旧结果或解释边界已修正。完整变化见 `audit_results.json`，独立参数清单见 `independent_audit.json`，源码构造检查见 `qa/source_shape_validation.json`。
+`docs/architecture/forward_backward_derivations.md`是当前数值与推导文档。原`calculation_audit.md` / `assumptions.md`保留固定源码审计与历史计数规则，文首指向新账本。`verify_audit.py`继续核验原源码/参数/历史kernel口径，并检查新账本生成后的数据与网页一致；不以旧结果证明新推导正确。
+
+运行 `python src/deepseek/verify_derivations.py` 检查完整HC、MoE、Compressor、Engram和条件Indexer VJP的微型数值差分，独立检查单行外积及所有步骤累计。`verify_calculations.py`另检Query/RMSNorm、含sink的共享KV Attention与截断SwiGLU。`node src/deepseek/verify_derivations.cjs`检查63模块×2场景×2计算模式=252组、步骤展开、参数联动、响应式和离线运行。结果位于`qa/derivation_validation.json`及`qa/derivation_browser_validation.json`。这些数学验证不等于验证官方训练GPU kernel。
 
 复跑：`python src/deepseek/audit_model.py`、`python src/deepseek/build.py`、`python src/deepseek/verify_audit.py`、`python src/deepseek/verify_single_token.py`。梯度检查需 NumPy，请使用根目录 requirements.txt 安装的 NumPy；浏览器检查运行 `node src/deepseek/verify_browser.cjs`、`node src/deepseek/verify_parameters.cjs` 和 `node src/deepseek/verify_flow.cjs`。运行 HTML 本身不需要这些构建与验证工具。
 
@@ -68,7 +73,7 @@ Query 来自当前层归一化后的 1280 维低秩表示，投影为 32 × 128�
 
 KV source layers 为 `[2,8,14,20]`，Index source layers 为 `[2,8,14,20,24,28,32,36]`。Reindex 复用 Global KV 和 Index Keys，重新评分；Reuse 连同已有位置索引一起复用。依据 `references/deepseek/inference/model.py` 的 `Indexer.forward`、`Attention.forward` 与 `SharedAttentionRuntime`。
 
-“评分范围、缓存与计算口径”展开项说明实际评分行数 C、先评分后掩码的参考实现与候选域优化的区别。Top-K 512 不是评分长度。各节点直接调用已有计算记录；切换流程模式不会生成一套新 FLOPs。反向面板继续保留已有 Unverified 状态。Indexer 面板的相关链接指向 Compressor、Global KV 和 Main Attention，避免误连 MoE Top-6；原计算数据不变。
+“评分范围、缓存与计算口径”说明C与Top-K的区别。架构按钮解释Full/Reindex/Reuse，面板中的A/B场景独立选择，数值主例明确为Full源层。Backward主路径在整数选择处标Unknown；给定额外dScore的评分子图VJP单列，不猜测真实训练目标。相关链接指向Compressor、Global KV和Main Attention。
 
 运行 `node src/deepseek/verify_indexer.cjs`，检查真实点击、全部 38 个适用层、三种计算模式、缓存复用、键盘与空白关闭、缩放平移、信息流切换、四种窗口及计算数据 / 原图保留。结果为 `qa/indexer_validation.json`，截图为 `qa/indexer_*.png`。
 

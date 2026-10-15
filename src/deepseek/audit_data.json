@@ -1304,80 +1304,44 @@
     ],
     "Scenario": [
       [
-        "当前 token",
-        "Batch Size 1；一次 Decode 更新 1 个 token，不是 Prefill 整段输入"
+        "A",
+        "B=1，当前 L=1，计算行数 M=B×L=1；此前1024个token已在缓存。前向只生成当前条目。A不执行训练反向；Backward仅是当前调用的局部VJP数学练习：历史缓存作为独立可求导叶子，梯度止于缓存，不能据此估算训练。"
       ],
       [
-        "历史",
-        "演示固定此前 1024 个 token；当前为第 1025 个。128 / 512 是此场景实际读取数，不能与配置上限混为一谈"
-      ],
-      [
-        "主计算范围",
-        "文本 40 层 + 两次 Engram + 最终 LM Head；不执行 Vision 或 DSpark"
-      ],
-      [
-        "缓存",
-        "历史 KV 已存在；本次新的 Local KV 每层生成，Global KV 只在源层生成。ratio=2 当前半组等待，ratio=1 当前产生一行"
-      ],
-      [
-        "反向",
-        "实数数学的局部梯度示例；不代表整批训练、历史缓存的完整反向、优化器更新或官方训练内核"
-      ],
-      [
-        "共享",
-        "重用一个权重或缓存不会增加存储参数；草稿引用的主 Embedding / LM Head 统计一次"
+        "B",
+        "B=1，L=128，计算行数 M=B×L=128；从序列起点重算全部位置。保存反向需要的实数状态，历史KV、Compressor、共享权重均参与梯度。固定每行同一组6个专家、查表行互异以提供可复算数字，实际分布须重算归约。离散索引固定，量化用实数代理（保留Engram显式values×scale）；这不是已验证的训练策略。"
       ]
     ],
     "Approximation": [
       [
-        "矩阵 FLOPs",
-        "主结果采用 2MKN 近似：乘、加各 1 次；单 token 的 M=1。展开审计另列精确乘加 MN(2K−1)"
+        "计数",
+        "普通算术：标量加、减、乘各记 1；约简 n 项为 n−1 次加法。复制、广播、reshape、比较、整数索引、Top-K 选择及通信不计浮点 FLOPs，单列其工作与边界。"
       ],
       [
-        "线性反向",
-        "dX 与 dW 分别计算；近似分别 2MNK 和 2KMN。精确分别 MK(2N−1) 和 KN(2M−1)，因此单 token 外积不应称作精确 2KN"
+        "计数",
+        "exp、log1p、sqrt、rsqrt、除法分别按调用次数列账，不与普通乘加相加为“精确 FLOPs”。均值按预计算常量1/N乘法计；Sigmoid 展开成负号、加法、exp、除法；SiLU 复用 Sigmoid。Softplus 使用 log1p(exp(z)) 的数学模型，稳定内核可能有分支。"
       ],
       [
-        "非矩阵操作",
-        "加、减、乘各 1 次；rsqrt、exp、sigmoid、softplus、sqrt、除法各简化计 1 次；比较、Top-K、索引、abs/copysign 的符号处理和类型转换不计为浮点 FLOPs"
+        "计数",
+        "严格标量计数只针对所写实数计算图，不是硬件指令数。并列的 2MKN 口径仅替换 GEMM 项为常见近似，其余普通操作仍逐项统计；不把它称作精确结果。"
       ],
       [
-        "Attention",
-        "矩阵小计按实际读取位置；在线 Softmax 的展开估计按源码 64 位置分块，含 sink。它不是 GPU 实测指令数"
-      ],
-      [
-        "量化与内存",
-        "仅显式计 Engram 查表反量化的逐项乘法；其他 FP4/FP8 量化、GEMM 内部反量化、缓存搬运、通信和分词耗时不计"
-      ],
-      [
-        "参数与字节",
-        "统计逻辑权重数字；FP4 两值打包、FP8/FP4 scale、缓存和整数哈希 buffer 不无条件当作新增数学学习权重，字节数另算"
+        "计数",
+        "矩阵反向分别记 dX、dW；dW 的求和轴是 M，精确 KN(2M−1)，单行时为 KN。批内已经形成的梯度再次累加到既有梯度缓冲、优化器与跨设备归约不在局部 VJP 中。"
       ]
     ],
     "Unverified": [
       [
-        "完整反向",
-        "参考实现为推理，不含训练反向；非线性总量、量化权重训练规则、选择偏置的更新方式未验证"
-      ],
-      [
-        "训练状态",
-        "技术报告 §2.5 说明预训练早期冻结 Vision 主体，保留最终归一化与对齐层可训练；本页面仍不能确定用户当前任务的 requires_grad 或量化权重更新规则"
-      ],
-      [
-        "完整 Prefill / Draft / Vision FLOPs",
-        "未运行完整图片、Prefill、DSpark 调度，当前未给出这些场景的精确 FLOPs"
-      ],
-      [
-        "本地差异",
-        "本地 model.py 落后于固定官方 revision：共享索引缓存发布条件、输出投影前量化有差异。参数维度不变；证据以官方固定版本为准"
+        "训练实现",
+        "完整量化、离散训练、重计算、通信和优化器未由推理实现确定；理论梯度不因此停止推导。"
       ]
     ]
   },
   "summary": {
     "Verified": 63,
-    "Estimated": 82,
-    "Unverified": 44,
-    "Mismatch": 0,
+    "Derived": 118,
+    "Estimated": 0,
+    "Unknown": 8,
     "historicalMismatchesCorrected": 38
   },
   "totals": {
@@ -3029,5 +2993,12 @@
         "matchesLocalNormalized": false
       }
     ]
+  },
+  "historicalSummary": {
+    "Verified": 63,
+    "Estimated": 82,
+    "Unverified": 44,
+    "Mismatch": 0,
+    "historicalMismatchesCorrected": 38
   }
 }

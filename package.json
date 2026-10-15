@@ -9,7 +9,7 @@
   "scripts": {
     "test:lab": "node src/compute_lab/tests.js && node src/compute_lab/extension_tests.js && node src/compute_lab/teaching_tests.js && node src/compute_lab/final_tests.js",
     "test:browser:lab": "node src/compute_lab/browser_test.mjs",
-    "test:browser:deepseek": "node src/deepseek/verify_browser.cjs && node src/deepseek/verify_parameters.cjs && node src/deepseek/verify_flow.cjs && node src/deepseek/verify_step4.cjs && node src/deepseek/verify_indexer.cjs"
+    "test:browser:deepseek": "node src/deepseek/verify_browser.cjs && node src/deepseek/verify_parameters.cjs && node src/deepseek/verify_flow.cjs && node src/deepseek/verify_step4.cjs && node src/deepseek/verify_indexer.cjs && node src/deepseek/verify_derivations.cjs"
   },
   "devDependencies": {
     "playwright": "1.64.0"

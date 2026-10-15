@@ -15,7 +15,7 @@
 <section id="indexer-bar" hidden aria-label="Indexer 演示控制">
  <div class="indexer-controls"><strong>Indexer Detail</strong><button data-indexer-mode="Full" aria-pressed="true">Full</button><button data-indexer-mode="Reindex" aria-pressed="false">Reindex</button><button data-indexer-mode="Reuse" aria-pressed="false">Reuse</button><label>查看层 <select id="indexer-layer" aria-label="Indexer 所在层"></select></label><button id="indexer-calculate">Indexer 计算面板</button><button id="indexer-close">返回架构 ×</button></div>
  <p id="indexer-mode-note" aria-live="polite"></p>
- <details id="indexer-boundary"><summary>评分范围、缓存与计算口径</summary><p>S 是已缓存的全局条目数，C 是实际参与评分的行数，Top-K 512 只是选取上限。参考 inference/model.py 先对可用 Index Key 缓存计算分数，再进行因果 / 候选掩码；不能把 Top-K 数或候选池上限直接代入该实现的评分工作量。</p><p>Layer 20 同时建立分层候选池（最多 2048 × 8 = 16384 个位置）；后续 Reindex 在候选范围内选择。报告中的候选域评分优化与参考代码的先评分、后掩码应区分。Indexer 与 Main Attention 各有自己的 Query；Head Weights 来自当前 X 的可学习投影，并非固定常量或 MoE 路由权重。</p><p>计算面板直接使用现有 module-data.indexer，沿用其历史长度与源层条件；切换流程模式不重新估算 FLOPs。完整反向结果仍保持已有的 Unverified 状态。只有 Full 层在新压缩条目完成时追加 Index Key，ratio=2 的未完成组不会新增条目。</p></details>
+ <details id="indexer-boundary"><summary>评分范围、缓存与计算口径</summary><p>S 是已缓存的全局条目数，C 是实际参与评分的行数，Top-K 512 只是选取上限。参考 inference/model.py 先对可用 Index Key 缓存计算分数，再进行因果 / 候选掩码；不能把 Top-K 数或候选池上限直接代入该实现的评分工作量。</p><p>Layer 20 同时建立分层候选池（最多 2048 × 8 = 16384 个位置）；后续 Reindex 在候选范围内选择。报告中的候选域评分优化与参考代码的先评分、后掩码应区分。Indexer 与 Main Attention 各有自己的 Query；Head Weights 来自当前 X 的可学习投影，并非固定常量或 MoE 路由权重。</p><p>计算面板复用统一逐步账本，A单Token与B理论训练分别计算。数值主例是Full源层，架构按钮不改变场景条件。主损失在Top-K处没有普通连续梯度；给定额外dScore的评分VJP单列，训练目标来源Unknown。只有 Full 层在新压缩条目完成时追加 Index Key，ratio=2 的未完成组不会新增条目。</p></details>
 </section>
 <script>
 (()=>{

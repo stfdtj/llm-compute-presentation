@@ -1,3 +1,5 @@
+> 本文为原审计口径与固定源码证据。当前逐步Forward/Backward、A/B场景、Derived/Unknown和特殊操作分账以[新账本](forward_backward_derivations.md)为准；旧“完整反向未推导”说明已由新理论推导补充。
+
 # 计算正确性审计
 
 官方固定版本：`5254448103b6254fc646dacbca1cbbf20e9216c1`。先按配置和实际构造权重建立独立总账，再对比旧页面。未用旧 HTML 数值证明实现正确。
