@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "streams": 4,
+  "coefficientCounts": [
+    4,
+    4,
+    16
+  ],
+  "stagesInBothModes": 9,
+  "canonicalLedgerUnchanged": true,
+  "labelContainment": true,
+  "zoomPan": true,
+  "keyboardAndBlankDismiss": true,
+  "flowAndIndexerTransitions": true,
+  "responsive": [
+    1920,
+    1366,
+    768,
+    390
+  ],
+  "offline": true,
+  "errors": []
+}

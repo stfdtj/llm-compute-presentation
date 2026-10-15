@@ -14,7 +14,17 @@ Shared KV线性层单行前向：严格5,242,368，2MKN近似5,242,880。单行�
 
 逻辑参数总账保持不变。普通加/减/乘与exp、log1p、sqrt、rsqrt、除法分账，严格标量图为Derived、GEMM近似为Estimated、源码前向公式为Verified、缺失策略/内核为Unknown。旧35,584,521,265将特殊函数按1混合，并采用分块在线Attention口径，保留在历史审计中；不作为新口径精确总量。见[逐步推导文档](../../docs/architecture/forward_backward_derivations.md)。
 
-原图的图形、位置、颜色、箭头和分组保持不变。Encoder / Decoder Attention Detail 底部新增 Indexer 入口，可展开独立的流程细节区域。
+本次只重画HC Detail的小框与独立展开图，其他架构模块的文字、图形、位置、颜色和箭头保持一致。Encoder / Decoder Attention Detail底部的Indexer入口继续可用。
+
+## HC 架构图
+
+HC小框已修正为h⁽¹⁾、h⁽²⁾、h⁽³⁾、h⁽⁴⁾，每路[1,5120]。点击底部“展开HC Pre / Post / Comb”，或右上聚焦菜单的“F · HC Detail”，查看完整图。
+
+上方路径从同一R生成24个动态系数：Flatten→W_HC[20480,24]→投影结果乘r→Scale/Base与非线性；Pre_next交给下一子模块，Post=4与Comb=16用于本次更新。主路径使用前阶段的Pre_in把四路合成一路，经RMSNorm与Attention/FFN得到U；Post分配U，Comb按C[i,j]（旧路i→新路j）混合旧R，两者相加得到[1,4,5120]。
+
+点击图中的Pre、Post、Comb、W_HC等节点，直接定位现有HC计算账本；图本身没有另一套FLOPs公式。点击空白关闭面板，“返回架构”恢复视角。node src/deepseek/verify_hc.cjs检查四路标签、动态系数、步骤定位、文字边界、缩放拖动和与Indexer/信息流的切换。
+
+before_hc.svg保留修改前的架构；hc_preservation.py锁定其原始哈希，并逐元素验证HC区域之外的SVG完全一致。原SVG回归检查只对授权修改的HC区域放行，其他模块仍受原有保护。
 
 ## 可编辑源文件
 
@@ -24,6 +34,7 @@ Shared KV线性层单行前向：严格5,242,368，2MKN近似5,242,880。单行�
 - `derivation_data.json`：自动导出的规范账本，各场景引用共享步骤，并保留旧行结果的比较记录。
 - `derivation_ui.html`：可展开步骤、场景选择、严格/近似/特殊操作分账，构建时编译并内嵌离线HTML。
 - `build_diagram.py`：SVG 几何与标签。
+- `hc_diagram.py`、`hc_ui.html`：HC小框、展开架构与现有计算步骤的链接。
 - `indexer_diagram.py`、`indexer_ui.html`：Indexer 流程、跨层复用与计算面板入口；配置来自 `references/deepseek/config.json`，计算复用原 `module-data`。
 - `page_template.html`：页面布局、面板样式与交互。
 - `flow_ui.html`：独立信息流开关、五步演示、SVG 路径叠加、缓存写入示例及说明；构建时内嵌到原 HTML。

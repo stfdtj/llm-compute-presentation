@@ -165,7 +165,8 @@ assert merge[0]['cost']['add']==19*128*512
 assert 'fp8_block_size = 32' in (ROOT/'references/deepseek/inference/model.py').read_text(encoding='utf-8')
 # Original vector geometry is an immutable reference even though compute data changes.
 import hashlib
-assert hashlib.sha256((ROOT/'src/deepseek/architecture.svg').read_bytes()).hexdigest()=='8861c3b502047b9ba507645343bedf1494cc1719d10060c22ba67072542ec84c'
+from hc_preservation import verify as verify_hc_scope
+assert verify_hc_scope()
 report=dict(passed=True,modules=len(pack['modules']),flows=len(pack['flows']),uniqueSteps=len(pack['steps']),finiteDifferenceMaxErrors=errors,outerProductStrict=7859200,outerProductApproximate=10485760,
   scope='Tiny real-valued graph tests, not official training or GPU kernels; fixed discrete choices; explicit scenario and special-op ledgers.')
 (ROOT/'src/deepseek/qa/derivation_validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')

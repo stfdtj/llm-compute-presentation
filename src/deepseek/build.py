@@ -10,6 +10,7 @@ from teaching_data import DATA,check
 from audited_data import apply,write_docs
 from build_diagram import build
 from indexer_diagram import build_indexer
+from hc_diagram import build_detail
 import derivation_ledger
 
 check()
@@ -50,6 +51,8 @@ indexer_ui=(ROOT/'src/deepseek/indexer_ui.html').read_text(encoding='utf-8').rep
 result=result.replace('</body>',indexer_ui+'\n</body>')
 derivation_ui=(ROOT/'src/deepseek/derivation_ui.html').read_text(encoding='utf-8').replace('__DERIVATIONS__',json.dumps(DERIVATIONS,ensure_ascii=False).replace('</','<\\/'))
 result=result.replace('</body>',derivation_ui+'\n</body>')
+hc_ui=(ROOT/'src/deepseek/hc_ui.html').read_text(encoding='utf-8').replace('__HC_SVG__',build_detail())
+result=result.replace('</body>',hc_ui+'\n</body>')
 (ROOT/'deepseek_v4_1_interactive.html').write_text(result,encoding='utf-8')
 (ROOT/'src/deepseek/architecture.svg').write_text(svg,encoding='utf-8')
 print(f'Built standalone HTML: {len(result.encode("utf-8")):,} bytes; {len(ids)} interactive SVG elements / {len(set(ids))} keys; {len(DATA)} calculation entries.')

@@ -49,6 +49,10 @@ assert '不用等待配对' in examples[2]['title']
 
 before=ET.parse(HERE/'before_single_token.svg').getroot()
 after=ET.parse(HERE/'architecture.svg').getroot()
+from hc_preservation import without_hc,verify as verify_hc_scope
+verify_hc_scope()
+before=without_hc(before)
+after=without_hc(after)
 def geometry(root):
     # All diagram boxes, paths, arrows, groups, paint, and positions must remain.
     shapes=[]

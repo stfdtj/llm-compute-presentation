@@ -44,6 +44,7 @@
   fitBar();
  }
  function show(n=20,calculate=false){
+  window.dispatchEvent(new CustomEvent('architecture-detail-open',{detail:{name:'indexer'}}));
   if(window.informationFlow?.state.enabled)document.getElementById('flow-toggle').click();
   if(!active){savedView={...view};savedRegion=region.value==='indexer'?'all':region.value;}
   active=true;layer=Number(n);closePanel();detail.style.display='';bar.hidden=false;document.body.classList.add('indexer-on');
@@ -92,6 +93,7 @@
  svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.indexer-module')){hide();e.stopImmediatePropagation();}},true);
  document.getElementById('indexer-boundary').addEventListener('toggle',fitBar);new ResizeObserver(fitBar).observe(bar);window.addEventListener('resize',fitBar);
  render();fitLabels();
+ window.addEventListener('architecture-detail-open',e=>{if(e.detail?.name!=='indexer')hide();});
  window.indexerTeaching={get state(){return{active,layer,mode:modeFor(layer),kvSource:latest(config.kv_source_layers,layer),indexSource:latest(config.index_source_layers,layer)}},config};
 })();
 </script>

@@ -177,16 +177,8 @@ def build():
     # C3: the original four-stream HC and MoE/routing detail.
     frame('moe',885,585,493,333,'purple','3.  Hyper-Connection + MoE (Detail)',21)
     text(1131,635,'Same FL and MoE structure used in both encoder and decoder blocks.',14)
-    start('hc','Hyper-Connection HC');rect(893,648,226,264,'orange',opacity=.15);text(1006,668,'Hyper-Connection (HC)',17,True);text(1006,689,'Four parallel residual streams',14);end()
-    text(919,718,'h⁽¹⁾',16,italic=True)
-    for y,t,c in [(728,'h⁽²⁾','blue'),(766,'h⁽³⁾','green'),(805,'h⁽³⁾','orange'),(843,'h⁽⁴⁾','purple')]:
-        box('streams',902,y,34,26,t,c,14)
-        text(961,y-2,'1 × 5120',12)
-    arrow('M939 739 H981 L992 762');arrow('M939 778 H991');arrow('M939 816 H981 L992 794');arrow('M939 854 H981 L992 822')
-    label('hc',994,741,70,77,['Learned','mixing','coefficients','(α₁ … α₄)'],12)
-    text(1090,729,['Updated','hidden state','1 × 5120'],12)
-    start('streams','Updated four residual streams');bars(1066,764,45,16,4);end()
-    for y in [773,793,813,833]:arrow(f'M1052 {y} H1064')
+    from hc_diagram import draw_overview
+    draw_overview()
     start('moe','Mixture of Experts MoE');rect(1129,648,242,264,'purple',opacity=.12);text(1250,666,'Mixture of Experts (MoE)',16,True);text(1250,682,'(6 routed + 1 shared from 384 experts)',13);end()
     label('moe',1137,691,117,25,'Input (1 × 5120)',14)
     for key,y,h,ls in [('router',720,24,'Router (top experts)'),('selection',752,24,'Top-6 Expert Selection'),('expert',784,24,'Expert FFN (SwiGLU)'),('shared',816,24,'Shared Expert'),('combine',848,23,'Combine Expert Outputs')]:box(key,1136,y,121,h,ls,'purple',12)
