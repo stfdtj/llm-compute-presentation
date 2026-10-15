@@ -5,7 +5,7 @@ const assert=require('assert/strict'),fs=require('fs'),path=require('path');
  const context=await browser.newContext({viewport:{width:1366,height:900},offline:true});
  const page=await context.newPage(),errors=[],requests=[],checks=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
- await page.goto('file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.html').replaceAll('\\','/'));
+ await page.goto('file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.html').replaceAll('\\','/')+'#architecture');
  const open=async key=>{await page.locator(`.module[data-module="${key}"]`).first().dispatchEvent('keydown',{key:'Enter'});};
  await open('query');
  for(const [i,id,symbol] of [[0,'qa-0','WQA'],[1,'qnorm-1','γ'],[2,'qb-2','WQB']]){

@@ -20,7 +20,7 @@ def build_indexer(config):
         d.raw('</g>')
 
     d.raw('<g id="indexer-entry-links" font-family="Times New Roman, Microsoft YaHei, serif">')
-    for source, layer, x, w in [('encoder', 2, 90, 240), ('decoder', 20, 536, 265)]:
+    for source, layer, x, w in [('encoder', 2, 27, 399), ('decoder', 20, 465, 399)]:
         d.raw(f'<g data-indexer-entry="{source}" data-indexer-layer="{layer}" aria-controls="indexer-detail" aria-expanded="false">')
         d.box('indexer', x, 897, w, 19, 'Indexer → Top-512 → Global KV  ↗', 'orange', 13, True)
         d.raw('</g>')

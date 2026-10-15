@@ -23,7 +23,9 @@ def without_hc(root):
 def verify():
     baseline=HERE/'before_hc.svg'
     assert hashlib.sha256(baseline.read_bytes()).hexdigest()==ORIGINAL_SHA256,'HC baseline was changed'
-    before=without_hc(ET.parse(baseline).getroot())
-    after=without_hc(ET.parse(HERE/'architecture.svg').getroot())
+    from attention_preservation import without_attention,verify as verify_attention
+    verify_attention()
+    before=without_attention(without_hc(ET.parse(baseline).getroot()))
+    after=without_attention(without_hc(ET.parse(HERE/'architecture.svg').getroot()))
     assert ET.tostring(before)==ET.tostring(after),'An architecture element outside HC changed'
     return True

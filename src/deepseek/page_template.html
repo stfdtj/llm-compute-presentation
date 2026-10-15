@@ -17,7 +17,7 @@
  <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><div><strong>DeepSeek-V4.1</strong><small>跟着一个 token 走</small></div></div>
  <nav class="modes" aria-label="分析模式"><button data-mode="parameter" aria-pressed="true">参数量</button><button data-mode="forward" aria-pressed="false">FLOPs（前向）</button><button data-mode="backward" aria-pressed="false">FLOPs（反向）</button></nav>
  <div class="scenario"><strong id="mode-caption">看权重矩阵里有多少个数字</strong><span>当前 1 个 token · X = [1,5120]</span></div>
- <div class="tools"><select id="region-select" aria-label="聚焦图中区域"><option value="all">完整架构</option><option value="a">A · 总体架构</option><option value="b">B · 逐层计算</option><option value="c1">C · Encoder 细节</option><option value="c2">C · Decoder 细节</option><option value="c3">C · HC + MoE</option><option value="d">D · Engram</option></select><button class="square" id="zoom-out" aria-label="缩小">−</button><span id="zoom-value">100%</span><button class="square" id="zoom-in" aria-label="放大">+</button><button id="reset" title="恢复完整图 · 快捷键 0">适合窗口</button></div>
+ <div class="tools"><select id="region-select" aria-label="聚焦图中区域"><option value="all">完整架构</option><option value="a">A · 总体架构</option><option value="b">B · 逐层计算</option><option value="attention">C · Encoder ↔ Decoder 对照</option><option value="c1">C · Encoder 细节</option><option value="c2">C · Decoder 细节</option><option value="c3">C · HC + MoE</option><option value="d">D · Engram</option></select><button class="square" id="zoom-out" aria-label="缩小">−</button><span id="zoom-value">100%</span><button class="square" id="zoom-in" aria-label="放大">+</button><button id="reset" title="恢复完整图 · 快捷键 0">适合窗口</button></div>
 </header>
 <main class="stage" id="stage" aria-label="可拖动、缩放的交互架构图">__SVG__</main>
 <footer><div class="legend"><span><i class="dot" style="background:#6fbcf5"></i>Attention / Q / KV</span><span><i class="dot" style="background:#83cda0"></i>RMSNorm</span><span><i class="dot" style="background:#b699e8"></i>MoE</span><span><i class="dot" style="background:#eac067"></i>HC</span><span><i class="dot" style="background:#ee819b"></i>Engram</span></div><span class="hint">点击查看 · 滚轮缩放 · 拖动平移 · Esc 关闭 · 0 复位</span></footer>
@@ -80,7 +80,7 @@ function endDrag(e){if(pointer?.id===e.pointerId){if(svg.hasPointerCapture(e.poi
 svg.addEventListener('pointerup',endDrag);svg.addEventListener('pointercancel',endDrag);svg.addEventListener('pointerleave',e=>{if(pointer&&!dragged)pointer=null;});
 svg.addEventListener('dblclick',e=>{if(!e.target.closest('.module'))reset();});
 document.getElementById('zoom-in').addEventListener('click',()=>zoom(1.3));document.getElementById('zoom-out').addEventListener('click',()=>zoom(1/1.3));document.getElementById('reset').addEventListener('click',reset);
-const regions={a:[0,75,1672,283],b:[10,365,1652,209],c1:[10,580,493,343],c2:[502,580,380,343],c3:[879,580,504,343],d:[1382,580,282,343]};
+const regions={a:[0,75,1672,283],b:[10,365,1652,209],attention:[10,580,872,361],c1:[10,580,433,361],c2:[448,580,433,361],c3:[879,580,504,343],d:[1382,580,282,343]};
 document.getElementById('region-select').addEventListener('change',e=>{if(e.target.value==='all'){reset();return;}const [x,y,w,h]=regions[e.target.value],pad=18,r=1672/941,nw=Math.max(w+pad*2,(h+pad*2)*r),nh=nw/r;view={x:x+w/2-nw/2,y:y+h/2-nh/2,w:nw,h:nh};paint();});
 // Read-only inspection hooks for reproducible browser QA.
 window.architectureApp={get state(){return{mode,selected,view:{...view}}},data:DATA};

@@ -14,7 +14,19 @@ Shared KV线性层单行前向：严格5,242,368，2MKN近似5,242,880。单行�
 
 逻辑参数总账保持不变。普通加/减/乘与exp、log1p、sqrt、rsqrt、除法分账，严格标量图为Derived、GEMM近似为Estimated、源码前向公式为Verified、缺失策略/内核为Unknown。旧35,584,521,265将特殊函数按1混合，并采用分块在线Attention口径，保留在历史审计中；不作为新口径精确总量。见[逐步推导文档](../../docs/architecture/forward_backward_derivations.md)。
 
-本次只重画HC Detail的小框与独立展开图，其他架构模块的文字、图形、位置、颜色和箭头保持一致。Encoder / Decoder Attention Detail底部的Indexer入口继续可用。
+HC Detail的小框与独立展开图保留原有交互。Encoder / Decoder Attention Detail现已重设计为等宽、对齐的三路输入和统一输出流程；底部Indexer入口继续可用。两个Attention细节区以外的SVG元素由独立基线逐元素保护。
+
+## DSpark 主干与辅助路径
+
+页面默认显示独立的“主干 + DSpark”总览：40层蓝色主干、3层紫色可选草稿网络、绿色调度与验证路径。点击任何DSpark节点可查看输入、三层内部、Draft Attention、三个Head、Prefill/Decode、矩阵维度及候选接受过程；“完整架构”或URL的`#architecture`入口保留此前全部细节。右上“主干 + DSpark”返回新总览。
+
+源文件为`dspark_diagram.py`、`dspark_ui.html`，构建沿用固定官方配置。`verify_dspark.cjs`已纳入浏览器回归。核对出处、七项陌生读者审查及参考代码未实现的验证循环边界见[DSpark验收记录](../../docs/architecture/dspark_validation.md)。
+
+## Attention 对照入口
+
+右上“Attention 对照”打开可按层切换的计算图；聚焦菜单的“C · Encoder ↔ Decoder 对照”同时放大主图中的两个模块。主图用橙色的“2 tokens → 1 KV / 1 token → 1 KV”突出全局分支差异，粉色E标签交代Encoder四路输出经L20 HC Pre / RMSNorm后进入Decoder。Q、Local KV、Attention、Inverse RoPE、分组输出投影保持同位展示。
+
+`attention_diagram.py`绘制主图，`attention_ui.html`提供逐层细节，维度与层配置来自固定官方inference/config.json。`verify_attention.cjs`验收40层模式、输入来源、文字边界与现有交互，已纳入`npm run test:browser:deepseek`。`attention_preservation.py`锁定Attention区域以外的全部SVG。源码核对、十项陌生读者审查与截图位置见[验收记录](../../docs/architecture/attention_redesign_validation.md)。
 
 ## HC 架构图
 

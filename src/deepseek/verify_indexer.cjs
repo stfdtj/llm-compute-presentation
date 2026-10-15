@@ -11,7 +11,7 @@ const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'qa');
  const context=await browser.newContext({viewport:{width:1920,height:1080},offline:true});
  const page=await context.newPage(),errors=[],requests=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
- await page.goto('file:///'+path.join(root,'deepseek_v4_1_interactive.html').replaceAll('\\','/'));
+ await page.goto('file:///'+path.join(root,'deepseek_v4_1_interactive.html').replaceAll('\\','/')+'#architecture');
  await page.evaluate(()=>document.fonts.ready);
  const data=await page.evaluate(()=>JSON.stringify(architectureApp.data));
  // Existing information-flow highlighting leaves empty style attributes behind.

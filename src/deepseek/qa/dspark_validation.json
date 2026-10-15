@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "viewports": [
+    1920,
+    1366
+  ],
+  "draftLayers": 3,
+  "draftPositions": 5,
+  "targets": [
+    37,
+    38,
+    39
+  ],
+  "detailTabs": 7,
+  "markovSteps": 5,
+  "verificationPrefixLengths": [
+    0,
+    1,
+    5
+  ],
+  "textOverflows": [],
+  "originalDiagramPreserved": true,
+  "errors": [],
+  "scope": "Actual Chrome page / interaction tests; mathematical source audit, not GPU execution"
+}

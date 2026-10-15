@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checkedLayers": 40,
+  "viewports": [
+    1366,
+    1920
+  ],
+  "errors": [],
+  "overflows": [],
+  "scope": "Browser / source-configuration verification; no model weights or GPU kernel execution"
+}

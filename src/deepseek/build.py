@@ -11,6 +11,7 @@ from audited_data import apply,write_docs
 from build_diagram import build
 from indexer_diagram import build_indexer
 from hc_diagram import build_detail
+from dspark_diagram import build_dspark
 import derivation_ledger
 
 check()
@@ -53,6 +54,11 @@ derivation_ui=(ROOT/'src/deepseek/derivation_ui.html').read_text(encoding='utf-8
 result=result.replace('</body>',derivation_ui+'\n</body>')
 hc_ui=(ROOT/'src/deepseek/hc_ui.html').read_text(encoding='utf-8').replace('__HC_SVG__',build_detail())
 result=result.replace('</body>',hc_ui+'\n</body>')
+attention_ui=(ROOT/'src/deepseek/attention_ui.html').read_text(encoding='utf-8').replace('__ATTENTION_CONFIG__',json.dumps(json.loads((ROOT/'references/deepseek/inference/config.json').read_text(encoding='utf-8'))))
+result=result.replace('</body>',attention_ui+'\n</body>')
+dspark_config=json.loads((ROOT/'references/deepseek/inference/config.json').read_text(encoding='utf-8'))
+dspark_ui=(ROOT/'src/deepseek/dspark_ui.html').read_text(encoding='utf-8').replace('__DSPARK_CONFIG__',json.dumps(dspark_config)).replace('__DSPARK_SVG__',build_dspark(dspark_config))
+result=result.replace('</body>',dspark_ui+'\n</body>')
 (ROOT/'deepseek_v4_1_interactive.html').write_text(result,encoding='utf-8')
 (ROOT/'src/deepseek/architecture.svg').write_text(svg,encoding='utf-8')
 print(f'Built standalone HTML: {len(result.encode("utf-8")):,} bytes; {len(ids)} interactive SVG elements / {len(set(ids))} keys; {len(DATA)} calculation entries.')

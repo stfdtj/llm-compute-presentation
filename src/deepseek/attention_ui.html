@@ -1,0 +1,75 @@
+<!-- Attention comparison reuses the existing calculation panels and pinned config. -->
+<style>
+#attention-compare-launch{font-size:12px;white-space:nowrap;border-color:#9bb6dc}
+#attention-comparison{color:#080d59;width:min(1240px,94vw);max-width:94vw;max-height:92dvh;padding:0;border:1px solid #b9cce8;border-radius:12px;background:#fff;box-shadow:0 18px 70px #142d6240;font:13px/1.5 system-ui,'Microsoft YaHei',sans-serif}
+#attention-comparison::backdrop{background:#17264775}
+.ac-toolbar{position:sticky;top:0;z-index:2;background:#f4f8ff;border-bottom:1px solid #c8d9ef;padding:12px 18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.ac-toolbar strong{font-size:18px}.ac-toolbar button:last-child{margin-left:auto}.ac-toolbar select{font-size:12px;max-width:190px}.ac-purpose{margin:12px 18px;color:#415577;font-size:13px}.ac-scroll{overflow-x:auto;padding:0 18px 16px}.ac-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;min-width:960px}.ac-side-title{font-weight:700;font-size:18px;padding:8px 12px;background:#e3f3ff;border:1px solid #42a9ff;border-radius:6px}.ac-stage{padding:9px 12px;background:#f5faff;border:1px solid #badbfa;border-radius:6px;position:relative}.ac-stage h3{margin:0 0 5px;font-size:13px}.ac-stage p{margin:3px 0}.ac-stage code{font:12px/1.7 Consolas,monospace;white-space:nowrap;color:#183e71}.ac-branches{display:grid;grid-template-columns:1.1fr 1fr;gap:10px}.ac-serial{display:flex;flex-direction:column;align-items:stretch;text-align:center;gap:2px}.ac-op{display:block;border:1px solid #a6caed;border-radius:4px;background:#e3f3ff;padding:3px 5px;color:#080d59;font:12px/1.6 system-ui}.ac-op[data-ac-calc]{cursor:pointer}.ac-norm{background:#e2f7e9;border-color:#60c787}.ac-cache{background:#efe6ff;border:1px dashed #a66aff;border-radius:4px;padding:4px 7px}.ac-cross{background:#fff1f5;border-color:#df809a}.ac-global{background:#fff8e9;border-color:#efba36}.ac-flow{font-weight:600;text-align:center;color:#4770a7;line-height:12px}.ac-badge{display:inline-block;border-radius:3px;padding:2px 6px;background:#ffe7b7;color:#785419;font-size:11px;font-weight:700}.ac-skip{opacity:.55;text-decoration:line-through}.ac-mode-note{min-height:39px;color:#6f551d}.ac-handoff{grid-column:1/-1;background:#fff1f5;border:1px solid #df809a;border-radius:6px;text-align:center;padding:10px}.ac-legend{display:flex;gap:14px;margin:10px 18px;flex-wrap:wrap;font-size:11px}.ac-legend span{padding:2px 7px;border-radius:4px}.ac-proof{margin:0 18px 15px;color:#536782;font-size:12px}.ac-proof p{margin:6px 0}.ac-proof summary{cursor:pointer}.ac-mode-table{border-collapse:collapse;width:100%;margin-top:9px;font-size:12px}.ac-mode-table th,.ac-mode-table td{text-align:left;border-bottom:1px solid #dfe7f2;padding:6px}.ac-mode-table th{color:#080d59}.ac-selected-layer{font-weight:700}
+@media(max-width:780px){#attention-comparison{width:96vw;max-width:96vw}.ac-toolbar{padding:8px 10px}.ac-toolbar strong{font-size:14px}.ac-purpose{font-size:12px}.ac-scroll{padding:0 10px 12px}}
+</style>
+<dialog id="attention-comparison" aria-labelledby="ac-title">
+ <div class="ac-toolbar"><strong id="ac-title">Encoder ↔ Decoder · Attention 对照</strong><label>Encoder <select id="ac-encoder-layer" aria-label="对照 Encoder 层"></select></label><label>Decoder <select id="ac-decoder-layer" aria-label="对照 Decoder 层"></select></label><button id="ac-close">返回架构 ×</button></div>
+ <p class="ac-purpose">共同计算路径保持一致；橙色分支显示真正差异：Encoder 每两 token 压缩一条 Global KV；Decoder 从 Encoder 最终表示生成一 token 一条的共享 Global KV，后续层不重复投影历史。相同结构的 Q / Local KV / Output 使用各层自己的权重。</p>
+ <div class="ac-legend"><span style="background:#e3f3ff">普通计算</span><span style="background:#fff3d8">Global KV 生成 / 选择</span><span style="background:#efe6ff">缓存 · 虚线代表读取复用</span><span style="background:#ffe7ed">E · 跨模块输入</span><span>↓ 串行计算；左右支路并行汇入同一次 Attention</span></div>
+ <div class="ac-scroll"><div id="ac-grid" class="ac-grid"></div></div>
+ <details class="ac-proof"><summary>层模式总表、量化顺序与源码依据</summary>
+  <table class="ac-mode-table"><thead><tr><th>模式 / 层（从 0 计）</th><th>Global KV / Index Key</th><th>位置索引</th><th>本层 Q / Local KV / Attention / Output</th></tr></thead><tbody id="ac-mode-rows"></tbody></table>
+  <p>Full 的 Index Key 从未旋转的 Compressor latent 生成；Indexer Query 来自本层低秩 Q，经独立投影与 RoPE，Head Weights 来自本层 X。随后 Global latent 才做 RoPE → FP4 → 写缓存。Reindex 保留 KV / Index Keys，重算 Indexer Query、Head Weights、评分与 Top-K；Reuse 直接读取上游索引。L20 另建立分层候选池，后续 Reindex 受候选 mask 限制。</p>
+  <p>同一 latent 同时作为 K 与 V；RoPE 处理尾部 64 维。Local 写 FP8 环形缓存；Global 写 FP4 缓存。Attention 后逆 RoPE，输出按 8 组重排，FP8 量化 / 反量化后执行分组 W_OA，再执行 W_OB。图示为 B=1、当前一个 token、逻辑未分片维度；S 随历史增长，Top-512 为上限。ratio=2 未完成一组时不追加 Global 条目。</p>
+  <p>依据仓库 references/deepseek/inference/model.py 的 Block.forward、Attention.forward / _window_kv / _compress_kv / _compress_topk_idxs、Compressor.forward、Indexer.forward、SharedAttentionRuntime，以及 inference/config.json。固定 revision 5254448103b6254fc646dacbca1cbbf20e9216c1；本地源码与配置的 SHA256 已对照 manifest。配置含 43 个 ratio 条目，主干只使用前 40 个，后三项属于 MTP。</p>
+ </details>
+</dialog>
+<script>
+(()=>{
+ const c=__ATTENTION_CONFIG__,dialog=document.getElementById('attention-comparison'),grid=document.getElementById('ac-grid');
+ const chooseE=document.getElementById('ac-encoder-layer'),chooseD=document.getElementById('ac-decoder-layer');
+ const mode=n=>n<2?'SWA':c.kv_source_layers.includes(n)?'Full':c.index_source_layers.includes(n)?'Reindex':'Reuse';
+ const latest=(xs,n)=>xs.filter(x=>x<=n).at(-1);
+ for(let n=0;n<c.n_layers;n++){const o=new Option(`L${n} · ${mode(n)}`,n);(n<20?chooseE:chooseD).add(o);}
+ chooseE.value='2';chooseD.value='20';
+ const op=(text,key='',extra='')=>`<${key?'button':'div'} class="ac-op ${extra}" ${key?`data-ac-calc="${key}"`:''}>${text}</${key?'button':'div'}>`;
+ const arrow='<div class="ac-flow" aria-hidden="true">↓</div>';
+ const serial=items=>'<div class="ac-serial">'+items.join(arrow)+'</div>';
+ const stage=(title,content,cls='')=>`<section class="ac-stage ${cls}"><h3>${title}</h3>${content}</section>`;
+ const dims=`[1,${c.dim}]`,qd=c.n_heads*c.head_dim,gi=qd/c.o_groups,gr=c.o_groups*c.o_lora_rank;
+ function source(n){return stage('① Input Hidden State',n===0?`当前 token: Token Embedding → 4 路初始状态 → HC Pre / RMSNorm → X₀ ${dims}`:n===20?`<span class="ac-badge">E · Encoder Final H₁₉ [1,4,${c.dim}]</span> → L20 HC Pre / RMSNorm → X₂₀ ${dims}`:`H${n-1} [1,4,${c.dim}]（上一完整层的输出） → 本层 HC Pre / RMSNorm → X${n} ${dims}`,n===20?'ac-cross':'');}
+ function branches(n){return `<div class="ac-branches">${stage('② Query Projection · 每层重算',serial([
+  op(`X${n} ${dims} × W_Q(L) [${c.dim},${c.q_lora_rank}]<br>= [1,${c.q_lora_rank}]`,'qa'),
+  op(`RMSNorm → qᵣ [1,${c.q_lora_rank}]`,'qnorm','ac-norm'),
+  op(`qᵣ × W_Q(R) [${c.q_lora_rank},${qd}]<br>= [1,${qd}] → [1,${c.n_heads},${c.head_dim}]`,'qb'),
+  op(`RoPE · 尾 ${c.rope_head_dim} 维 → Q`,'rope')]))}
+  ${stage('③ Local KV Projection · 每层重算',serial([
+   op(`X${n} ${dims} × W_KV(local)<br>[${c.dim},${c.head_dim}] = [1,${c.head_dim}]`,'kv'),
+   op('RMSNorm','kvnorm','ac-norm'),op(`RoPE · 尾 ${c.rope_head_dim} 维 → FP8`,'rope'),
+   `<div class="ac-cache">写入本层 Local KV Cache<br>环形窗口 ≤ ${c.window_size} × ${c.head_dim}<br>历史 + 当前 token；K = V</div>`]))}</div>`;}
+ function global(n){const m=mode(n),src=latest(c.kv_source_layers,n),idx=latest(c.index_source_layers,n),ratio=c.compress_ratios[n];
+  if(m==='SWA')return stage('④ Global KV · L0–1 不启用',`<span class="ac-badge">SWA ONLY</span><p>不生成或读取 Global KV，不运行 Indexer。</p><p>Q 与 Local KV 仍进入下方 Attention。</p>`,'ac-global');
+  let text=m==='Full'?serial([
+   op(`X${n} × W_KV(global) [${c.dim},${c.head_dim}] → [1,${c.head_dim}]`+(ratio===2?`<br>同时：X${n} × W_gate [${c.dim},${c.head_dim}] → 每特征权重`:''),'compressor'),
+   ratio===2?op(`每特征 Softmax 权重 × KV → 2 个 token 加权池化<br>完整组才产生一条 latent`,'compressor'):op('ratio = 1 · 不运行 W_gate，不执行池化'),
+   op('RMSNorm → latent（尚未 RoPE）','compressor','ac-norm'),
+   `<div class="ac-cache">latent → Index Key 投影 / Norm / RoPE / FP4 → 写 Index Key Cache</div>`]):
+   `<div class="ac-cache">⇢ 读取 L${src} Global KV Cache [S,${c.head_dim}] + Index Key Cache<br>本层不运行 Global W_KV / gate / pooling / Norm / RoPE，不追加 Global KV</div>`;
+  text+=`<p class="ac-mode-note"><span class="ac-badge">${m} · L${n}</span> `+(m==='Reuse'?`⇢ 读取 L${idx} 的 Top-K 位置索引；跳过 Indexer。`:`本层 qᵣ → Indexer Query；X${n} → Head Weights → 对共享 Index Keys 评分 / mask → Top-${c.index_topk}。`)+`</p>`;
+  if(m==='Full')text+=`<div class="ac-cache">Indexer 后：原 latent → 尾 ${c.rope_head_dim} 维 RoPE → FP4<br>写 Global KV Cache [S,${c.head_dim}]</div>`;
+  text+=`<div class="ac-flow">↓ 按位置索引读取 Global KV，最多 ${c.index_topk} 条；K = V</div>`;
+  return stage('④ Global KV Generation / Reuse · 唯一不同的分支',text,'ac-global');
+ }
+ function attention(n){return stage('⑤ Attention · 两路 KV 同时参与',`<div class="ac-flow">Q ↓　　Local KV Cache ↓　　${n<2?'无 Global 分支':'Global KV Cache ⇢'}</div>`+op(`Local 位置索引${n<2?'':' + Global Top-K 索引'}<br>同一次 sparse_attn：Scores → Softmax（含 sink）→ KV 加权汇总<br>O [1,${c.n_heads},${c.head_dim}]`,'multi')+`<p>${n<2?'此层仅 Local SWA。':'Local 与 Global 共同归一化，既非串行 Attention，也非二选一。'}</p>`);}
+ function output(){return stage('⑥ Output Projection · 两侧完全相同',serial([
+  op(`Inverse RoPE · O 的尾 ${c.rope_head_dim} 维`,'rope'),
+  op(`Reshape [1,${c.o_groups},${gi}] → FP8 量化 / 反量化<br>${c.o_groups} 组独立 W_OA：[1,${gi}] × [${gi},${c.o_lora_rank}] = [1,${c.o_lora_rank}]`,'output'),
+  op(`Flatten [1,${gr}] × W_OB [${gr},${c.dim}] = U ${dims}`,'output') ]));}
+ function finish(n){return stage('⑦ Output Hidden State',`U ${dims} → HC 更新四路残差 → FFN Norm / MoE / HC → H${n} [1,4,${c.dim}]<br>`+(n===19?'输出 E，交给 L20（Decoder 首层）。':n===39?'交给最终 HC Pre / RMSNorm → LM Head。':`交给 L${n+1}。`));}
+ function render(){const e=Number(chooseE.value),d=Number(chooseD.value);let html=`<div class="ac-side-title">Encoder · L${e} · ${mode(e)}</div><div class="ac-side-title">Decoder · L${d} · ${mode(d)}</div>`;
+  for(const f of [source,branches,global,attention,output,finish])html+=f(e)+f(d);
+  html+=`<div class="ac-handoff"><strong>E · 跨模块连接</strong><br>Encoder L0…19 → E = H₁₉ [1,4,${c.dim}] → Decoder L20 HC Pre / RMSNorm → X₂₀ ${dims}<br>X₂₀ 分别生成 Q、Local KV 和 Global KV；L21–39 使用各自 Xℓ 生成 Q / Local KV，读取 L20 的 Global KV。</div>`;grid.innerHTML=html;
+ }
+ const groups=[['SWA · 0,1','无 Global 分支','无'],['Full · '+c.kv_source_layers.join(','),'生成并写缓存','本层 Indexer 重新选择'],['Reindex · '+c.index_source_layers.filter(n=>!c.kv_source_layers.includes(n)).join(','),'读取 L20 缓存','本层 Indexer 重新选择'],['Reuse · 其余 L2–39','读取最近 Full 层缓存','读取最近 Index source 层索引']];
+ document.getElementById('ac-mode-rows').innerHTML=groups.map(g=>'<tr>'+g.map(t=>'<td>'+t+'</td>').join('')+'<td>全部执行</td></tr>').join('');
+ const button=document.createElement('button');button.id='attention-compare-launch';button.textContent='Attention 对照';document.querySelector('.tools').prepend(button);
+ button.addEventListener('click',()=>{closePanel();render();dialog.showModal();dialog.scrollTop=0;});document.getElementById('ac-close').addEventListener('click',()=>dialog.close());
+ chooseE.addEventListener('change',render);chooseD.addEventListener('change',render);
+ grid.addEventListener('click',e=>{const b=e.target.closest('[data-ac-calc]');if(b){e.stopPropagation();dialog.close();openPanel(b.dataset.acCalc,null);}});
+ window.attentionComparison={get state(){return{open:dialog.open,encoder:Number(chooseE.value),decoder:Number(chooseD.value)}},show:()=>button.click()};
+})();
+</script>

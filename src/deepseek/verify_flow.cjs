@@ -6,7 +6,7 @@ const browser=await chromium.launch(require('./browser_options.cjs')());
 const context=await browser.newContext({viewport:{width:1920,height:1080},offline:true});
 const page=await context.newPage(),errors=[],requests=[];
 page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
-await page.goto('file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.html').replaceAll('\\','/'));
+await page.goto('file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.html').replaceAll('\\','/')+'#architecture');
 await page.evaluate(()=>document.fonts.ready);
 const data=await page.locator('#module-data').textContent();
 const geometry=()=>page.locator('#diagram-content').evaluate(n=>[...n.querySelectorAll('rect,path')].map(e=>[e.tagName,...['x','y','width','height','d','fill','stroke'].map(k=>e.getAttribute(k))]));

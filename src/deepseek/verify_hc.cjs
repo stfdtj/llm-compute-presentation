@@ -5,7 +5,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  try{
  const context=await browser.newContext({viewport:{width:1920,height:1080},offline:true}),page=await context.newPage(),errors=[],requests=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
- await page.goto('file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.html').replaceAll('\\','/'));await page.evaluate(()=>document.fonts.ready);
+ await page.goto('file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.html').replaceAll('\\','/')+'#architecture');await page.evaluate(()=>document.fonts.ready);
  const canonical=await page.locator('#derivation-data').textContent();
  const overview=page.locator('#hc-overview');
  const inputs=await overview.locator('.module[data-module="streams"]').allTextContents();

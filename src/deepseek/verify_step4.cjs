@@ -6,7 +6,7 @@ const assert=require('assert/strict'),fs=require('fs'),path=require('path'),cryp
  const browser=await chromium.launch(require('./browser_options.cjs')());
  const context=await browser.newContext({offline:true}),page=await context.newPage(),errors=[],requests=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
- await page.goto('file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.html').replaceAll('\\','/'));
+ await page.goto('file:///'+path.resolve(__dirname,'../../deepseek_v4_1_interactive.html').replaceAll('\\','/')+'#architecture');
  const data=await page.locator('#module-data').textContent();
  const geometry=()=>page.locator('#diagram-content').evaluate(n=>n.innerHTML);
  // Compare physical geometry, since normal highlighting temporarily adds classes/styles.
