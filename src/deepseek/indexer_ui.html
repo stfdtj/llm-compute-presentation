@@ -1,0 +1,97 @@
+<!-- Indexer presentation extension; DATA remains the sole calculation source. -->
+<style>
+.indexer-module{cursor:pointer;outline:none}.indexer-module text{pointer-events:none}
+.indexer-module:hover>.surface,.indexer-module:focus-visible>.surface,.indexer-module.selected>.surface{stroke:#245dc3;stroke-width:2;filter:drop-shadow(0 1px 2px #1c479a24)}
+.indexer-muted{opacity:.18}.indexer-hidden{display:none}
+.indexer-on #diagram-content,.indexer-on #indexer-entry-links,.flow-on #indexer-entry-links{display:none}
+#indexer-bar[hidden]{display:none!important}#indexer-bar{position:absolute;z-index:4;top:66px;left:10px;right:10px;background:#fff;border:1px solid #dae3f1;border-radius:0 0 7px 7px;padding:9px 12px;box-shadow:0 3px 10px #1e407008;font-size:12px}
+.indexer-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.indexer-controls strong{font-size:15px;color:#080d59}.indexer-controls label{margin-left:7px}.indexer-controls button{font-size:12px;padding:4px 9px}.indexer-controls button[aria-pressed=true]{background:#fff3d8;border-color:#efba36;color:#725519}.indexer-controls select{max-width:180px}.indexer-controls #indexer-close{margin-left:auto}
+#indexer-mode-note{margin:7px 0 0;color:#455875;line-height:1.5}#indexer-boundary{margin-top:5px;color:#64738b}#indexer-boundary summary{cursor:pointer}#indexer-boundary p{max-width:1100px;margin:5px 0}
+.indexer-on #stage{top:var(--indexer-stage-top,165px)}.indexer-context{font-size:12px;color:#66511f;background:#fff9e9;border:1px solid #ead69c;border-radius:6px;padding:8px 10px;margin-bottom:10px;line-height:1.65}.indexer-launch{font-size:12px;margin:0 0 10px}
+#indexer-boundary[open]{max-height:min(180px,22vh);overflow:auto}
+@media(max-width:780px){#indexer-bar{top:116px;padding:7px 9px}.indexer-controls{gap:4px}.indexer-controls strong{font-size:13px}.indexer-controls label{margin-left:0}.indexer-controls button{font-size:11px;padding:4px 6px}#indexer-mode-note{font-size:11px}.indexer-on #stage{touch-action:none}}
+</style>
+<template id="indexer-svg-template"><svg xmlns="http://www.w3.org/2000/svg">__INDEXER_SVG__</svg></template>
+<section id="indexer-bar" hidden aria-label="Indexer 演示控制">
+ <div class="indexer-controls"><strong>Indexer Detail</strong><button data-indexer-mode="Full" aria-pressed="true">Full</button><button data-indexer-mode="Reindex" aria-pressed="false">Reindex</button><button data-indexer-mode="Reuse" aria-pressed="false">Reuse</button><label>查看层 <select id="indexer-layer" aria-label="Indexer 所在层"></select></label><button id="indexer-calculate">Indexer 计算面板</button><button id="indexer-close">返回架构 ×</button></div>
+ <p id="indexer-mode-note" aria-live="polite"></p>
+ <details id="indexer-boundary"><summary>评分范围、缓存与计算口径</summary><p>S 是已缓存的全局条目数，C 是实际参与评分的行数，Top-K 512 只是选取上限。参考 inference/model.py 先对可用 Index Key 缓存计算分数，再进行因果 / 候选掩码；不能把 Top-K 数或候选池上限直接代入该实现的评分工作量。</p><p>Layer 20 同时建立分层候选池（最多 2048 × 8 = 16384 个位置）；后续 Reindex 在候选范围内选择。报告中的候选域评分优化与参考代码的先评分、后掩码应区分。Indexer 与 Main Attention 各有自己的 Query；Head Weights 来自当前 X 的可学习投影，并非固定常量或 MoE 路由权重。</p><p>计算面板直接使用现有 module-data.indexer，沿用其历史长度与源层条件；切换流程模式不重新估算 FLOPs。完整反向结果仍保持已有的 Unverified 状态。只有 Full 层在新压缩条目完成时追加 Index Key，ratio=2 的未完成组不会新增条目。</p></details>
+</section>
+<script>
+(()=>{
+ const config=__INDEXER_CONFIG__;
+ const template=document.getElementById('indexer-svg-template');
+ for(const child of [...template.content.querySelector('svg').children])svg.append(child.cloneNode(true));
+ template.remove();
+ const detail=document.getElementById('indexer-detail'),entries=document.getElementById('indexer-entry-links'),bar=document.getElementById('indexer-bar'),chooser=document.getElementById('indexer-layer'),region=document.getElementById('region-select');
+ const option=document.createElement('option');option.value='indexer';option.textContent='E · Indexer Detail';region.append(option);regions.indexer=[15,20,1642,850];
+ let active=false,layer=20,savedView=null,savedRegion='all';
+ const modeFor=n=>config.kv_source_layers.includes(n)?'Full':config.index_source_layers.includes(n)?'Reindex':'Reuse';
+ const latest=(values,n)=>values.filter(x=>x<=n).at(-1);
+ for(let n=2;n<config.n_layers;n++){const o=document.createElement('option');o.value=n;o.textContent=`Layer ${n} · ${modeFor(n)}`;chooser.append(o);}
+ const description=()=>{const kind=modeFor(layer),source=latest(config.kv_source_layers,layer),indexSource=latest(config.index_source_layers,layer);return `Layer ${layer} · ${kind} · `+({Full:'生成 Global KV；有新条目时追加 Index Key；运行 Indexer。',Reindex:`复用 Layer ${source} 的 Global KV / Index Keys；用本层 Index Query 与 Head Weights 重新评分。`,Reuse:`复用 Layer ${source} 的 Global KV 与 Layer ${indexSource} 的位置索引；跳过 Indexer，仍执行本层 Main Attention。`}[kind]);};
+ function fitBar(){if(active)document.documentElement.style.setProperty('--indexer-stage-top',(bar.getBoundingClientRect().bottom+9)+'px');}
+ function render(){
+  const kind=modeFor(layer);chooser.value=layer;
+  for(const b of bar.querySelectorAll('[data-indexer-mode]'))b.setAttribute('aria-pressed',String(b.dataset.indexerMode===kind));
+  document.getElementById('indexer-mode-note').textContent=description();
+  for(const el of detail.querySelectorAll('[data-indexer-node],[data-indexer-edge]')){
+   const name=el.dataset.indexerNode||el.dataset.indexerEdge;
+   el.classList.toggle('indexer-hidden',name==='cachedindices'||name==='reusedtopk'?kind!=='Reuse':name==='weights'||name==='topk'?kind==='Reuse':false);
+   const skipped=(['compressor','key','globalwrite'].includes(name)&&kind!=='Full')||(['query','keycache','score','aggregate'].includes(name)&&kind==='Reuse');
+   el.classList.toggle('indexer-muted',skipped);el.dataset.execution=skipped?'reused-or-skipped':'active';
+  }
+  fitBar();
+ }
+ function show(n=20,calculate=false){
+  if(window.informationFlow?.state.enabled)document.getElementById('flow-toggle').click();
+  if(!active){savedView={...view};savedRegion=region.value==='indexer'?'all':region.value;}
+  active=true;layer=Number(n);closePanel();detail.style.display='';bar.hidden=false;document.body.classList.add('indexer-on');
+  entries.querySelectorAll('[data-indexer-entry]').forEach(e=>e.setAttribute('aria-expanded','true'));
+  region.value='indexer';view={x:0,y:0,w:1672,h:900};paint();render();fitLabels();
+  if(calculate)openPanel('indexer',detail.querySelector('[data-indexer-node="score"] .indexer-module'));
+ }
+ function hide(restore=true,preserveSelection=false){
+  if(!active)return;if(!preserveSelection)closePanel();active=false;detail.style.display='none';bar.hidden=true;document.body.classList.remove('indexer-on');document.getElementById('indexer-boundary').open=false;
+  entries.querySelectorAll('[data-indexer-entry]').forEach(e=>e.setAttribute('aria-expanded','false'));
+  if(restore&&savedView){view={...savedView};region.value=savedRegion;paint();}
+  layer=20;render();
+ }
+ const oldOpen=openPanel;openPanel=function(...args){svg.querySelectorAll('.indexer-module.selected').forEach(n=>n.classList.remove('selected'));return oldOpen(...args);};
+ const oldClose=closePanel;closePanel=function(...args){svg.querySelectorAll('.indexer-module.selected').forEach(n=>n.classList.remove('selected'));return oldClose(...args);};
+ const oldDraw=drawPanel;drawPanel=function(...args){
+  oldDraw(...args);
+  // The existing panel shortcut enters Data Flow directly, without the toolbar toggle.
+  // Keep its selection until its own handler chooses the correct demonstration step.
+  const flowEntry=body.querySelector('.flow-entry');if(active&&flowEntry)flowEntry.addEventListener('click',()=>hide(true,true),true);
+  if(selected==='indexer'){
+   // The existing indexer.related "selection" points to the unrelated MoE Top-6.
+   // Correct navigation at the presentation boundary without mutating audited DATA.
+   const related=body.querySelector('.related');if(related){related.replaceChildren();for(const id of ['compressor','global','multi']){const b=document.createElement('button');b.dataset.related=id;b.textContent=DATA[id].title.split(' / ')[0];related.append(b);}}
+   const note=document.createElement('div');note.className='indexer-context';note.textContent=(active?description()+' ':'')+'以下数值沿用现有 Indexer 的源层与历史长度条件，不代表所选模式的新 FLOPs；Top-K 输出位置编号，Gather 读取已有 KV。';body.prepend(note);
+  }
+  if(['indexer','compressor','global','sparse','multi','encoderattn','decoderattn'].includes(selected)){
+   const b=document.createElement('button');b.className='indexer-launch';b.textContent=active?'定位 Indexer 完整流程 →':'展开 Indexer 完整流程 →';b.addEventListener('click',()=>show(active?layer:20));body.prepend(b);
+  }
+ };
+ function activateNode(e){
+  if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;
+  const m=e.target.closest('.indexer-module');if(!m)return;
+  e.preventDefault();e.stopPropagation();if(dragged){dragged=false;return;}
+  const entry=m.closest('[data-indexer-entry]');if(entry)show(Number(entry.dataset.indexerLayer),true);else openPanel(m.dataset.module,m);
+ }
+ for(const root of [entries,detail]){root.addEventListener('click',activateNode);root.addEventListener('keydown',activateNode);}
+ chooser.addEventListener('change',()=>{layer=Number(chooser.value);closePanel();render();});
+ for(const b of bar.querySelectorAll('[data-indexer-mode]'))b.addEventListener('click',()=>{layer={Full:20,Reindex:24,Reuse:21}[b.dataset.indexerMode];closePanel();render();});
+ document.getElementById('indexer-close').addEventListener('click',()=>hide());
+ document.getElementById('indexer-calculate').addEventListener('click',e=>{e.stopPropagation();openPanel('indexer',e.currentTarget);});
+ region.addEventListener('change',e=>{if(e.target.value==='indexer')show();else hide(false);},true);
+ document.getElementById('reset').addEventListener('click',()=>hide(false),true);
+ document.getElementById('flow-toggle').addEventListener('click',()=>hide(),true);
+ document.addEventListener('keydown',e=>{if(e.key==='0'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))hide(false);if(e.key==='Escape'&&active&&panel.getAttribute('aria-hidden')==='true')hide();},true);
+ svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.indexer-module')){hide();e.stopImmediatePropagation();}},true);
+ document.getElementById('indexer-boundary').addEventListener('toggle',fitBar);new ResizeObserver(fitBar).observe(bar);window.addEventListener('resize',fitBar);
+ render();fitLabels();
+ window.indexerTeaching={get state(){return{active,layer,mode:modeFor(layer),kvSource:latest(config.kv_source_layers,layer),indexSource:latest(config.index_source_layers,layer)}},config};
+})();
+</script>

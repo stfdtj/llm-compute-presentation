@@ -14,13 +14,14 @@ Shared KV 投影：每层 2,621,440 个参数，当前 token 前向 5,242,880 FL
 
 去重后的逻辑权重：Text Backbone 551,566,180,464；Engram 196,928,504,320；Draft 14,225,362,530；Vision 与对齐 485,268,480；合计 763,205,315,794。原 748,494,684,784 仅为 Text + Engram。固定历史长度下，文本与 Engram 当前一步估算为 35,584,521,265 次操作，与旧数值独立核对一致；修正其“全模型”统计边界，不含 Vision / Draft 执行，不代表实测 GPU 指令数或延迟。反向内容是局部数学推导，完整未确认部分标为 Unverified。
 
-原图的图形、位置、颜色、箭头和分组保持不变，只更新了相关文字和维度标签。没有新增架构模块。
+原图的图形、位置、颜色、箭头和分组保持不变。Encoder / Decoder Attention Detail 底部新增 Indexer 入口，可展开独立的流程细节区域。
 
 ## 可编辑源文件
 
 - `teaching_data.py`：当前使用的 63 个教学条目，含三种模式与 Compressor 示例。
 - `module_data.json`：自动导出的可读数据，公式保留 LaTeX。
 - `build_diagram.py`：SVG 几何与标签。
+- `indexer_diagram.py`、`indexer_ui.html`：Indexer 流程、跨层复用与计算面板入口；配置来自 `references/deepseek/config.json`，计算复用原 `module-data`。
 - `page_template.html`：页面布局、面板样式与交互。
 - `flow_ui.html`：独立信息流开关、五步演示、SVG 路径叠加、缓存写入示例及说明；构建时内嵌到原 HTML。
 - `audit_model.py`：直接按固定官方配置和源码构造建立参数总账与独立操作计数；不读取旧 HTML 或旧 FLOPs 报告。
@@ -56,6 +57,22 @@ Shared KV 投影：每层 2,621,440 个参数，当前 token 前向 5,242,880 FL
 复跑：`python src/deepseek/audit_model.py`、`python src/deepseek/build.py`、`python src/deepseek/verify_audit.py`、`python src/deepseek/verify_single_token.py`。梯度检查需 NumPy，请使用根目录 requirements.txt 安装的 NumPy；浏览器检查运行 `node src/deepseek/verify_browser.cjs`、`node src/deepseek/verify_parameters.cjs` 和 `node src/deepseek/verify_flow.cjs`。运行 HTML 本身不需要这些构建与验证工具。
 
 ## 信息流演示
+
+### Indexer 全局位置选择
+
+点击 Encoder / Decoder Attention Detail 底部橙色的 `Indexer → Top-512 → Global KV ↗`，展开流程并打开现有 Indexer 计算面板。也可以从右上角聚焦菜单选择 `E · Indexer Detail`。点击空白关闭计算面板，保留流程；“返回架构”恢复进入前的视角。
+
+Presentation 建议先选 Full（Layer 20），沿 Query / Key → Scoring + ReLU → Head Aggregation → Top-K → Global KV Gather → Main Attention 讲解，再切换 Reindex（Layer 24）与 Reuse（Layer 21）。淡化的节点表示该层跳过的计算；层选择器可检查 2–39 层的真实配置。0–1 层只有局部 SWA，不运行 Indexer。所有层仍执行自己的主要 Attention。
+
+Query 来自当前层归一化后的 1280 维低秩表示，投影为 32 × 128；Index Key 来自 Compressor 的 512 维 RoPE 前 latent，仅在源层完成新条目时投影、追加缓存。Head Weights 来自当前 X 的可学习投影。Top-K 输出整数位置，Gather 读取已有 Global KV；与最多 128 个 Local KV 位置一起供 Main Attention 使用，Main Query 与 Index Query 相互独立。
+
+KV source layers 为 `[2,8,14,20]`，Index source layers 为 `[2,8,14,20,24,28,32,36]`。Reindex 复用 Global KV 和 Index Keys，重新评分；Reuse 连同已有位置索引一起复用。依据 `references/deepseek/inference/model.py` 的 `Indexer.forward`、`Attention.forward` 与 `SharedAttentionRuntime`。
+
+“评分范围、缓存与计算口径”展开项说明实际评分行数 C、先评分后掩码的参考实现与候选域优化的区别。Top-K 512 不是评分长度。各节点直接调用已有计算记录；切换流程模式不会生成一套新 FLOPs。反向面板继续保留已有 Unverified 状态。Indexer 面板的相关链接指向 Compressor、Global KV 和 Main Attention，避免误连 MoE Top-6；原计算数据不变。
+
+运行 `node src/deepseek/verify_indexer.cjs`，检查真实点击、全部 38 个适用层、三种计算模式、缓存复用、键盘与空白关闭、缩放平移、信息流切换、四种窗口及计算数据 / 原图保留。结果为 `qa/indexer_validation.json`，截图为 `qa/indexer_*.png`。
+
+### 原有五步信息流
 
 在原页面打开“信息流 / Data Flow”，使用上一步、下一步和重新播放。蓝色表示 Hidden State 主干，橙色表示共享 KV，绿色表示 Local KV，紫色表示 Attention 汇总。箭头可悬停查看来源与用途；第 3 步可以逐行写入缓存示例，第 4 步可分别追踪 Q / Global / Local。点击 Global KV 可定位第 2 步，说明面板可返回原计算说明。关闭开关恢复进入演示前的视角。
 
