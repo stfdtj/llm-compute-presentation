@@ -3,7 +3,11 @@ from html import escape
 
 S=[]
 INK='#080d59'
-COLORS={'blue':('#e3f3ff','#42a9ff'),'green':('#e2f7e9','#60c787'),'purple':('#efe6ff','#a66aff'),'orange':('#fff3d8','#efba36'),'pink':('#ffe7ed','#ff476f'),'white':('#ffffff','#88bfff')}
+COLORS={'blue':('#e3f3ff','#42a9ff'),'green':('#e2f7e9','#60c787'),'purple':('#efe6ff','#a66aff'),'orange':('#fff3d8','#efba36'),'pink':('#ffe7ed','#ff476f'),'white':('#ffffff','#88bfff'),
+    # drawio-faithful lane colors for the 43-layer backbone (deepseek_v41_43_layer_mainline_en.drawio legend).
+    'backbone':('#E7F0FE','#3678C8'),'hcmix':('#FFF0D8','#D9A144'),'localkv':('#E3F7F0','#168863'),
+    'sharedkv':('#E7EDFF','#5C67C9'),'indexkv':('#FFEAF2','#D15C88'),'engramlane':('#F0E9FF','#7F54BA'),
+    'draftlane':('#EAF8FF','#3282AB'),'moelane':('#FFF1E1','#B9783C')}
 
 def raw(t): S.append(t)
 def text(x,y,lines,size=14,bold=False,anchor='middle',fill=INK,leading=None,italic=False,maxwidth=None):

@@ -150,6 +150,6 @@ def build_detail():
 
     d.text(40, ey + eh + 26, '虚线：仅用于匹配/地址计算的辅助数据；实线：Hidden State 或记忆内容的主数据路径。所有节点关联已有计算面板（Parameter / Forward / Backward），不新增另一套 FLOPs。', 14, anchor='start', fill='#6b7790')
     d.raw('</g>')
-    markup = ''.join(d.S[offset:])
+    markup = ''.join(d.S[offset:]).replace('class="module"', 'class="engram-module"')
     del d.S[offset:]
     return markup

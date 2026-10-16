@@ -4,6 +4,16 @@
 
 默认进入“总体架构 / 数据流 / 局部计算 / 实现与证据”四个工作区。局部计算采用 Level 1 概览、Level 2 逻辑步骤、Level 3 原审计账本；Forward A 与 Backward B 分别注明口径。旧完整图可通过 `deepseek_v4_1_interactive.html#architecture` 打开，原 DSpark 总览通过 `#dspark` 打开；在旧图点“返回学习主线”即可返回。
 
+## 43 层主干图与 CSA2 详解（drawio 对齐重构）
+
+参考 `docs/architecture/deepseek_v41_43_layer_mainline_en.drawio`（已解析为 XML，不是截图）重建的两个新模块：
+
+- `backbone43_diagram.py` / `backbone43_ui.html`：竖排 43 层（Encoder 0–19 + Decoder 20–39 + Draft 40–42）交互式主干图，内容/配色/分层详略与 drawio 一致（重要层 L0/L1/L2/L3/L8/L14/L19→20 边界/L20/L21/L24/L28/L32/L36/L37–39 展开，其余层保持单行）。Region 下拉新增 `I · 43-Layer Backbone`；顶部“跳转 Jump to”下拉用构建期算出的精确像素偏移滚动定位，不是估算比例。点击节点复用既有计算面板；点击 Draft 步骤打开 DSpark 对话框。
+- `csa2_diagram.py` / `csa2_ui.html`：CSA2（Compressed Sparse Attention 2）单层数据流图——Query / Local KV / Compressed Global KV 三条独立分支汇入一次共享归一化的 Sparse Attention，Full / Reindex / Reuse 切换只影响 Branch C。Region 下拉新增 `F · CSA2 Detail`；提供"打开 Indexer / Compressor 完整流程"直达按钮，不重画已有的层级化 Indexer 图。
+- 学习工作区新增第 2 个标签页"CSA2 详解"（`learning_ui.html`）：直觉类比（Local KV / Compressed KV / Indexer / Attention 各自角色）→ Full/Reindex/Reuse 对比卡片 → 按 `config.json` 的 `kv_source_layers`/`index_source_layers` 核实过的层级一览表 → Encoder 2:1 / Decoder 1:1 的 1024-token 压缩例子 → 候选块与 Top-k 区别（纠正"L21–23 会重跑候选块过滤"的常见误解）→ L2→L3→L8→L14→L20→L21→L24→L25 互动走查（含 Global KV / Index Key / Top-k / 候选块 / Local KV / Query 六项共享状态面板）→ CSA2 与 CED（技术报告描述）的区分说明。
+- 新增诊断修复：`engram_diagram.py`/`encoder_diagram.py`/`decoder_diagram.py`/`backbone43_diagram.py`/`csa2_diagram.py` 现在把返回标记里的 `class="module"` 改写为各自专属的类名（如 `indexer_diagram.py`/`dspark_diagram.py` 早已采用的模式），避免与主图或其它细节图里同名 `data-module` 键的元素在 DOM 里产生重复匹配（Playwright strict-mode 曾因此在 `embedding` 键上失败）；对应 `*_ui.html` 改为显式路由点击到 `openPanel`，并各自包一层 `openPanel`/`closePanel` 以清除自己class的 `selected` 高亮。
+- 原 43 层.drawio 文件按 XML 解析提取，不是截图；核对要点：`kv_source_layers=[2,8,14,20]`、`index_source_layers=[2,8,14,20,24,28,32,36]`、`candidate_source_layer=20`，均与 `config.json` 一致。
+
 ## Engram / Encoder / Decoder 独立展开图（可读性重设计）
 
 `#architecture` 旧图的 Region 下拉新增三项：`D · Engram Detail`、`G · Encoder Detail`、`H · Decoder Detail`，各自占满整屏，不再挤进原 1672×941 画布。三者都复用既有 `DATA` 键（如 `ngram`/`hash`/`engembed`/`enggate`/`injection`、`encoderattn`/`sliding`/`sparse`、`decoderattn`/`multi`/`compressor`/`indexer`），点击节点打开的仍是原计算面板，不新增第二套 FLOPs。入口：Engram 小框下的“展开 Engram 完整流程”、Attention 对照弹窗的“展开 Encoder/Decoder 完整 Block 流程”按钮，或直接从 Region 下拉选择。

@@ -1,5 +1,6 @@
 <style>
 .decoder-hidden{display:none}
+.decoder-module{cursor:pointer;outline:none}.decoder-module text{pointer-events:none}.decoder-module:hover>.surface,.decoder-module:focus-visible>.surface{stroke:#245dc3;stroke-width:1.8;filter:drop-shadow(0 1px 2px #1c479a24)}.decoder-module.selected>.surface{stroke:#1d57c7;stroke-width:2.5;filter:drop-shadow(0 0 3px #386bd945)}
 .decoder-on #diagram-content,.decoder-on #indexer-entry-links{display:none}.decoder-on #stage{top:var(--decoder-stage-top,165px)}
 #decoder-bar[hidden]{display:none!important}#decoder-bar{position:absolute;z-index:4;top:66px;left:10px;right:10px;background:#fff;border:1px solid #e3d8f7;border-radius:0 0 7px 7px;padding:9px 12px;box-shadow:0 3px 10px #1e407008;font-size:12px}
 .decoder-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.decoder-controls strong{font-size:15px;color:#4a1f8f}.decoder-controls label{margin-left:7px}.decoder-controls button{font-size:12px;padding:4px 9px}.decoder-controls button[aria-pressed=true]{background:#efe6ff;border-color:#a66aff;color:#4a1f8f}.decoder-controls select{max-width:150px}.decoder-controls #decoder-close{margin-left:auto}
@@ -24,6 +25,8 @@
  const detail=document.getElementById('decoder-detail'),bar=document.getElementById('decoder-bar'),chooser=document.getElementById('decoder-layer'),region=document.getElementById('region-select');
  const option=document.createElement('option');option.value='decoder';option.textContent='H · Decoder Detail';region.append(option);regions.decoder=[15,12,1642,1040];
  let active=false,layer=20,savedView=null,savedRegion='all';
+ const oldOpen=openPanel;openPanel=function(...args){svg.querySelectorAll('.decoder-module.selected').forEach(n=>n.classList.remove('selected'));return oldOpen(...args);};
+ const oldClose=closePanel;closePanel=function(...args){svg.querySelectorAll('.decoder-module.selected').forEach(n=>n.classList.remove('selected'));return oldClose(...args);};
  const modeFor=n=>KV_SOURCE.includes(n)?'full':REINDEX.includes(n)?'reindex':'reuse';
  for(let n=20;n<40;n++){const o=document.createElement('option');o.value=n;o.textContent=`Layer ${n} · ${{full:'Full',reindex:'Reindex',reuse:'Reuse'}[modeFor(n)]}`;chooser.append(o);}
  const note=()=>({full:'Layer 20：唯一新建压缩 KV 的 Decoder 层；同时新建候选池并运行 Indexer 选出初始 Top-K。',reindex:`Layer ${layer}：不新建 KV，直接复用 Layer 20 的压缩 KV；用本层新 Query 在候选池内重新打分选 Top-K。`,reuse:`Layer ${layer}：既不新建 KV 也不重新打分，直接复用最近一次选出的压缩 KV 与索引；本层仍独立算自己的 Local KV。`}[modeFor(layer)]);
@@ -55,10 +58,17 @@
   const flowEntry=body.querySelector('.flow-entry');if(active&&flowEntry)flowEntry.addEventListener('click',()=>hide(true,true),true);
  };
  function pick(e){
-  const g=e.target.closest('[data-decoder-layer]');if(!g)return;
-  layer=Number(g.dataset.decoderLayer);render();
+  const g=e.target.closest('[data-decoder-layer]');if(g){layer=Number(g.dataset.decoderLayer);render();}
+ }
+ function activateModule(e){
+  if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;
+  const m=e.target.closest('.decoder-module');if(!m)return;
+  e.preventDefault();e.stopPropagation();if(dragged){dragged=false;return;}
+  openPanel(m.dataset.module,m);
  }
  detail.addEventListener('click',pick);
+ detail.addEventListener('click',activateModule);
+ detail.addEventListener('keydown',activateModule);
  chooser.addEventListener('change',()=>{layer=Number(chooser.value);closePanel();render();});
  for(const b of bar.querySelectorAll('[data-decoder-mode]'))b.addEventListener('click',()=>{layer={full:20,reindex:24,reuse:21}[b.dataset.decoderMode];closePanel();render();});
  document.getElementById('decoder-close').addEventListener('click',()=>hide());
@@ -66,7 +76,7 @@
  document.getElementById('reset').addEventListener('click',()=>hide(false),true);
  document.getElementById('flow-toggle').addEventListener('click',()=>hide(),true);
  document.addEventListener('keydown',e=>{if(e.key==='0'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))hide(false);if(e.key==='Escape'&&active&&panel.getAttribute('aria-hidden')==='true')hide();},true);
- svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.module')){hide();e.stopImmediatePropagation();}},true);
+ svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.module')&&!e.target.closest('.decoder-module')){hide();e.stopImmediatePropagation();}},true);
  new ResizeObserver(fitBar).observe(bar);window.addEventListener('resize',fitBar);
  render();fitLabels();
  window.addEventListener('architecture-detail-open',e=>{if(e.detail?.name!=='decoder')hide();});

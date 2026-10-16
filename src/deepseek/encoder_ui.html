@@ -1,5 +1,6 @@
 <style>
 .encoder-hidden{display:none}
+.encoder-module{cursor:pointer;outline:none}.encoder-module text{pointer-events:none}.encoder-module:hover>.surface,.encoder-module:focus-visible>.surface{stroke:#245dc3;stroke-width:1.8;filter:drop-shadow(0 1px 2px #1c479a24)}.encoder-module.selected>.surface{stroke:#1d57c7;stroke-width:2.5;filter:drop-shadow(0 0 3px #386bd945)}
 .encoder-on #diagram-content,.encoder-on #indexer-entry-links{display:none}.encoder-on #stage{top:var(--encoder-stage-top,165px)}
 #encoder-bar[hidden]{display:none!important}#encoder-bar{position:absolute;z-index:4;top:66px;left:10px;right:10px;background:#fff;border:1px solid #cdeedb;border-radius:0 0 7px 7px;padding:9px 12px;box-shadow:0 3px 10px #1e407008;font-size:12px}
 .encoder-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.encoder-controls strong{font-size:15px;color:#0d5d33}.encoder-controls label{margin-left:7px}.encoder-controls button{font-size:12px;padding:4px 9px}.encoder-controls button[aria-pressed=true]{background:#e2f7e9;border-color:#60c787;color:#17633a}.encoder-controls select{max-width:150px}.encoder-controls #encoder-close{margin-left:auto}
@@ -25,6 +26,8 @@
  const detail=document.getElementById('encoder-detail'),bar=document.getElementById('encoder-bar'),chooser=document.getElementById('encoder-layer'),region=document.getElementById('region-select');
  const option=document.createElement('option');option.value='encoder';option.textContent='G · Encoder Detail';region.append(option);regions.encoder=[15,12,1642,820];
  let active=false,layer=2,savedView=null,savedRegion='all';
+ const oldOpen=openPanel;openPanel=function(...args){svg.querySelectorAll('.encoder-module.selected').forEach(n=>n.classList.remove('selected'));return oldOpen(...args);};
+ const oldClose=closePanel;closePanel=function(...args){svg.querySelectorAll('.encoder-module.selected').forEach(n=>n.classList.remove('selected'));return oldClose(...args);};
  const modeFor=n=>LOCAL_ONLY.includes(n)?'local':KV_SOURCE.includes(n)?'full':'reuse';
  for(let n=0;n<20;n++){const o=document.createElement('option');o.value=n;o.textContent=`Layer ${n} · ${{local:'Local only',full:'Full',reuse:'Reuse'}[modeFor(n)]}`;chooser.append(o);}
  const note=()=>({local:'L0–1：没有共享 KV，也没有 Engram 介入（Engram 只在进入 L1 之前）。',full:`Layer ${layer}：本层运行 Compressor 新建压缩 KV，并运行 Indexer 选出 Top-K 位置，供接下来 5 层复用。`,reuse:`Layer ${layer}：本层仍有自己独立的 Local KV，但压缩 KV 与索引直接复用最近一个 Full 层（2 / 8 / 14 之一）。`}[modeFor(layer)]);
@@ -56,10 +59,17 @@
   const flowEntry=body.querySelector('.flow-entry');if(active&&flowEntry)flowEntry.addEventListener('click',()=>hide(true,true),true);
  };
  function pick(e){
-  const g=e.target.closest('[data-encoder-layer]');if(!g)return;
-  layer=Number(g.dataset.encoderLayer);render();
+  const g=e.target.closest('[data-encoder-layer]');if(g){layer=Number(g.dataset.encoderLayer);render();}
+ }
+ function activateModule(e){
+  if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;
+  const m=e.target.closest('.encoder-module');if(!m)return;
+  e.preventDefault();e.stopPropagation();if(dragged){dragged=false;return;}
+  openPanel(m.dataset.module,m);
  }
  detail.addEventListener('click',pick);
+ detail.addEventListener('click',activateModule);
+ detail.addEventListener('keydown',activateModule);
  chooser.addEventListener('change',()=>{layer=Number(chooser.value);closePanel();render();});
  for(const b of bar.querySelectorAll('[data-encoder-mode]'))b.addEventListener('click',()=>{layer={local:0,full:2,reuse:3}[b.dataset.encoderMode];closePanel();render();});
  document.getElementById('encoder-close').addEventListener('click',()=>hide());
@@ -67,7 +77,7 @@
  document.getElementById('reset').addEventListener('click',()=>hide(false),true);
  document.getElementById('flow-toggle').addEventListener('click',()=>hide(),true);
  document.addEventListener('keydown',e=>{if(e.key==='0'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))hide(false);if(e.key==='Escape'&&active&&panel.getAttribute('aria-hidden')==='true')hide();},true);
- svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.module')){hide();e.stopImmediatePropagation();}},true);
+ svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.module')&&!e.target.closest('.encoder-module')){hide();e.stopImmediatePropagation();}},true);
  new ResizeObserver(fitBar).observe(bar);window.addEventListener('resize',fitBar);
  render();fitLabels();
  window.addEventListener('architecture-detail-open',e=>{if(e.detail?.name!=='encoder')hide();});

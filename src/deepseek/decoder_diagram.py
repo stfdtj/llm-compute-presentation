@@ -150,6 +150,6 @@ def build_detail():
     d.text(46, y + 176, '任务草稿曾假设“20/24/28/32/36 都新建 KV”——源码核实后只有 Layer 20 新建；24/28/32/36 只新建 Top-K 索引（Reindex），复用同一份 KV。', 14, anchor='start', fill='#a50027')
     d.text(46, y + 200, '点击任意 Attention 节点可打开 Indexer / Compressor 的完整流程；与 Encoder Detail 对照可见两者是同一套机制，只是起止层不同。', 13.5, anchor='start', fill='#5b6981')
     d.raw('</g>')
-    markup = ''.join(d.S[offset:])
+    markup = ''.join(d.S[offset:]).replace('class="module"', 'class="decoder-module"')
     del d.S[offset:]
     return markup

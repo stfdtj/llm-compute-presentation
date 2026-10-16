@@ -14,6 +14,8 @@ from hc_diagram import build_detail
 from engram_diagram import build_detail as build_engram_detail
 from encoder_diagram import build_detail as build_encoder_detail
 from decoder_diagram import build_detail as build_decoder_detail
+from backbone43_diagram import build_detail as build_backbone43_detail
+from csa2_diagram import build_detail as build_csa2_detail
 from dspark_diagram import build_dspark
 import derivation_ledger
 
@@ -63,6 +65,11 @@ encoder_ui=(ROOT/'src/deepseek/encoder_ui.html').read_text(encoding='utf-8').rep
 result=result.replace('</body>',encoder_ui+'\n</body>')
 decoder_ui=(ROOT/'src/deepseek/decoder_ui.html').read_text(encoding='utf-8').replace('__DECODER_SVG__',build_decoder_detail())
 result=result.replace('</body>',decoder_ui+'\n</body>')
+backbone43_svg,backbone43_height,backbone43_marks=build_backbone43_detail()
+backbone43_ui=(ROOT/'src/deepseek/backbone43_ui.html').read_text(encoding='utf-8').replace('__BACKBONE43_SVG__',backbone43_svg).replace('__BACKBONE43_HEIGHT__',str(backbone43_height)).replace('__BACKBONE43_MARKS__',json.dumps(backbone43_marks))
+result=result.replace('</body>',backbone43_ui+'\n</body>')
+csa2_ui=(ROOT/'src/deepseek/csa2_ui.html').read_text(encoding='utf-8').replace('__CSA2_SVG__',build_csa2_detail())
+result=result.replace('</body>',csa2_ui+'\n</body>')
 attention_ui=(ROOT/'src/deepseek/attention_ui.html').read_text(encoding='utf-8').replace('__ATTENTION_CONFIG__',json.dumps(json.loads((ROOT/'references/deepseek/inference/config.json').read_text(encoding='utf-8'))))
 result=result.replace('</body>',attention_ui+'\n</body>')
 dspark_config=json.loads((ROOT/'references/deepseek/inference/config.json').read_text(encoding='utf-8'))

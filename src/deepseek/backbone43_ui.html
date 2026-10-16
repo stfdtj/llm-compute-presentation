@@ -1,0 +1,72 @@
+<style>
+.draft-jump-module{cursor:pointer;outline:none}.draft-jump-module text{pointer-events:none}
+.draft-jump-module:hover rect,.draft-jump-module:focus-visible rect{stroke:#3282AB;stroke-width:2}
+.backbone43-module{cursor:pointer;outline:none}.backbone43-module text{pointer-events:none}.backbone43-module:hover>.surface,.backbone43-module:focus-visible>.surface{stroke:#245dc3;stroke-width:1.8;filter:drop-shadow(0 1px 2px #1c479a24)}.backbone43-module.selected>.surface{stroke:#1d57c7;stroke-width:2.5;filter:drop-shadow(0 0 3px #386bd945)}
+.backbone43-on #diagram-content,.backbone43-on #indexer-entry-links{display:none}.backbone43-on #stage{top:var(--backbone43-stage-top,125px)}
+#backbone43-bar[hidden]{display:none!important}#backbone43-bar{position:absolute;z-index:4;left:10px;right:10px;top:var(--header-height,66px);border:1px solid #c4d8f4;border-radius:0 0 7px 7px;background:#fff;padding:8px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px}
+#backbone43-bar strong{font-size:15px;color:#17304C}#backbone43-bar span{color:#60738f}#backbone43-close{margin-left:auto;font-size:12px;padding:5px 9px}#backbone43-jump{max-width:190px}
+@media(max-width:780px){#backbone43-bar{left:5px;right:5px;padding:6px 9px;gap:5px}#backbone43-bar strong{font-size:13px}#backbone43-bar span{display:none}}
+</style>
+<template id="backbone43-svg-template"><svg xmlns="http://www.w3.org/2000/svg">__BACKBONE43_SVG__</svg></template>
+<section id="backbone43-bar" hidden aria-label="43 层主干展示控制">
+ <strong>43-Layer Backbone</strong><span>点击任意步骤查看已有计算面板；点击 Draft 步骤打开 DSpark 详情。</span>
+ <label>跳转 Jump to <select id="backbone43-jump" aria-label="跳转到指定层"></select></label>
+ <button id="backbone43-close">返回架构 ×</button>
+</section>
+<script>
+(()=>{
+ const template=document.getElementById('backbone43-svg-template');
+ for(const child of [...template.content.querySelector('svg').children])svg.append(child.cloneNode(true));template.remove();
+ const detail=document.getElementById('backbone43-detail'),bar=document.getElementById('backbone43-bar'),region=document.getElementById('region-select'),jump=document.getElementById('backbone43-jump');
+ const CANVAS_H=__BACKBONE43_HEIGHT__,CANVAS_W=1500,WIN_H=1020;
+ const marks=__BACKBONE43_MARKS__;
+ const option=document.createElement('option');option.value='backbone43';option.textContent='I · 43-Layer Backbone';region.append(option);regions.backbone43=[0,0,CANVAS_W,CANVAS_H];
+ const jumpTargets=[['input','Input / Embedding'],['l0','Layer 0'],['l1','Layer 1 · Engram'],['l2','Layer 2 · Full'],['l8','Layer 8 · Full'],['l14','Layer 14 · Engram+Full'],
+  ['boundary','L19→L20 boundary'],['l20','Layer 20 · Full'],['l21','Layer 21 · Reuse'],['l24','Layer 24 · Reindex'],['l37','Layer 37–39 · capture'],
+  ['draft','Draft 40–42'],['notes','Reading notes']];
+ for(const [key,label] of jumpTargets){const o=document.createElement('option');o.value=key;o.textContent=label;jump.append(o);}
+ let active=false,savedView=null,savedRegion='all';
+ const oldOpen=openPanel;openPanel=function(...args){svg.querySelectorAll('.backbone43-module.selected').forEach(n=>n.classList.remove('selected'));return oldOpen(...args);};
+ const oldClose=closePanel;closePanel=function(...args){svg.querySelectorAll('.backbone43-module.selected').forEach(n=>n.classList.remove('selected'));return oldClose(...args);};
+ function fitBar(){if(active)document.documentElement.style.setProperty('--backbone43-stage-top',(bar.getBoundingClientRect().bottom+8)+'px');}
+ function scrollTo(key){const raw=marks[key]??0;const y=Math.max(0,Math.min(CANVAS_H-WIN_H,raw-20));view={x:0,y,w:CANVAS_W,h:WIN_H};paint();}
+ function show(key='input'){
+  window.dispatchEvent(new CustomEvent('architecture-detail-open',{detail:{name:'backbone43'}}));
+  if(window.informationFlow?.state.enabled)document.getElementById('flow-toggle').click();
+  if(!active){savedView={...view};savedRegion=region.value==='backbone43'?'all':region.value;}
+  closePanel();active=true;detail.style.display='';bar.hidden=false;document.body.classList.add('backbone43-on');
+  region.value='backbone43';jump.value=key;scrollTo(key);fitBar();fitLabels();
+ }
+ function hide(restore=true,preserveSelection=false){
+  if(!active)return;
+  if(!preserveSelection)closePanel();active=false;detail.style.display='none';bar.hidden=true;document.body.classList.remove('backbone43-on');
+  if(restore&&savedView){view={...savedView};region.value=savedRegion;paint();}
+ }
+ function activate(e){
+  if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;
+  const draftNode=e.target.closest('.draft-jump-module');
+  if(draftNode){e.preventDefault();e.stopImmediatePropagation();if(dragged){dragged=false;return;}window.dsparkArchitecture?.detail(draftNode.dataset.draftJump);return;}
+  const m=e.target.closest('.backbone43-module');
+  if(m){e.preventDefault();e.stopImmediatePropagation();if(dragged){dragged=false;return;}openPanel(m.dataset.module,m);return;}
+ }
+ svg.addEventListener('click',activate,true);svg.addEventListener('keydown',activate,true);
+ jump.addEventListener('change',()=>scrollTo(jump.value));
+ document.addEventListener('change',e=>{
+  if(e.target!==region)return;
+  if(region.value==='backbone43'){e.stopPropagation();show();}
+  else if(active)hide(false);
+ },true);
+ document.getElementById('backbone43-close').addEventListener('click',()=>hide());
+ document.getElementById('reset').addEventListener('click',()=>hide(false),true);
+ document.getElementById('flow-toggle').addEventListener('click',()=>hide(),true);
+ document.addEventListener('keydown',e=>{
+  if(e.key==='0'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))hide(false);
+  if(e.key==='Escape'&&active&&panel.getAttribute('aria-hidden')==='true')hide();
+ },true);
+ svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.module')&&!e.target.closest('.draft-jump-module')&&!e.target.closest('.backbone43-module')){hide();e.stopImmediatePropagation();}},true);
+ window.addEventListener('architecture-detail-open',e=>{if(e.detail?.name!=='backbone43')hide();});
+ new ResizeObserver(fitBar).observe(bar);window.addEventListener('resize',fitBar);
+ window.backbone43Teaching={show,hide,get state(){return{active};}};
+ fitLabels();
+})();
+</script>

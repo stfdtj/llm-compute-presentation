@@ -124,6 +124,6 @@ def build_detail():
             d.text(cx, y + 82 + j * 24, '· ' + line, 14, anchor='start')
     d.text(46, y + 176, '每一组压缩层固定是 6 层（1 个 Full + 5 个 Reuse）：2–7、8–13、14–19。点击任意 Attention 节点可打开 Indexer / Compressor 的完整流程。', 13.5, anchor='start', fill='#5b6981')
     d.raw('</g>')
-    markup = ''.join(d.S[offset:])
+    markup = ''.join(d.S[offset:]).replace('class="module"', 'class="encoder-module"')
     del d.S[offset:]
     return markup
