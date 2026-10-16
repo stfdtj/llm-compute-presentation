@@ -1,0 +1,65 @@
+<style>
+.engram-expand-link{cursor:pointer;outline:none}.engram-expand-link:hover rect,.engram-expand-link:focus-visible rect{stroke:#a50027;stroke-width:1.4}
+.engram-on #diagram-content,.engram-on #indexer-entry-links{display:none}.engram-on #stage{top:var(--engram-stage-top,125px)}
+#engram-bar[hidden]{display:none!important}#engram-bar{position:absolute;z-index:4;left:10px;right:10px;top:var(--header-height,66px);border:1px solid #f3cdd8;border-radius:0 0 7px 7px;background:#fff;padding:8px 12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px}
+#engram-bar strong{font-size:15px;color:#a50027}#engram-bar span{color:#60738f}#engram-close{margin-left:auto;font-size:12px;padding:5px 9px}
+@media(max-width:780px){#engram-bar{left:5px;right:5px;padding:6px 9px;gap:5px}#engram-bar strong{font-size:13px}#engram-bar span{font-size:10px}}
+</style>
+<template id="engram-svg-template"><svg xmlns="http://www.w3.org/2000/svg">__ENGRAM_SVG__</svg></template>
+<section id="engram-bar" hidden aria-label="Engram Detail 展示控制"><strong>Engram Detail · N-gram 记忆查找</strong><span>点击任意节点，打开已有的计算面板；点击空白关闭。</span><button id="engram-close">返回架构 ×</button></section>
+<script>
+(()=>{
+ const template=document.getElementById('engram-svg-template');
+ for(const child of [...template.content.querySelector('svg').children])svg.append(child.cloneNode(true));template.remove();
+ const detail=document.getElementById('engram-detail'),bar=document.getElementById('engram-bar'),region=document.getElementById('region-select');
+ const option=document.createElement('option');option.value='engram';option.textContent='D · Engram Detail';region.append(option);regions.engram=[15,12,1642,1020];
+ let active=false,savedView=null,savedRegion='all';
+ function fitBar(){if(active)document.documentElement.style.setProperty('--engram-stage-top',(bar.getBoundingClientRect().bottom+8)+'px');}
+ function show(){
+  window.dispatchEvent(new CustomEvent('architecture-detail-open',{detail:{name:'engram'}}));
+  if(window.informationFlow?.state.enabled)document.getElementById('flow-toggle').click();
+  if(!active){savedView={...view};savedRegion=region.value==='engram'?'all':region.value;}
+  closePanel();active=true;detail.style.display='';bar.hidden=false;document.body.classList.add('engram-on');
+  document.querySelectorAll('[data-engram-expand]').forEach(n=>n.setAttribute('aria-expanded','true'));
+  region.value='engram';view={x:0,y:0,w:1672,h:1045};paint();fitBar();fitLabels();
+ }
+ function hide(restore=true,preserveSelection=false){
+  if(!active)return;
+  if(!preserveSelection)closePanel();active=false;detail.style.display='none';bar.hidden=true;document.body.classList.remove('engram-on');
+  document.querySelectorAll('[data-engram-expand]').forEach(n=>n.setAttribute('aria-expanded','false'));
+  if(restore&&savedView){view={...savedView};region.value=savedRegion;paint();}
+ }
+ const oldDraw=drawPanel;drawPanel=function(...args){
+  oldDraw(...args);
+  if(['engram','engram1','engram14','ngram','hash','engembed','enggate','injection'].includes(selected)){
+   const launch=document.createElement('button');launch.className='hc-launch';launch.textContent=active?'显示 Engram 完整流程 →':'展开 Engram 完整流程 →';
+   launch.addEventListener('click',show);body.prepend(launch);
+  }
+  const flowEntry=body.querySelector('.flow-entry');if(active&&flowEntry)flowEntry.addEventListener('click',()=>hide(true,true),true);
+ };
+ function activate(e){
+  if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;
+  const link=e.target.closest('.engram-expand-link');if(!link)return;
+  e.preventDefault();e.stopImmediatePropagation();if(dragged){dragged=false;return;}
+  show();
+ }
+ svg.addEventListener('click',activate,true);svg.addEventListener('keydown',activate,true);
+ document.addEventListener('change',e=>{
+  if(e.target!==region)return;
+  if(region.value==='engram'){e.stopPropagation();show();}
+  else if(active)hide(false);
+ },true);
+ document.getElementById('engram-close').addEventListener('click',()=>hide());
+ document.getElementById('reset').addEventListener('click',()=>hide(false),true);
+ document.getElementById('flow-toggle').addEventListener('click',()=>hide(),true);
+ document.addEventListener('keydown',e=>{
+  if(e.key==='0'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))hide(false);
+  if(e.key==='Escape'&&active&&panel.getAttribute('aria-hidden')==='true')hide();
+ },true);
+ svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.module')){hide();e.stopImmediatePropagation();}},true);
+ window.addEventListener('architecture-detail-open',e=>{if(e.detail?.name!=='engram')hide();});
+ new ResizeObserver(fitBar).observe(bar);window.addEventListener('resize',fitBar);
+ window.engramTeaching={show,hide,get state(){return{active};}};
+ fitLabels();
+})();
+</script>

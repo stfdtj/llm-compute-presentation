@@ -24,7 +24,7 @@
  for(const child of [...template.content.querySelector('svg').children])svg.append(child.cloneNode(true));
  template.remove();
  const detail=document.getElementById('indexer-detail'),entries=document.getElementById('indexer-entry-links'),bar=document.getElementById('indexer-bar'),chooser=document.getElementById('indexer-layer'),region=document.getElementById('region-select');
- const option=document.createElement('option');option.value='indexer';option.textContent='E · Indexer Detail';region.append(option);regions.indexer=[15,20,1642,850];
+ const option=document.createElement('option');option.value='indexer';option.textContent='E · Indexer Detail';region.append(option);regions.indexer=[15,20,1642,1075];
  let active=false,layer=20,savedView=null,savedRegion='all';
  const modeFor=n=>config.kv_source_layers.includes(n)?'Full':config.index_source_layers.includes(n)?'Reindex':'Reuse';
  const latest=(values,n)=>values.filter(x=>x<=n).at(-1);
@@ -49,7 +49,7 @@
   if(!active){savedView={...view};savedRegion=region.value==='indexer'?'all':region.value;}
   active=true;layer=Number(n);closePanel();detail.style.display='';bar.hidden=false;document.body.classList.add('indexer-on');
   entries.querySelectorAll('[data-indexer-entry]').forEach(e=>e.setAttribute('aria-expanded','true'));
-  region.value='indexer';view={x:0,y:0,w:1672,h:900};paint();render();fitLabels();
+  region.value='indexer';view={x:0,y:0,w:1672,h:1120};paint();render();fitLabels();
   if(calculate)openPanel('indexer',detail.querySelector('[data-indexer-node="score"] .indexer-module'));
  }
  function hide(restore=true,preserveSelection=false){

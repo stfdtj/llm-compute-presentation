@@ -4,6 +4,17 @@
 
 默认进入“总体架构 / 数据流 / 局部计算 / 实现与证据”四个工作区。局部计算采用 Level 1 概览、Level 2 逻辑步骤、Level 3 原审计账本；Forward A 与 Backward B 分别注明口径。旧完整图可通过 `deepseek_v4_1_interactive.html#architecture` 打开，原 DSpark 总览通过 `#dspark` 打开；在旧图点“返回学习主线”即可返回。
 
+## Engram / Encoder / Decoder 独立展开图（可读性重设计）
+
+`#architecture` 旧图的 Region 下拉新增三项：`D · Engram Detail`、`G · Encoder Detail`、`H · Decoder Detail`，各自占满整屏，不再挤进原 1672×941 画布。三者都复用既有 `DATA` 键（如 `ngram`/`hash`/`engembed`/`enggate`/`injection`、`encoderattn`/`sliding`/`sparse`、`decoderattn`/`multi`/`compressor`/`indexer`），点击节点打开的仍是原计算面板，不新增第二套 FLOPs。入口：Engram 小框下的“展开 Engram 完整流程”、Attention 对照弹窗的“展开 Encoder/Decoder 完整 Block 流程”按钮，或直接从 Region 下拉选择。
+
+- `engram_diagram.py` / `engram_ui.html`：Engram 的调用位置（`Transformer.forward` 逐层循环中、`Block.forward` 之前，而非 Attention 内部）→ N-gram 构造 → 哈希查表 → Embedding Lookup → 投影出 4×Key + 1×Value → Gate → 注入四路 Hyper-Connections，附一个历史序列“quick brown fox jumps”的手算小例子，以及与 Attention 读 KV Cache 的对比说明。哈希的乘数/质数由加载时的固定随机种子生成，图中只演示结构，不编造具体数值。
+- `encoder_diagram.py` / `encoder_ui.html`：Layers 0–19 总览（区分 L0–1 纯局部 SWA、L2–19 的 2:1 压缩、KV/Index source = 2,8,14）+ 一个代表层的 `Block.forward` 完整顺序（HC 系数生成 → HC Pre → RMSNorm → Attention → HC Post，Attention 与 MoE 子层各一次），Local only / Full / Reuse 三态按钮切换 Attention 子层差异。
+- `decoder_diagram.py` / `decoder_ui.html`：Layer 19→20 边界专页（四路 E → HC Pre + RMSNorm → X20，X20 只是 Layer 20 这个 Block 的普通输入，不是独立 Cross-Attention）+ Layers 20–39 总览 + 同构的代表层流程。明确标注：只有 Layer 20 新建压缩 KV（`kv_source_layers` 在该区间仅含 20）；24/28/32/36 只是 Reindex（复用同一份 KV、重新选 Top-K）；其余层纯 Reuse。
+- `indexer_diagram.py` 新增一个“8 个历史位置选 3 个”的教学小例子（与真实 `index_topk=512` 明确区分），其余 Indexer 流程保持原有设计。
+- 总览（`build_diagram.py`）文案同步修正：标题与 Decoder Attention 框不再使用“Encoder 输出 → Decoder Cross-Attention”式的表述——源码里没有独立的 Encoder/Decoder 类或 Cross-Attention 模块，只有同一个 `Block` 循环 40 次，`Layer 20` 恰好是压缩 KV 的新建点。
+- `before_hc.svg` / `before_attention.svg` / `before_single_token.svg` 基线已随本次总览改动刷新（`hc_preservation.py` / `attention_preservation.py` 的 `ORIGINAL_SHA256`、`step4_preservation.json` 同步更新）；HC / Attention 区域本身未改动，由各自的 preservation 检查继续保护。
+
 L20 边界显式展示四路 E → HC Pre / Attention RMSNorm → X20。Prefill bounded replay 与 DSpark 验证/调度标为论文设计，未声称固定参考 model.py 已提供完整实现。
 
 构建仍为 `python src/deepseek/build.py`；浏览器聚合命令 `npm run test:browser:deepseek` 包含 Attention、DSpark 和新增 `verify_final_review.cjs`。详见 [最终验收与截图](../../docs/architecture/v2_final_validation.md)。
@@ -56,6 +67,9 @@ before_hc.svg保留修改前的架构；hc_preservation.py锁定其原始哈希�
 - `derivation_ui.html`：可展开步骤、场景选择、严格/近似/特殊操作分账，构建时编译并内嵌离线HTML。
 - `build_diagram.py`：SVG 几何与标签。
 - `hc_diagram.py`、`hc_ui.html`：HC小框、展开架构与现有计算步骤的链接。
+- `engram_diagram.py`、`engram_ui.html`：Engram 独立展开图（调用位置 / N-gram / 哈希 / 查表 / 投影 / Gate / 注入），复用现有 `ngram`/`hash`/`engembed`/`enggate`/`injection`/`engram1`/`engram14` 计算条目。
+- `encoder_diagram.py`、`encoder_ui.html`：Encoder（L0–19）独立展开图，Local only / Full / Reuse 三态代表层流程。
+- `decoder_diagram.py`、`decoder_ui.html`：Decoder（L20–39）独立展开图，含 L19→L20 边界专页与 Full / Reindex / Reuse 三态代表层流程。
 - `indexer_diagram.py`、`indexer_ui.html`：Indexer 流程、跨层复用与计算面板入口；配置来自 `references/deepseek/config.json`，计算复用原 `module-data`。
 - `page_template.html`：页面布局、面板样式与交互。
 - `flow_ui.html`：独立信息流开关、五步演示、SVG 路径叠加、缓存写入示例及说明；构建时内嵌到原 HTML。

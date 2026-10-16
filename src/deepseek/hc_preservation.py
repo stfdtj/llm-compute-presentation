@@ -5,7 +5,7 @@ from xml.etree import ElementTree as ET
 import hashlib
 
 HERE=Path(__file__).resolve().parent
-ORIGINAL_SHA256='8861c3b502047b9ba507645343bedf1494cc1719d10060c22ba67072542ec84c'
+ORIGINAL_SHA256='9c9b6b9cdd832a0f5ebe85a39819cfa0dd351e4b2dd13abfc9e2fd872f31dc92'
 
 def without_hc(root):
     root=deepcopy(root)

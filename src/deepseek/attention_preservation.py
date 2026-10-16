@@ -23,7 +23,7 @@ def without_attention(root):
 
 def verify():
     baseline = HERE / 'before_attention.svg'
-    assert hashlib.sha256(baseline.read_bytes()).hexdigest() == '44553abc9298bbeed68d0df5b1daad677a00ce0bdfef74cdead827ad03b89e89'
+    assert hashlib.sha256(baseline.read_bytes()).hexdigest() == '9c9b6b9cdd832a0f5ebe85a39819cfa0dd351e4b2dd13abfc9e2fd872f31dc92'
     before = without_attention(ET.parse(baseline).getroot())
     after = without_attention(ET.parse(HERE / 'architecture.svg').getroot())
     assert ET.tostring(before) == ET.tostring(after), 'Element outside the Attention details changed'

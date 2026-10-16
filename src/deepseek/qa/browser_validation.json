@@ -1,8 +1,8 @@
 {
   "passed": true,
   "viewport": "1920x1080",
-  "directModuleKeys": 61,
-  "calculationModesChecked": 192,
+  "directModuleKeys": 62,
+  "calculationModesChecked": 195,
   "physicalClicksAcrossAreas": 30,
   "checks": [
     "all direct module mappings in 3 modes",

@@ -7,7 +7,7 @@
 @media(max-width:780px){#attention-comparison{width:96vw;max-width:96vw}.ac-toolbar{padding:8px 10px}.ac-toolbar strong{font-size:14px}.ac-purpose{font-size:12px}.ac-scroll{padding:0 10px 12px}}
 </style>
 <dialog id="attention-comparison" aria-labelledby="ac-title">
- <div class="ac-toolbar"><strong id="ac-title">Encoder ↔ Decoder · Attention 对照</strong><label>Encoder <select id="ac-encoder-layer" aria-label="对照 Encoder 层"></select></label><label>Decoder <select id="ac-decoder-layer" aria-label="对照 Decoder 层"></select></label><button id="ac-close">返回架构 ×</button></div>
+ <div class="ac-toolbar"><strong id="ac-title">Encoder ↔ Decoder · Attention 对照</strong><label>Encoder <select id="ac-encoder-layer" aria-label="对照 Encoder 层"></select></label><label>Decoder <select id="ac-decoder-layer" aria-label="对照 Decoder 层"></select></label><button id="ac-open-encoder">展开 Encoder 完整 Block 流程 →</button><button id="ac-open-decoder">展开 Decoder 完整 Block 流程 →</button><button id="ac-close">返回架构 ×</button></div>
  <p class="ac-purpose">共同计算路径保持一致；橙色分支显示真正差异：Encoder 每两 token 压缩一条 Global KV；Decoder 从 Encoder 最终表示生成一 token 一条的共享 Global KV，后续层不重复投影历史。相同结构的 Q / Local KV / Output 使用各层自己的权重。</p>
  <div class="ac-legend"><span style="background:#e3f3ff">普通计算</span><span style="background:#fff3d8">Global KV 生成 / 选择</span><span style="background:#efe6ff">缓存 · 虚线代表读取复用</span><span style="background:#ffe7ed">E · 跨模块输入</span><span>↓ 串行计算；左右支路并行汇入同一次 Attention</span></div>
  <div class="ac-scroll"><div id="ac-grid" class="ac-grid"></div></div>
@@ -68,6 +68,8 @@
  document.getElementById('ac-mode-rows').innerHTML=groups.map(g=>'<tr>'+g.map(t=>'<td>'+t+'</td>').join('')+'<td>全部执行</td></tr>').join('');
  const button=document.createElement('button');button.id='attention-compare-launch';button.textContent='Attention 对照';document.querySelector('.tools').prepend(button);
  button.addEventListener('click',()=>{closePanel();render();dialog.showModal();dialog.scrollTop=0;});document.getElementById('ac-close').addEventListener('click',()=>dialog.close());
+ document.getElementById('ac-open-encoder').addEventListener('click',()=>{dialog.close();window.encoderTeaching?.show(Number(chooseE.value)||2);});
+ document.getElementById('ac-open-decoder').addEventListener('click',()=>{dialog.close();window.decoderTeaching?.show(Number(chooseD.value)||20);});
  chooseE.addEventListener('change',render);chooseD.addEventListener('change',render);
  grid.addEventListener('click',e=>{const b=e.target.closest('[data-ac-calc]');if(b){e.stopPropagation();dialog.close();openPanel(b.dataset.acCalc,null);}});
  window.attentionComparison={get state(){return{open:dialog.open,encoder:Number(chooseE.value),decoder:Number(chooseD.value)}},show:()=>button.click()};

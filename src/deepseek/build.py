@@ -11,6 +11,9 @@ from audited_data import apply,write_docs
 from build_diagram import build
 from indexer_diagram import build_indexer
 from hc_diagram import build_detail
+from engram_diagram import build_detail as build_engram_detail
+from encoder_diagram import build_detail as build_encoder_detail
+from decoder_diagram import build_detail as build_decoder_detail
 from dspark_diagram import build_dspark
 import derivation_ledger
 
@@ -54,6 +57,12 @@ derivation_ui=(ROOT/'src/deepseek/derivation_ui.html').read_text(encoding='utf-8
 result=result.replace('</body>',derivation_ui+'\n</body>')
 hc_ui=(ROOT/'src/deepseek/hc_ui.html').read_text(encoding='utf-8').replace('__HC_SVG__',build_detail())
 result=result.replace('</body>',hc_ui+'\n</body>')
+engram_ui=(ROOT/'src/deepseek/engram_ui.html').read_text(encoding='utf-8').replace('__ENGRAM_SVG__',build_engram_detail())
+result=result.replace('</body>',engram_ui+'\n</body>')
+encoder_ui=(ROOT/'src/deepseek/encoder_ui.html').read_text(encoding='utf-8').replace('__ENCODER_SVG__',build_encoder_detail())
+result=result.replace('</body>',encoder_ui+'\n</body>')
+decoder_ui=(ROOT/'src/deepseek/decoder_ui.html').read_text(encoding='utf-8').replace('__DECODER_SVG__',build_decoder_detail())
+result=result.replace('</body>',decoder_ui+'\n</body>')
 attention_ui=(ROOT/'src/deepseek/attention_ui.html').read_text(encoding='utf-8').replace('__ATTENTION_CONFIG__',json.dumps(json.loads((ROOT/'references/deepseek/inference/config.json').read_text(encoding='utf-8'))))
 result=result.replace('</body>',attention_ui+'\n</body>')
 dspark_config=json.loads((ROOT/'references/deepseek/inference/config.json').read_text(encoding='utf-8'))

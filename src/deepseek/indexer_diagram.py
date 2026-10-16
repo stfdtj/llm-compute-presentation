@@ -27,7 +27,7 @@ def build_indexer(config):
     d.raw('</g>')
 
     d.raw('<g id="indexer-detail" style="display:none" font-family="Times New Roman, Microsoft YaHei, serif" role="group" aria-label="Indexer Detail：全局 KV 位置选择流程">')
-    d.rect(15, 20, 1642, 850, 'blue', opacity=.08)
+    d.rect(15, 20, 1642, 1075, 'blue', opacity=.08)
     d.text(38, 60, 'Indexer Detail · Global KV Selection', 32, True, anchor='start')
     d.text(38, 95, '选择 Global KV 位置 · 每个模块可点击，复用原计算面板', 20, anchor='start')
     d.text(1630, 60, 'Attention 路径 · 与 MoE Router 分开', 19, anchor='end', fill='#806019')
@@ -90,6 +90,25 @@ def build_indexer(config):
     d.raw('</g>')
     d.text(38, 803, f'KV source layers: {config["kv_source_layers"]}    |    Index source layers: {config["index_source_layers"]}', 20, anchor='start')
     d.text(38, 837, f'仅 {len(config["index_source_layers"])} 层运行 Indexer；0–1 层仅 SWA；每层仍有自己的主要 Attention。Gather 表示按索引读取，不承诺分配独立张量。', 18, anchor='start')
+
+    # Teaching-only worked example: 8 history positions, pick 3. Clearly separated from
+    # the real index_topk=512 so nobody mistakes this illustrative count for the config value.
+    ey = 880
+    d.rect(32, ey, 1591, 195, 'green', opacity=.11)
+    d.text(46, ey + 28, f'教学小例子 · 8 个历史位置里选 3 个（真实配置 index_topk = {topk}，这里只是便于演示的小数字）', 18, True, anchor='start')
+    positions = [('p1', .11), ('p2', .52), ('p3', .74), ('p4', .05), ('p5', .63), ('p6', .22), ('p7', .81), ('p8', .38)]
+    chosen = {'p3', 'p5', 'p7'}
+    px0, pw, pgap = 46, 130, 16
+    for i, (name, score) in enumerate(positions):
+        px = px0 + i * (pw + pgap)
+        picked = name in chosen
+        d.raw(f'<g data-indexer-node="teach-{name}">')
+        d.box('indexer', px, ey + 46, pw, 54, [f'位置 {name}', f'score = {score:.2f}'], 'purple' if picked else 'white', 13, picked)
+        d.raw('</g>')
+        if picked:
+            d.text(px + pw / 2, ey + 116, '✓ Top-3', 12.5, True, fill='#5a21c9')
+    d.text(46, ey + 150, '按分数从高到低排序：p7(0.81) · p3(0.74) · p5(0.63) · p2(0.52) · … → 选出 p7、p3、p5 这 3 个位置 → 按原始位置顺序重排为 p3、p5、p7。', 15, anchor='start')
+    d.text(46, ey + 174, '真实流程完全一样，只是候选位置可以有上千个、Top-K 最多选 512 个；这个 8 选 3 的小例子不对应任何真实层的真实分数。', 14, anchor='start', fill='#5b6981')
     d.raw('</g>')
     # Own class keeps existing diagram event routing / preservation tests independent.
     return ''.join(d.S).replace('class="module"', 'class="indexer-module"')

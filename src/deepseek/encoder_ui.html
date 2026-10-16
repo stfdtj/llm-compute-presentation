@@ -1,0 +1,76 @@
+<style>
+.encoder-hidden{display:none}
+.encoder-on #diagram-content,.encoder-on #indexer-entry-links{display:none}.encoder-on #stage{top:var(--encoder-stage-top,165px)}
+#encoder-bar[hidden]{display:none!important}#encoder-bar{position:absolute;z-index:4;top:66px;left:10px;right:10px;background:#fff;border:1px solid #cdeedb;border-radius:0 0 7px 7px;padding:9px 12px;box-shadow:0 3px 10px #1e407008;font-size:12px}
+.encoder-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.encoder-controls strong{font-size:15px;color:#0d5d33}.encoder-controls label{margin-left:7px}.encoder-controls button{font-size:12px;padding:4px 9px}.encoder-controls button[aria-pressed=true]{background:#e2f7e9;border-color:#60c787;color:#17633a}.encoder-controls select{max-width:150px}.encoder-controls #encoder-close{margin-left:auto}
+#encoder-note{margin:7px 0 0;color:#455875;line-height:1.5}
+.encoder-on #stage{top:var(--encoder-stage-top,125px)}
+@media(max-width:780px){#encoder-bar{top:116px;padding:7px 9px}.encoder-controls{gap:4px}.encoder-controls strong{font-size:13px}.encoder-controls button{font-size:11px;padding:4px 6px}}
+</style>
+<template id="encoder-svg-template"><svg xmlns="http://www.w3.org/2000/svg">__ENCODER_SVG__</svg></template>
+<section id="encoder-bar" hidden aria-label="Encoder Detail 展示控制">
+ <div class="encoder-controls"><strong>Encoder Detail · L0–19</strong>
+  <button data-encoder-mode="local" aria-pressed="false">L0–1 · Local only</button>
+  <button data-encoder-mode="full" aria-pressed="true">L2/8/14 · Full</button>
+  <button data-encoder-mode="reuse" aria-pressed="false">其余 L2–19 · Reuse</button>
+  <label>查看层 <select id="encoder-layer" aria-label="Encoder 所在层"></select></label>
+  <button id="encoder-close">返回架构 ×</button></div>
+ <p id="encoder-note" aria-live="polite"></p>
+</section>
+<script>
+(()=>{
+ const KV_SOURCE=[2,8,14],LOCAL_ONLY=[0,1];
+ const template=document.getElementById('encoder-svg-template');
+ for(const child of [...template.content.querySelector('svg').children])svg.append(child.cloneNode(true));template.remove();
+ const detail=document.getElementById('encoder-detail'),bar=document.getElementById('encoder-bar'),chooser=document.getElementById('encoder-layer'),region=document.getElementById('region-select');
+ const option=document.createElement('option');option.value='encoder';option.textContent='G · Encoder Detail';region.append(option);regions.encoder=[15,12,1642,820];
+ let active=false,layer=2,savedView=null,savedRegion='all';
+ const modeFor=n=>LOCAL_ONLY.includes(n)?'local':KV_SOURCE.includes(n)?'full':'reuse';
+ for(let n=0;n<20;n++){const o=document.createElement('option');o.value=n;o.textContent=`Layer ${n} · ${{local:'Local only',full:'Full',reuse:'Reuse'}[modeFor(n)]}`;chooser.append(o);}
+ const note=()=>({local:'L0–1：没有共享 KV，也没有 Engram 介入（Engram 只在进入 L1 之前）。',full:`Layer ${layer}：本层运行 Compressor 新建压缩 KV，并运行 Indexer 选出 Top-K 位置，供接下来 5 层复用。`,reuse:`Layer ${layer}：本层仍有自己独立的 Local KV，但压缩 KV 与索引直接复用最近一个 Full 层（2 / 8 / 14 之一）。`}[modeFor(layer)]);
+ function fitBar(){if(active)document.documentElement.style.setProperty('--encoder-stage-top',(bar.getBoundingClientRect().bottom+9)+'px');}
+ function render(){
+  const mode=modeFor(layer);chooser.value=layer;
+  for(const b of bar.querySelectorAll('[data-encoder-mode]'))b.setAttribute('aria-pressed',String(b.dataset.encoderMode===mode));
+  detail.querySelectorAll('[data-encoder-mode]').forEach(g=>g.classList.toggle('encoder-hidden',g.dataset.encoderMode!==mode));
+  document.getElementById('encoder-note').textContent=note();
+  fitBar();
+ }
+ function show(n=2){
+  window.dispatchEvent(new CustomEvent('architecture-detail-open',{detail:{name:'encoder'}}));
+  if(window.informationFlow?.state.enabled)document.getElementById('flow-toggle').click();
+  if(!active){savedView={...view};savedRegion=region.value==='encoder'?'all':region.value;}
+  active=true;layer=Number(n);closePanel();detail.style.display='';bar.hidden=false;document.body.classList.add('encoder-on');
+  region.value='encoder';view={x:0,y:0,w:1672,h:850};paint();render();fitLabels();
+ }
+ function hide(restore=true,preserveSelection=false){
+  if(!active)return;if(!preserveSelection)closePanel();active=false;detail.style.display='none';bar.hidden=true;document.body.classList.remove('encoder-on');
+  if(restore&&savedView){view={...savedView};region.value=savedRegion;paint();}
+  layer=2;render();
+ }
+ const oldDraw=drawPanel;drawPanel=function(...args){
+  oldDraw(...args);
+  if(['encoder','encoderattn','sliding','sparse','compressor','indexer','global','hc','moe','anorm','fnorm','layer0','layer1','layer2','layer13','layer14','layer19'].includes(selected)){
+   const b=document.createElement('button');b.className='indexer-launch';b.textContent=active?'定位 Encoder 完整流程 →':'展开 Encoder 完整流程 →';b.addEventListener('click',()=>show(active?layer:2));body.prepend(b);
+  }
+  const flowEntry=body.querySelector('.flow-entry');if(active&&flowEntry)flowEntry.addEventListener('click',()=>hide(true,true),true);
+ };
+ function pick(e){
+  const g=e.target.closest('[data-encoder-layer]');if(!g)return;
+  layer=Number(g.dataset.encoderLayer);render();
+ }
+ detail.addEventListener('click',pick);
+ chooser.addEventListener('change',()=>{layer=Number(chooser.value);closePanel();render();});
+ for(const b of bar.querySelectorAll('[data-encoder-mode]'))b.addEventListener('click',()=>{layer={local:0,full:2,reuse:3}[b.dataset.encoderMode];closePanel();render();});
+ document.getElementById('encoder-close').addEventListener('click',()=>hide());
+ region.addEventListener('change',e=>{if(e.target.value==='encoder')show();else hide(false);},true);
+ document.getElementById('reset').addEventListener('click',()=>hide(false),true);
+ document.getElementById('flow-toggle').addEventListener('click',()=>hide(),true);
+ document.addEventListener('keydown',e=>{if(e.key==='0'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))hide(false);if(e.key==='Escape'&&active&&panel.getAttribute('aria-hidden')==='true')hide();},true);
+ svg.addEventListener('dblclick',e=>{if(active&&!e.target.closest('.module')){hide();e.stopImmediatePropagation();}},true);
+ new ResizeObserver(fitBar).observe(bar);window.addEventListener('resize',fitBar);
+ render();fitLabels();
+ window.addEventListener('architecture-detail-open',e=>{if(e.detail?.name!=='encoder')hide();});
+ window.encoderTeaching={show,hide,get state(){return{active,layer,mode:modeFor(layer)};}};
+})();
+</script>
