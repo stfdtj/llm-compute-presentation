@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeepSeek V4.1 Flash · Roofline &amp; MFU</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <div>
+      <strong>Compute Efficiency</strong>
+      <small>Roofline Analysis &amp; Model FLOPs Utilization · DeepSeek V4.1 Flash</small>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="tab-btn-roofline" aria-selected="true" aria-controls="tab-roofline" data-tab="roofline">A · Roofline Analysis</button>
+    <button role="tab" id="tab-btn-mfu" aria-selected="false" aria-controls="tab-mfu" data-tab="mfu" tabindex="-1">B · MFU Analysis</button>
+  </nav>
+  <button id="reset-defaults" class="ghost" title="Reset every input on both tabs back to its starting value">↺ Reset to Defaults</button>
+</header>
+
+<main>
+<!-- ======================= TAB A: ROOFLINE ======================= -->
+<section id="tab-roofline" role="tabpanel" aria-labelledby="tab-btn-roofline">
+
+  <section class="panel intro">
+    <h1>Roofline Analysis</h1>
+    <p>The <b>Roofline model</b> estimates the <em>upper bound</em> of achievable performance for a computation, based on two hardware limits: how fast the accelerator can compute (<b>peak compute throughput</b>) and how fast it can move data between memory and compute (<b>peak memory bandwidth</b>). Comparing a workload's own <b>Arithmetic Intensity</b> against those two limits tells you which one is more likely to constrain it — this is a theoretical ceiling, not a measurement of real achieved performance.</p>
+
+    <div class="formula-grid">
+      <div class="formula-card">
+        <h3>Arithmetic Intensity</h3>
+        <div class="math">AI = FLOPs ÷ Memory&nbsp;Traffic</div>
+        <p class="units">FLOPs: floating-point operations · Memory Traffic: Bytes · AI: FLOPs/Byte</p>
+      </div>
+      <div class="formula-card">
+        <h3>Roofline Performance</h3>
+        <div class="math">P<sub>roof</sub> = min( P<sub>peak</sub> ,  AI × BW<sub>peak</sub> )</div>
+        <p class="units">P<sub>peak</sub>: FLOP/s (TFLOP/s) · BW<sub>peak</sub>: Byte/s (GB/s or TB/s) · P<sub>roof</sub>: FLOP/s</p>
+      </div>
+      <div class="formula-card">
+        <h3>Ridge Point</h3>
+        <div class="math">AI<sub>ridge</sub> = P<sub>peak</sub> ÷ BW<sub>peak</sub></div>
+        <p class="units">Units: FLOPs/Byte · Below the ridge: <b>memory-bound</b>. Above: <b>compute-bound</b>.</p>
+      </div>
+    </div>
+    <p class="caveat">P<sub>roof</sub> is a <b>theoretical bound</b>, not measured hardware performance.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Worked Example: Query Low-Rank Projection</h2>
+    <p>DeepSeek V4.1 Flash compresses its attention query through a low-rank bottleneck before expanding it back out to per-head queries. Parameters below are read directly from <code>config.json</code>: Hidden Size <b>5120</b>, Q LoRA Rank <b>1280</b>, Query Heads <b>64</b>, Head Dimension <b>512</b> (Total Query Dimension <b>32,768</b>).</p>
+
+    <div class="flow-diagram" aria-label="Query projection data flow">
+      <div class="flow-box">X <span>[M, 5120]</span></div>
+      <div class="flow-arrow">↓ <small>W<sub>QA</sub> [5120,&nbsp;1280]</small></div>
+      <div class="flow-box">H <span>[M, 1280]</span></div>
+      <div class="flow-arrow excluded">↓ <small>RMSNorm — excluded from this baseline</small></div>
+      <div class="flow-arrow">↓ <small>W<sub>QB</sub> [1280,&nbsp;32768]</small></div>
+      <div class="flow-box">Q <span>[M, 32768]</span></div>
+    </div>
+    <p class="scope-note">Scope: only the two linear projections (W<sub>QA</sub>, W<sub>QB</sub>) are counted below. RMSNorm and every other operation in the layer are excluded from this baseline — this is a scoped teaching example, not the full Attention module.</p>
+
+    <h3>FLOPs (2MKN convention)</h3>
+    <div class="math-block">F = 2 × M × (5120 × 1280 + 1280 × 32768)</div>
+    <p>M is the number of tokens processed together in one batched matmul.</p>
+
+    <h3>Memory Traffic (simplified BF16 HBM model)</h3>
+    <p>Each weight and activation element is 2 Bytes (BF16). Weights are read <b>once</b> per batched computation; input, intermediate (written then read back), and output activations scale with M. This is a simplified logical traffic model, not a hardware trace — caching and kernel fusion are ignored unless stated.</p>
+    <div id="traffic-formula" class="math-block"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Scenario A vs. Scenario B</h2>
+    <div class="scenario-grid" id="scenario-cards"></div>
+    <p class="caveat">Scenario A is <b>not</b> "1024 sequential single-token decode steps summed" — it is M = 1024 tokens genuinely processed together in one batched matmul (e.g. a prefill pass). The weight matrices are identical in both scenarios; only the activation traffic (and therefore the arithmetic intensity) changes with M.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Controls &amp; Interactive Roofline Chart</h2>
+    <p id="roofline-error" class="caveat" hidden></p>
+    <div class="roofline-split">
+    <div class="roofline-controls">
+    <div class="controls-grid one-col">
+      <label>Tokens processed together (M) — plots a "Custom" point
+        <input type="number" id="in-M" min="1" max="1048576" step="1" value="1024">
+      </label>
+      <label>Precision / bytes per element
+        <select id="in-precision"><option value="BF16">BF16 (2 B)</option><option value="FP16">FP16 (2 B)</option><option value="FP32">FP32 (4 B)</option><option value="FP8">FP8 (1 B)</option></select>
+      </label>
+      <label>Hardware preset
+        <select id="in-hw-preset"><option value="h100">NVIDIA H100 SXM 80GB (reference, dense BF16)</option><option value="illustrative">Illustrative accelerator (hypothetical)</option><option value="custom">Custom</option></select>
+      </label>
+      <label>Peak compute (TFLOP/s)
+        <input type="number" id="in-peak-tf" min="0.001" step="any" value="989">
+      </label>
+      <label>Peak memory bandwidth
+        <input type="number" id="in-bandwidth" min="0.001" step="any" value="3.35">
+      </label>
+      <label>Bandwidth unit
+        <select id="in-bw-unit"><option value="TB/s">TB/s</option><option value="GB/s">GB/s</option></select>
+      </label>
+    </div>
+    <p id="hw-source" class="source-note"></p>
+    <details class="advanced">
+      <summary>Advanced (weight reuse &amp; traffic assumptions)</summary>
+      <p>This baseline always assumes weights are read exactly once per batched computation (ideal reuse across all M tokens in that one call) and that intermediate activations are written and read back once each. These assumptions are fixed for the worked example above; they are the same simplified HBM model described in the Memory Traffic section.</p>
+    </details>
+    </div>
+    <div class="roofline-chart-col">
+    <p class="chart-help">Log–log axes. The sloped line is the memory-bandwidth limit (P = AI × BW); the horizontal line is the peak-compute limit. Scenario A (M=1) and Scenario B (M=1024) are always plotted; if the "Tokens processed together (M)" control is set to any other value, a third "Custom" point is added. Each point sits at its own Arithmetic Intensity against the <em>theoretical</em> ceiling — this is not a measured achieved performance.</p>
+    <div id="roofline-chart-wrap">
+      <svg id="roofline-chart" viewBox="0 0 900 420" role="img" aria-label="Roofline chart"></svg>
+      <div id="roofline-tooltip" class="tooltip" hidden></div>
+    </div>
+    <div id="roofline-metrics" class="metrics-row"></div>
+    </div>
+    </div>
+  </section>
+
+</section>
+
+<!-- ======================= TAB B: MFU ======================= -->
+<section id="tab-mfu" role="tabpanel" aria-labelledby="tab-btn-mfu" hidden>
+
+  <section class="panel intro">
+    <h1>Model FLOPs Utilization (MFU)</h1>
+    <p>MFU measures how much of a hardware setup's <em>theoretical peak</em> compute throughput is actually converted into <em>useful model training</em> throughput.</p>
+    <div class="formula-grid two">
+      <div class="formula-card">
+        <h3>MFU</h3>
+        <div class="math">MFU = Model&nbsp;FLOPs/s ÷ Theoretical&nbsp;Peak&nbsp;FLOPs/s</div>
+      </div>
+      <div class="formula-card">
+        <h3>Equivalently</h3>
+        <div class="math">MFU = (F<sub>step</sub> ÷ T<sub>step</sub>) ÷ ΣP<sub>peak</sub></div>
+        <p class="units">F<sub>step</sub>: model FLOPs per training step · T<sub>step</sub>: step time (s)</p>
+      </div>
+    </div>
+    <table class="term-table">
+      <tr><td>FLOPs</td><td>total number of floating-point operations (a count)</td></tr>
+      <tr><td>FLOP/s</td><td>computational throughput (a rate)</td></tr>
+      <tr><td>TFLOP/s</td><td>10<sup>12</sup> FLOP/s</td></tr>
+      <tr><td>MFU</td><td>dimensionless ratio, usually shown as a percentage</td></tr>
+    </table>
+    <p class="caveat">MFU is primarily a <b>training</b> efficiency metric. It is <b>not</b>: GPU/NPU utilization %, memory utilization, Hardware FLOPs Utilization (HFU, which counts recomputation too), or a Roofline arithmetic-intensity measurement.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Why "FLOPs per token" Isn't Simple for a MoE Model</h2>
+    <p>A common dense-Transformer approximation is <span class="math">Training FLOPs/token ≈ 6 × Parameter Count</span>. DeepSeek V4.1 Flash is a <b>Mixture-of-Experts</b> model, so <em>total stored</em> parameters and the parameters <em>actually used by one token</em> are very different — applying 6×total blindly overstates the real cost. (Attention computation, sparse position selection, shared operations, and sequence length also affect real training FLOPs; this section only corrects the MoE total-vs-active part.)</p>
+    <div id="moe-bars" class="moe-bars"></div>
+    <p id="moe-explain" class="moe-explain"></p>
+  </section>
+
+  <section class="panel">
+    <h2>MFU Calculator</h2>
+    <div class="mode-switch" role="radiogroup" aria-label="FLOPs/token source">
+      <button data-mode="generic" aria-pressed="true">Generic hypothetical example</button>
+      <button data-mode="deepseek" aria-pressed="false">DeepSeek V4.1 Flash — MoE-only (partial)</button>
+      <button data-mode="user" aria-pressed="false">User-provided</button>
+    </div>
+    <p id="mode-note" class="mode-note"></p>
+
+    <div class="controls-grid">
+      <label>Training FLOPs per token
+        <input type="number" id="in-flops-per-token" min="1" step="any" value="1e12">
+      </label>
+      <label>Number of accelerators (devices)
+        <input type="number" id="in-devices" min="1" step="1" value="4">
+      </label>
+      <label>Peak compute per accelerator (TFLOP/s)
+        <input type="number" id="in-mfu-peak-tf" min="0.001" step="any" value="1000">
+      </label>
+      <label>Throughput input
+        <select id="in-rate-mode"><option value="rate">Tokens / second</option><option value="step">Tokens per step ÷ step time</option></select>
+      </label>
+      <label id="label-tokens-per-sec">Tokens processed per second
+        <input type="number" id="in-tokens-per-sec" min="0.001" step="any" value="2000">
+      </label>
+      <label id="label-tokens-per-step" hidden>Tokens processed per training step
+        <input type="number" id="in-tokens-per-step" min="1" step="any" value="8000">
+      </label>
+      <label id="label-step-seconds" hidden>Training step duration (seconds)
+        <input type="number" id="in-step-seconds" min="0.001" step="any" value="4">
+      </label>
+    </div>
+
+    <div id="mfu-steps" class="math-block"></div>
+    <div id="mfu-result" class="mfu-result"></div>
+    <div id="mfu-gauge-wrap"><svg id="mfu-gauge" viewBox="0 0 900 140" role="img" aria-label="MFU comparison bar"></svg></div>
+    <p id="mfu-meaning" class="mfu-meaning"></p>
+  </section>
+
+  <section class="panel">
+    <h2>Sensitivity: What If Step Time Halves?</h2>
+    <p>Everything else held fixed, here is how MFU changes if training step time were cut in half (throughput doubles).</p>
+    <div id="sensitivity-table"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Roofline vs. MFU</h2>
+    <table class="compare-table">
+      <thead><tr><th>Aspect</th><th>Roofline</th><th>MFU</th></tr></thead>
+      <tbody>
+        <tr><td>Main question</td><td>What limits performance?</td><td>How efficiently is peak compute used for useful model training?</td></tr>
+        <tr><td>Key inputs</td><td>FLOPs, Bytes, bandwidth, peak compute</td><td>Useful training FLOPs, time, peak compute</td></tr>
+        <tr><td>Typical scope</td><td>Individual kernel or workload</td><td>Model training</td></tr>
+        <tr><td>Output</td><td>Theoretical performance ceiling</td><td>Utilization percentage</td></tr>
+      </tbody>
+    </table>
+    <p>Both describe computational efficiency from different angles. Roofline alone cannot tell you MFU (it doesn't know your actual achieved throughput); MFU alone cannot tell you <em>why</em> a kernel is slow (it doesn't separate bandwidth- from compute-bound causes).</p>
+  </section>
+
+</section>
+</main>
+
+<footer>
+  <p>Standalone, offline page — open <code>index.html</code> directly, no server or build step required. See <a href="README.md">README.md</a> for sources, formulas, and known limitations.</p>
+</footer>
+
+<script src="calculations.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
