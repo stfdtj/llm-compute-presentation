@@ -1,0 +1,42 @@
+<style>
+.learning-levels{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.learning-levels button{font-size:12px}.learning-levels button[aria-pressed=true]{background:#e8f1ff;color:#245aca}.learning-summary{border:1px solid #c8d9ef;border-radius:9px;padding:12px;margin:10px 0;background:#f7faff}.learning-summary p{margin:7px 0;font-size:13px}.learning-summary code{white-space:normal;overflow-wrap:anywhere}.learning-number{font-size:22px;color:#245aca}.learning-steps>section{border-left:3px solid #a2bbde;padding:8px 12px;margin:10px 0}.learning-steps p{font-size:12px;overflow-wrap:anywhere}.learning-audit[hidden],.learning-summary[hidden],.learning-steps[hidden]{display:none}
+</style>
+<script>
+(()=>{
+ const original=drawPanel;let level=1;
+ drawPanel=function(...args){original(...args);if(!selected||!window.learningWorkspace?.state.active)return;
+ const d=DATA[selected],m=d[mode],ledger=derivationTeaching.data,scenario=derivationTeaching.state.scenario;
+ const flow=mode==='parameter'?null:m.flow,steps=(flow||ledger.flows[ledger.modules[selected]['A'].forward]).steps.map(e=>ledger.steps[e.ref]);
+ const first=steps[0],refs=new Set(first?.parameterRefs||[]),weights=d.learnable.filter(p=>refs.has(p.bindingId));
+ const n=x=>Number(x).toLocaleString('en-US'),shapes=first?.inputs?first.inputs.join(' × ')+' → '+first.outputs.join(', '):'';
+ const audit=document.createElement('div');audit.className='learning-audit';while(body.firstChild)audit.append(body.firstChild);body.append(audit);
+ const controls=document.createElement('div');controls.className='learning-levels';controls.innerHTML=[['parameter','参数'],['forward','前向'],['backward','反向']].map(([k,t])=>`<button data-learning-mode="${k}" aria-pressed="${mode===k}">${t}</button>`).join('')+'<br>'+[1,2,3].map(i=>`<button data-learning-level="${i}">Level ${i} · ${['概览','怎么算','完整审计'][i-1]}</button>`).join('');body.prepend(controls);
+ const scenarioControl=audit.querySelector('.derivation-controls');if(scenarioControl){controls.after(scenarioControl);const p=scenarioControl.querySelector('p');if(p){const more=document.createElement('details');more.innerHTML='<summary>场景边界与训练假设</summary>';more.append(p);scenarioControl.append(more);}}
+ const summary=document.createElement('section');summary.className='learning-summary';summary.innerHTML=`<p>${esc(d.purpose)}</p><p>口径：${mode==='parameter'?'存储 / 共享权重；投影示例为 A 单行':esc(ledger.scenarios[scenario].title)}</p><p>模块存储参数：<b>${n(d.ownedParameters)}</b>（共享引用不重复计数）</p><p>${esc(flow?.scope||d.scope)}</p>`;
+ if(first){summary.innerHTML+=`<p><strong>当前计算节点：${esc(first.title)}</strong></p>`+(shapes?`<p><code>${esc(shapes)}</code></p>`:'')+`<div class="formulas">${formulas((first.formulas||[]).slice(0,1))}</div>`;
+ if(weights.length)summary.innerHTML+=`<p>此步权重：${weights.map(p=>`${esc(p.name)} [${p.shape}] = ${n(p.count)}${p.multiplicity>1?' × '+p.multiplicity+' 套':''}`).join('；')}</p>`;
+ if(first.cost)summary.innerHTML+=`<p>此步${mode==='backward'?'局部梯度':'前向'}近似操作量 <strong class="learning-number">${n(first.cost.approximate)}</strong><br>仅此步骤；不含后续 Norm / 缓存 / Attention。矩阵采用 2MKN。</p>`;
+ }
+ if(flow)summary.innerHTML+=`<p>模块已覆盖主路径合计：${n(flow.totals.main.approximate)}（矩阵近似 + 其余普通算术，特殊函数另列）${flow.unknown.length?' · 完整执行边界 Unknown':''}</p>`;
+ if(mode==='backward')summary.innerHTML+='<p>梯度表示输出变化如何影响 Loss；dY 沿本次图传回 dX 与 dW。A 仅局部 VJP、历史缓存处停止；B 从 128 位置重算理论训练图，不能用 Decode × 3 代替。</p>';
+ if(selected==='global')summary.innerHTML+='<p>L20 Full 从 X20 生成 Global KV；L21–39 复用。这里计算源层，不能把此成本逐层相加。</p>';
+ const moe=audit.querySelector('.moe-stat-grid');if(moe)summary.append(moe.cloneNode(true));
+ const logic=document.createElement('div');logic.className='learning-steps';
+ if(mode==='backward')logic.innerHTML='<section><strong>dY → dX / dW</strong><p>Y=XW；dX=dY·Wᵀ，dW=Xᵀ·dY。dX 与 X 同形，dW 与 W 同形；传播到输入与累加权重梯度是两项不同矩阵运算。</p></section>';
+ const mainSteps=steps.filter(s=>s.path!=='conditional');
+ // Group by real ledger operation boundaries, never by a second cost model.
+ const plans={decoderattn:[['W_QA','Q：串行低秩投影 / Norm / RoPE'],['W_KV','Local KV：本层生成'],['W_CKV','Global KV 与 Indexer：源层主例'],['Attention · 选址','Local + Global：共同 Attention'],['Inverse RoPE','逆 RoPE 与分组输出投影']],hc:[['1a','生成动态系数'],['2a','Pre / Post / Comb 非线性与归一化'],['3 ·','用传入 Pre 合并四路'],['4 ·','Post / Comb 回混四路']],indexer:[['W_IQ','Index Query'],['W_IK','Index Key 与缓存复用'],['W_IH','Head 权重'],['Indexer · 相似度','打分、聚合与 Top-K'],['Indexer · Global','读取选中 Global KV']],engram:[['N-gram','历史编号、Hash 与查表'],['W_E','投影与 Key / Value'],['Engram · 残差','归一化匹配与门控'],['Residual','残差注入']]};
+ let groups=[];if(mode!=='backward'&&plans[selected]){const boundaries=plans[selected].map(([prefix,label])=>({i:mainSteps.findIndex(s=>s.title.startsWith(prefix)),label})).filter(b=>b.i>=0);groups=boundaries.map((b,j)=>({...b,end:boundaries[j+1]?.i??mainSteps.length}));}
+ if(mode!=='backward'&&selected==='moe'){const gate=mainSteps.map((s,i)=>s.title.startsWith('W1 ·')?i:-1).filter(i=>i>=0),ends=[0,...gate,mainSteps.findIndex(s=>s.title.startsWith('MoE ·'))];groups=ends.map((i,j)=>({i,end:ends[j+1]??mainSteps.length,label:['路由评分与 Top-6','当前 token 的 Routed Experts','Shared Expert','合并专家输出'][j]}));}
+ if(!groups.length){const size=Math.max(1,Math.ceil(mainSteps.length/6));for(let i=0;i<mainSteps.length;i+=size)groups.push({i,end:i+size,label:mainSteps[i].title});}
+ for(const {i,end,label} of groups){const group=mainSteps.slice(i,end),a=group[0],z=group.at(-1);logic.innerHTML+=`<section><strong>${esc(label)}</strong><p>账本步骤 ${i+1}–${i+group.length} · ${esc(a.purpose||a.note||'当前模块计算')}</p><p>${esc((a.inputs||[]).join('；'))} → ${esc((z.outputs||[]).join('；'))}</p><div class="formulas">${formulas((a.formulas||[]).slice(0,1))}</div><p>${group.every(s=>s.cost)?'近似小计 '+n(group.reduce((v,s)=>v+s.cost.approximate,0))+'；条件 VJP 仍单独列在审计中。':''}</p><button data-learning-step="${i}">核查此步权重与完整账本 →</button></section>`;}
+ if(mode==='parameter')logic.innerHTML=m.steps.map((s,i)=>`<section><strong>${esc(s.title)}</strong><div class="formulas">${formulas(s.formulas.slice(0,1))}${formulas(s.dimensions)}</div><p>${esc(s.note||'形状与权重引用来自当前模块参数表。')}</p><button data-learning-step="${i}">高亮此步使用的参数 →</button></section>`).join('');
+ body.append(summary,logic);
+ function setLevel(i){level=i;summary.hidden=i!==1;logic.hidden=i!==2;audit.hidden=i!==3;controls.querySelectorAll('[data-learning-level]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.learningLevel===i)));body.scrollTop=0;}
+ controls.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.learningLevel)setLevel(+b.dataset.learningLevel);if(b.dataset.learningMode){level=1;document.querySelector('.modes [data-mode="'+b.dataset.learningMode+'"]').click();}};
+ logic.onclick=e=>{const b=e.target.closest('[data-learning-step]');if(!b)return;setLevel(3);const i=+b.dataset.learningStep;parameterAudit.selectStep(i);const target=audit.querySelector('[data-derivation-index="'+i+'"]');if(target){target.open=true;target.scrollIntoView({block:'nearest'});}else audit.querySelector('#parameter-mini')?.scrollIntoView({block:'nearest'});};
+ setLevel(level);
+ };
+ window.progressiveCompute={reset(){level=1;},get level(){return level;}};
+})();
+</script>

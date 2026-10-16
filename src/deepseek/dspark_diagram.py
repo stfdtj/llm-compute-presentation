@@ -11,7 +11,7 @@ def build_dspark(c):
     d.raw('</defs>')
     def edge(path,kind='draft',dash=False):
         color={'main':'#2863c5','draft':'#8b51ce','verify':'#24875d'}[kind]
-        d.raw(f'<path class="dspark-edge" d="{path}" fill="none" stroke="{color}" stroke-width="2" marker-end="url(#ds-arrow-{kind})"'+(' stroke-dasharray="6 4"' if dash else '')+'/>')
+        d.raw(f'<path class="dspark-edge" d="{path}" fill="none" stroke="{color}" stroke-width="2" marker-end="url(#ds-arrow-{kind})"'+(' stroke-dasharray="6 4"' if dash or kind=='verify' else '')+'/>')
     def box(stage,x,y,w,h,lines,color='purple',size=19):
         d.raw(f'<g data-dspark-stage="{stage}">')
         d.box('overview',x,y,w,h,lines,color,size)

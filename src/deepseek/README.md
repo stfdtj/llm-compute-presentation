@@ -1,5 +1,14 @@
 # DeepSeek-V4.1 架构与逐步计算教学
 
+## 当前学习入口（最终聚焦重构）
+
+默认进入“总体架构 / 数据流 / 局部计算 / 实现与证据”四个工作区。局部计算采用 Level 1 概览、Level 2 逻辑步骤、Level 3 原审计账本；Forward A 与 Backward B 分别注明口径。旧完整图可通过 `deepseek_v4_1_interactive.html#architecture` 打开，原 DSpark 总览通过 `#dspark` 打开；在旧图点“返回学习主线”即可返回。
+
+L20 边界显式展示四路 E → HC Pre / Attention RMSNorm → X20。Prefill bounded replay 与 DSpark 验证/调度标为论文设计，未声称固定参考 model.py 已提供完整实现。
+
+构建仍为 `python src/deepseek/build.py`；浏览器聚合命令 `npm run test:browser:deepseek` 包含 Attention、DSpark 和新增 `verify_final_review.cjs`。详见 [最终验收与截图](../../docs/architecture/v2_final_validation.md)。
+
+
 直接用浏览器打开 `../../deepseek_v4_1_interactive.html`。这是一个离线单文件，内含 SVG、样式、交互、数据和 MathML 公式，无需启动服务器。
 
 点击模块查看参数量、前向 FLOPs 或反向梯度。切换模式保留当前模块；点击空白或按 Esc 关闭。滚轮缩放、拖动平移，按 `0` 或点击“适合窗口”复位。Tab / Enter 可操作图中模块。
@@ -18,7 +27,7 @@ HC Detail的小框与独立展开图保留原有交互。Encoder / Decoder Atten
 
 ## DSpark 主干与辅助路径
 
-页面默认显示独立的“主干 + DSpark”总览：40层蓝色主干、3层紫色可选草稿网络、绿色调度与验证路径。点击任何DSpark节点可查看输入、三层内部、Draft Attention、三个Head、Prefill/Decode、矩阵维度及候选接受过程；“完整架构”或URL的`#architecture`入口保留此前全部细节。右上“主干 + DSpark”返回新总览。
+旧版 `#dspark` 入口显示独立的“主干 + DSpark”总览：40层蓝色主干、3层紫色可选草稿网络、绿色调度与验证路径。点击任何DSpark节点可查看输入、三层内部、Draft Attention、三个Head、Prefill/Decode、矩阵维度及候选接受过程；“完整架构”或URL的`#architecture`入口保留此前全部细节。右上“主干 + DSpark”返回新总览。
 
 源文件为`dspark_diagram.py`、`dspark_ui.html`，构建沿用固定官方配置。`verify_dspark.cjs`已纳入浏览器回归。核对出处、七项陌生读者审查及参考代码未实现的验证循环边界见[DSpark验收记录](../../docs/architecture/dspark_validation.md)。
 

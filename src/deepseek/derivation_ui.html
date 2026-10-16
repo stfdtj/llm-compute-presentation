@@ -44,7 +44,7 @@
   return flow.steps.map((entry,i)=>{
    const s=LEDGER.steps[entry.ref];let head='';
    if(s.path==='conditional'&&!conditional){conditional=true;head='<div class="derivation-conditional"><strong>给定额外上游梯度的条件VJP</strong><p>以下账目独立累计，不并入主路径，也不代表已有训练算法。</p></div>';}
-   return head+'<details class="derivation-step" data-derivation-index="'+i+'"'+(i===0?' open':'')+'><summary><span class="derivation-title">'+(i+1)+'. '+esc(s.title)+'<small>'+n(s.cost.ordinary)+' 普通算术 · 特殊函数 '+special(s.cost.special)+'</small></span><span class="audit-badge '+esc(s.status)+'">'+esc(s.status)+'</span></summary><div class="derivation-content">'+
+   return head+'<details class="derivation-step" data-derivation-index="'+i+'"'+'><summary><span class="derivation-title">'+(i+1)+'. '+esc(s.title)+'<small>'+n(s.cost.ordinary)+' 普通算术 · 特殊函数 '+special(s.cost.special)+'</small></span><span class="audit-badge '+esc(s.status)+'">'+esc(s.status)+'</span></summary><div class="derivation-content">'+
     '<h3>这一步在做什么</h3><p>'+esc(s.purpose)+'</p><h3>输入 / 输出</h3><div class="derivation-shape">输入：'+s.inputs.map(esc).join('<br>')+'<br>↓<br>输出：'+s.outputs.map(esc).join('<br>')+'</div>'+
     '<h3>执行公式 <span class="audit-badge '+esc(s.formulaStatus)+'">'+esc(s.formulaStatus)+'</span></h3><div class="formulas">'+formulas(s.formulas)+'</div>'+
     '<h3>FLOPs 怎样推导</h3><p>'+esc(s.work)+'</p>'+countBlock(s.cost,false)+countBlock(entry.cumulative,true)+

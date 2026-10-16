@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "viewports": [
+    1920,
+    1366,
+    768,
+    390
+  ],
+  "workspaces": 4,
+  "dsparkTabs": 7,
+  "summaryCoverage": 189,
+  "keyboard": true,
+  "scroll": true,
+  "blankDismiss": true,
+  "scenarioModes": true,
+  "goldenProjection": true,
+  "ledgerUnchanged": true,
+  "offline": true,
+  "errors": []
+}

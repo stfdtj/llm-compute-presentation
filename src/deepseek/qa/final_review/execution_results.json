@@ -1,0 +1,62 @@
+{
+  "baselineHead": "deff9fd9dadcb9f3b8efd93d536ca0d0cee40480",
+  "date": "2026-10-16",
+  "pythonExecutable": ".venv/Scripts/python.exe -X utf8",
+  "commands": [
+    {
+      "command": "python src/compute_lab/build.py",
+      "exitCode": 0
+    },
+    {
+      "command": "python src/deepseek/build.py",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run test:lab",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run test:browser:lab",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run test:browser:deepseek",
+      "exitCode": 0
+    },
+    {
+      "command": "node src/deepseek/verify_attention.cjs",
+      "exitCode": 0
+    },
+    {
+      "command": "node src/deepseek/verify_dspark.cjs",
+      "exitCode": 0
+    },
+    {
+      "command": "python scripts/FLOPs_calculation_verify.py",
+      "exitCode": 0
+    },
+    {
+      "command": "python src/deepseek/verify_audit.py",
+      "exitCode": 0
+    },
+    {
+      "command": "python src/deepseek/verify_single_token.py",
+      "exitCode": 0
+    },
+    {
+      "command": "python src/deepseek/verify_calculations.py",
+      "exitCode": 0
+    },
+    {
+      "command": "python src/deepseek/verify_derivations.py",
+      "exitCode": 0
+    }
+  ],
+  "finalReview": "Included in final aggregate; see validation.json",
+  "artifacts": {
+    "deepseek_v4_1_interactive.html": "42ae8ef3a0aa9c1a2b169eb49bbcfb6c3be6a1a73dc329c47c3aad7d5ae547d9",
+    "index.html": "683610a0ec8a0acfe436dba721561dc4d4fe772d8218f64a407d17ffac2473d7"
+  },
+  "manualScreenshotsReviewed": true,
+  "noModelWeightsOrGPUExecution": true
+}

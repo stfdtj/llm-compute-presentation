@@ -1,5 +1,14 @@
 # LLM Compute Presentation
 
+## 当前学习入口（最终聚焦重构）
+
+默认进入“总体架构 / 数据流 / 局部计算 / 实现与证据”四个工作区。局部计算采用 Level 1 概览、Level 2 逻辑步骤、Level 3 原审计账本；Forward A 与 Backward B 分别注明口径。旧完整图可通过 `deepseek_v4_1_interactive.html#architecture` 打开，原 DSpark 总览通过 `#dspark` 打开；在旧图点“返回学习主线”即可返回。
+
+L20 边界显式展示四路 E → HC Pre / Attention RMSNorm → X20。Prefill bounded replay 与 DSpark 验证/调度标为论文设计，未声称固定参考 model.py 已提供完整实现。
+
+构建仍为 `python src/deepseek/build.py`；浏览器聚合命令 `npm run test:browser:deepseek` 包含 Attention、DSpark 和新增 `verify_final_review.cjs`。详见 [最终验收与截图](docs/architecture/v2_final_validation.md)。
+
+
 两个可离线打开的教学网页，以及从架构、参数量、FLOPs 到 Roofline / MFU 的中文讲稿。
 
 - [DeepSeek 架构交互页](deepseek_v4_1_interactive.html)：参数、前向、局部反向与信息流。

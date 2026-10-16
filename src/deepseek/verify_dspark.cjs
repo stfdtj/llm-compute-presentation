@@ -7,7 +7,7 @@ const {pathToFileURL}=require('node:url');
  try{
  const context=await browser.newContext({viewport:{width:1920,height:1080},offline:true}),page=await context.newPage(),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
- await page.goto(pathToFileURL(path.resolve(__dirname,'../../deepseek_v4_1_interactive.html')).href);await page.evaluate(()=>document.fonts.ready);
+ await page.goto(pathToFileURL(path.resolve(__dirname,'../../deepseek_v4_1_interactive.html')).href+'#dspark');await page.evaluate(()=>document.fonts.ready);
  assert.equal((await page.evaluate(()=>dsparkArchitecture.state)).active,true);
  const c=JSON.parse(fs.readFileSync(path.join(__dirname,'../../references/deepseek/inference/config.json'),'utf8'));
  assert.equal(c.n_layers,40);assert.equal(c.n_mtp_layers,3);assert.equal(c.dspark_block_size,5);assert.deepEqual(c.dspark_target_layer_ids,[37,38,39]);

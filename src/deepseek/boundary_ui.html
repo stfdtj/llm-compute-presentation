@@ -1,0 +1,23 @@
+﻿<!-- Presentation correction for the preserved historical SVG; no ledger or geometry baseline is rewritten. -->
+<style>.flow-on .review-boundary-edge{display:none}</style>
+<script>
+(()=>{
+ const hidden=svg.querySelector('#diagram-content [data-module="hidden"]');
+ const labels=['E = H19','1 × 4 × 5120','L20 HC Pre','+ RMSNorm','X20:1 × 5120'];
+ hidden.querySelectorAll('tspan').forEach((t,i)=>{t.textContent=labels[i]||'';t.removeAttribute('textLength');t.removeAttribute('lengthAdjust');});
+ hidden.querySelector('text').setAttribute('font-size','12');
+ hidden.setAttribute('aria-label','L20 boundary: Encoder E, four streams, HC Pre and Attention RMSNorm to X20');
+ for(const t of svg.querySelectorAll('#diagram-content tspan')){
+  const replacements={'(for Decoder)':'(L20 Full)','Encode encoder output':'X20 → Global KV','into decoder KV':'L21–39 reuse KV','(global KV)':'not Hidden State','Uses encoder Global KV +':'Uses L20 Global KV +'};
+  if(replacements[t.textContent])t.textContent=replacements[t.textContent];
+ }
+ // The original serial Global-KV -> Decoder arrow conflated a cache branch
+ // with residual state. Keep the frozen source SVG, correct its rendered path.
+ for(const p of svg.querySelectorAll('#diagram-content .connection'))if(p.getAttribute('d')==='M1063 233 H1070')p.style.display='none';
+ const ns='http://www.w3.org/2000/svg',g=document.createElementNS(ns,'g');g.classList.add('review-boundary-edge');
+ const path=document.createElementNS(ns,'path');path.setAttribute('d','M859 233 V179 H1197 V184');path.setAttribute('fill','none');path.setAttribute('stroke','#2863c5');path.setAttribute('stroke-width','1.5');
+ const title=document.createElementNS(ns,'title');title.textContent='E [1,4,5120] remains the residual input to Decoder L20. The separate boundary box shows its HC Pre / Norm branch to X20.';path.append(title);g.append(path);
+ const text=document.createElementNS(ns,'text');text.setAttribute('x','1090');text.setAttribute('y','173');text.setAttribute('font-size','12');text.setAttribute('text-anchor','middle');text.textContent='E [1,4,5120] → L20 residual input';g.append(text);svg.querySelector('#diagram-content').append(g);
+ fitLabels();
+})();
+</script>
