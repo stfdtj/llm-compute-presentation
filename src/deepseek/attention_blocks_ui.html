@@ -1,0 +1,27 @@
+<!-- Extend the original SVG focus controls; keep the original page and inspector. -->
+<style>
+.attention-focus{cursor:pointer;outline:none}.attention-focus:hover rect,.attention-focus:focus-visible rect{stroke:#245dc3;stroke-width:2}
+.attention-expanded{display:none}.attention-expanded.attention-active{display:block}#diagram-content.attention-block-focused>:not(.attention-expanded){display:none}
+#architecture #indexer-entry-links{display:none}#architecture[data-native-focus="c1"] #indexer-entry-links,#architecture[data-native-focus="c2"] #indexer-entry-links{display:block}#architecture[data-native-focus="c1"] [data-indexer-entry="decoder"],#architecture[data-native-focus="c2"] [data-indexer-entry="encoder"]{display:none}
+.inline-indexer{cursor:pointer}.inline-indexer-node{outline:none}.inline-indexer.inline-highlight>.inline-indexer-node>.surface,.inline-indexer-node:focus-visible>.surface{stroke:#8653b6;stroke-width:3}
+#attention-source-note{font-size:12px;line-height:1.6;margin:8px 0;padding:9px;background:#fff5df;border:1px solid #ddc899;border-radius:6px;color:#705521}
+</style>
+<script>
+(()=>{
+ // The original overview and four-block detail composition remain at their original coordinates.
+ // Only focus targets for the two Attention blocks point to larger drawings within this same SVG.
+ regions.c1=[1720,0,1500,970];regions.c2=[1720,1050,1500,970];
+ regions.draft=[3300,0,1500,970];const draftOption=document.createElement('option');draftOption.value='draft';draftOption.textContent='DSpark · 3 draft stages';document.getElementById('region-select').append(draftOption);
+ function visibility(){const selected=document.getElementById('region-select').value,id={c1:'encoder-attention-expanded',c2:'decoder-attention-expanded',draft:'draft-expanded'}[selected],content=document.getElementById('diagram-content');svg.dataset.nativeFocus=selected;if(!content.hasAttribute('class'))content.setAttribute('class','');content.classList.toggle('attention-block-focused',Boolean(id));svg.querySelectorAll('.attention-expanded').forEach(n=>n.classList.toggle('attention-active',n.id===id));fitLabels();}
+ document.getElementById('region-select').addEventListener('change',visibility);document.getElementById('reset').addEventListener('click',visibility);document.addEventListener('keydown',e=>{if(e.key==='0')visibility();});visibility();
+ document.getElementById('region-select').addEventListener('change',e=>{if(['c1','c2','draft'].includes(e.target.value)&&window.informationFlow?.state.enabled)document.getElementById('flow-toggle').click();},true);
+ document.getElementById('flow-toggle').addEventListener('click',()=>{if(!window.informationFlow?.state.enabled){reset();visibility();}},true);
+ function focusAttention(name){closePanel();if(window.informationFlow?.state.enabled)document.getElementById('flow-toggle').click();if(window.indexerTeaching?.state.active)document.getElementById('indexer-close').click();const chooser=document.getElementById('region-select');chooser.value=name;chooser.dispatchEvent(new Event('change',{bubbles:true}));}
+ function activate(e){if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;const target=e.target.closest('[data-attention-focus]');if(target){e.preventDefault();e.stopImmediatePropagation();focusAttention(target.dataset.attentionFocus);return;}const index=e.target.closest('.inline-indexer');if(index){e.preventDefault();e.stopImmediatePropagation();closePanel();if(index.dataset.inlineRegion){focusAttention(index.dataset.inlineRegion);}else{svg.querySelectorAll('.inline-highlight').forEach(n=>n.classList.remove('inline-highlight'));index.classList.add('inline-highlight');}}}
+ svg.addEventListener('click',activate,true);svg.addEventListener('keydown',activate,true);
+ const originalDraw=drawPanel;drawPanel=function(...args){originalDraw(...args);if(document.getElementById('region-select').value==='draft'&&selected){const scope=document.createElement('div');scope.id='attention-source-note';scope.textContent='DSpark view: this is the existing backbone calculation ledger for comparison. These values are not draft-specific parameter or FLOPs results; draft shapes and Top-3 routing are shown in the diagram.';body.prepend(scope);}else if(['encoderattn','decoderattn','indexer','compressor','global'].includes(selected)){
+  const note=document.createElement('div');note.id='attention-source-note';note.textContent='Source note: KV generators are layers 2/8/14/20; reindex-only layers are 24/28/32/36. Local model.py publishes source Index Keys only when a compression group completes; the pinned reference rebinds them even for an incomplete group. That local branch has not been runtime-verified. Existing calculation values retain their original layer/history assumptions.';body.prepend(note);
+ }};
+ window.attentionBlocks={focus:focusAttention,regions:{encoder:regions.c1,decoder:regions.c2}};
+})();
+</script>

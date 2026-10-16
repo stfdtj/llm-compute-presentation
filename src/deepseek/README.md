@@ -1,5 +1,11 @@
 # DeepSeek-V4.1 单 token 交互教学
 
+## Original layout / expanded Attention blocks
+
+The original page, 1672×941 canvas and four detail-block positions remain. Encoder and Decoder Attention are updated in place; click **Enlarge detail** or choose C · Encoder / C · Decoder in the original focus menu. The larger drawings are part of the same SVG and include Query, Local KV, Compressor, inline Indexer scoring/Top-k, KV gathering and output projection. Indexer nodes highlight inline; the explicit Full Indexer calculations link retains the eb9356c calculation tool. DSpark is a small overview entry and an original-menu focus target. No replacement workspace or tab bar is built.
+
+Source discrepancies, retained geometry checks, tests and screenshots: [validation](../../docs/architecture/attention_inplace_validation.md).
+
 直接用浏览器打开 `../../deepseek_v4_1_interactive.html`。这是一个离线单文件，内含 SVG、样式、交互、数据和 MathML 公式，无需启动服务器。
 
 点击模块查看参数量、前向 FLOPs 或反向梯度。切换模式保留当前模块；点击空白或按 Esc 关闭。滚轮缩放、拖动平移，按 `0` 或点击“适合窗口”复位。Tab / Enter 可操作图中模块。

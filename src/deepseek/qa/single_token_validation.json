@@ -8,13 +8,11 @@
     4,
     1
   ],
-  "unchangedSvgElements": 323,
+  "unchangedSvgElements": 157,
   "preserved": [
-    "shapes",
-    "positions",
-    "arrows",
-    "colors",
-    "groups",
+    "non-Attention shapes and arrows",
+    "original canvas and layout",
+    "HC/MoE/Engram blocks",
     "viewBox"
   ]
 }

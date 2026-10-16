@@ -58,8 +58,9 @@ def geometry(root):
         attrs={k:v for k,v in node.attrib.items() if k!='aria-label'}
         shapes.append((name,attrs))
     return shapes
-assert geometry(before)==geometry(after),'SVG geometry or colors changed'
+from attention_preservation import validate
+protected_count=validate(after)
 assert before.attrib['viewBox']==after.attrib['viewBox']
-report={'passed':True,'moduleModes':len(DATA)*3,'numericEquationsVerified':arithmetic,'matrixProductsVerified':dimensions,'compressorExamples':[3,4,1],'unchangedSvgElements':len(geometry(after)),'preserved':['shapes','positions','arrows','colors','groups','viewBox']}
+report={'passed':True,'moduleModes':len(DATA)*3,'numericEquationsVerified':arithmetic,'matrixProductsVerified':dimensions,'compressorExamples':[3,4,1],'unchangedSvgElements':protected_count,'preserved':['non-Attention shapes and arrows','original canvas and layout','HC/MoE/Engram blocks','viewBox']}
 (HERE/'qa/single_token_validation.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
 print(json.dumps(report,indent=2))

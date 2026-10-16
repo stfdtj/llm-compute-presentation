@@ -1,0 +1,563 @@
+{
+  "config": {
+    "vocab_size": 129280,
+    "dim": 5120,
+    "moe_inter_dim": 2304,
+    "n_layers": 40,
+    "n_mtp_layers": 3,
+    "dspark_block_size": 5,
+    "dspark_noise_token_id": 128799,
+    "dspark_target_layer_ids": [
+      37,
+      38,
+      39
+    ],
+    "dspark_markov_rank": 256,
+    "dspark_n_routed_experts": 128,
+    "dspark_n_activated_experts": 3,
+    "n_heads": 64,
+    "n_routed_experts": 384,
+    "n_shared_experts": 1,
+    "n_activated_experts": 6,
+    "score_func": "sqrtsoftplus",
+    "route_scale": 1.5,
+    "swiglu_limit": 10.0,
+    "q_lora_rank": 1280,
+    "head_dim": 512,
+    "rope_head_dim": 64,
+    "norm_eps": 1e-20,
+    "o_groups": 8,
+    "o_lora_rank": 1024,
+    "window_size": 128,
+    "kv_source_layers": [
+      2,
+      8,
+      14,
+      20
+    ],
+    "index_source_layers": [
+      2,
+      8,
+      14,
+      20,
+      24,
+      28,
+      32,
+      36
+    ],
+    "original_seq_len": 65536,
+    "rope_theta": 10000,
+    "rope_factor": 16,
+    "beta_fast": 32,
+    "beta_slow": 1,
+    "index_n_heads": 32,
+    "index_head_dim": 128,
+    "index_topk": 512,
+    "candidate_source_layer": 20,
+    "candidate_topk_blocks": 2048,
+    "candidate_block_size": 8,
+    "hc_mult": 4,
+    "hc_sinkhorn_iters": 20,
+    "hc_eps": 1e-06,
+    "engram_layer_ids": [
+      1,
+      14
+    ],
+    "engram_vocab_size": 16000000,
+    "engram_num_embeddings": [
+      384006168,
+      384016682
+    ],
+    "engram_max_ngram_size": 4,
+    "engram_pad_id": 2,
+    "engram_compressed_vocab_size": 99092,
+    "dtype": "fp8",
+    "expert_dtype": "fp4",
+    "compress_rope_theta": 160000,
+    "compress_ratios": [
+      0,
+      0,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "vision_n_layers": 32,
+    "vision_dim": 1024,
+    "vision_n_heads": 16,
+    "vision_inter_dim": 2816,
+    "vision_patch_size": 14,
+    "vision_downsample_ratio": 3,
+    "vision_max_n_token": 1024,
+    "vision_min_pixels": 295936,
+    "vision_max_wh_ratio": null,
+    "image_token_id": 129264,
+    "engram_n_heads": 8,
+    "engram_head_dim": 256,
+    "vision_rope_theta": 10000
+  },
+  "layers": [
+    {
+      "layer": 0,
+      "ratio": 0,
+      "kvSource": null,
+      "indexSource": null,
+      "action": "Window only"
+    },
+    {
+      "layer": 1,
+      "ratio": 0,
+      "kvSource": null,
+      "indexSource": null,
+      "action": "Window only"
+    },
+    {
+      "layer": 2,
+      "ratio": 2,
+      "kvSource": 2,
+      "indexSource": 2,
+      "action": "Generate"
+    },
+    {
+      "layer": 3,
+      "ratio": 2,
+      "kvSource": 2,
+      "indexSource": 2,
+      "action": "Reuse"
+    },
+    {
+      "layer": 4,
+      "ratio": 2,
+      "kvSource": 2,
+      "indexSource": 2,
+      "action": "Reuse"
+    },
+    {
+      "layer": 5,
+      "ratio": 2,
+      "kvSource": 2,
+      "indexSource": 2,
+      "action": "Reuse"
+    },
+    {
+      "layer": 6,
+      "ratio": 2,
+      "kvSource": 2,
+      "indexSource": 2,
+      "action": "Reuse"
+    },
+    {
+      "layer": 7,
+      "ratio": 2,
+      "kvSource": 2,
+      "indexSource": 2,
+      "action": "Reuse"
+    },
+    {
+      "layer": 8,
+      "ratio": 2,
+      "kvSource": 8,
+      "indexSource": 8,
+      "action": "Generate"
+    },
+    {
+      "layer": 9,
+      "ratio": 2,
+      "kvSource": 8,
+      "indexSource": 8,
+      "action": "Reuse"
+    },
+    {
+      "layer": 10,
+      "ratio": 2,
+      "kvSource": 8,
+      "indexSource": 8,
+      "action": "Reuse"
+    },
+    {
+      "layer": 11,
+      "ratio": 2,
+      "kvSource": 8,
+      "indexSource": 8,
+      "action": "Reuse"
+    },
+    {
+      "layer": 12,
+      "ratio": 2,
+      "kvSource": 8,
+      "indexSource": 8,
+      "action": "Reuse"
+    },
+    {
+      "layer": 13,
+      "ratio": 2,
+      "kvSource": 8,
+      "indexSource": 8,
+      "action": "Reuse"
+    },
+    {
+      "layer": 14,
+      "ratio": 2,
+      "kvSource": 14,
+      "indexSource": 14,
+      "action": "Generate"
+    },
+    {
+      "layer": 15,
+      "ratio": 2,
+      "kvSource": 14,
+      "indexSource": 14,
+      "action": "Reuse"
+    },
+    {
+      "layer": 16,
+      "ratio": 2,
+      "kvSource": 14,
+      "indexSource": 14,
+      "action": "Reuse"
+    },
+    {
+      "layer": 17,
+      "ratio": 2,
+      "kvSource": 14,
+      "indexSource": 14,
+      "action": "Reuse"
+    },
+    {
+      "layer": 18,
+      "ratio": 2,
+      "kvSource": 14,
+      "indexSource": 14,
+      "action": "Reuse"
+    },
+    {
+      "layer": 19,
+      "ratio": 2,
+      "kvSource": 14,
+      "indexSource": 14,
+      "action": "Reuse"
+    },
+    {
+      "layer": 20,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 20,
+      "action": "Generate"
+    },
+    {
+      "layer": 21,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 20,
+      "action": "Reuse"
+    },
+    {
+      "layer": 22,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 20,
+      "action": "Reuse"
+    },
+    {
+      "layer": 23,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 20,
+      "action": "Reuse"
+    },
+    {
+      "layer": 24,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 24,
+      "action": "Reindex"
+    },
+    {
+      "layer": 25,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 24,
+      "action": "Reuse"
+    },
+    {
+      "layer": 26,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 24,
+      "action": "Reuse"
+    },
+    {
+      "layer": 27,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 24,
+      "action": "Reuse"
+    },
+    {
+      "layer": 28,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 28,
+      "action": "Reindex"
+    },
+    {
+      "layer": 29,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 28,
+      "action": "Reuse"
+    },
+    {
+      "layer": 30,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 28,
+      "action": "Reuse"
+    },
+    {
+      "layer": 31,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 28,
+      "action": "Reuse"
+    },
+    {
+      "layer": 32,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 32,
+      "action": "Reindex"
+    },
+    {
+      "layer": 33,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 32,
+      "action": "Reuse"
+    },
+    {
+      "layer": 34,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 32,
+      "action": "Reuse"
+    },
+    {
+      "layer": 35,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 32,
+      "action": "Reuse"
+    },
+    {
+      "layer": 36,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 36,
+      "action": "Reindex"
+    },
+    {
+      "layer": 37,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 36,
+      "action": "Reuse"
+    },
+    {
+      "layer": 38,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 36,
+      "action": "Reuse"
+    },
+    {
+      "layer": 39,
+      "ratio": 1,
+      "kvSource": 20,
+      "indexSource": 36,
+      "action": "Reuse"
+    }
+  ],
+  "sources": {
+    "models/DeepSeek-V4.1-Flash/model.py": {
+      "sha256": "4e9ae23620edc8028ccc5d5fef552ab7fdc7dcd6f79608754fe9f67644056f65",
+      "functions": {
+        "ModelArgs.vision_enabled": 139,
+        "ModelArgs.get_moe_config": 142,
+        "ParallelEmbedding.__init__": 156,
+        "ParallelEmbedding.forward": 168,
+        "Linear.__init__": 214,
+        "Linear.forward": 242,
+        "ColumnParallelLinear.__init__": 249,
+        "ColumnParallelLinear.forward": 256,
+        "RowParallelLinear.__init__": 264,
+        "RowParallelLinear.forward": 271,
+        "RMSNorm.__init__": 282,
+        "RMSNorm.forward": 288,
+        "ParallelEngramEmbedding.__init__": 299,
+        "ParallelEngramEmbedding.forward": 312,
+        "Engram.__init__": 335,
+        "Engram.forward": 350,
+        "Compressor.__init__": 437,
+        "Compressor.forward": 458,
+        "Indexer.__init__": 496,
+        "Indexer.forward": 527,
+        "Attention.__init__": 622,
+        "Attention._window_kv": 700,
+        "Attention._compress_topk_idxs": 722,
+        "Attention._compress_kv": 739,
+        "Attention.forward": 765,
+        "Gate.__init__": 796,
+        "Gate.forward": 809,
+        "Expert.__init__": 834,
+        "Expert.forward": 841,
+        "MoE.__init__": 858,
+        "MoE.forward": 889,
+        "Block.__init__": 919,
+        "Block.hc_mixes": 948,
+        "Block.hc_pre": 957,
+        "Block.hc_post": 962,
+        "Block.forward": 968,
+        "ParallelHead.__init__": 998,
+        "ParallelHead.forward": 1008,
+        "DSparkAttention.forward": 1033,
+        "DSparkMarkovHead.__init__": 1078,
+        "DSparkMarkovHead.forward": 1083,
+        "DSparkConfidenceHead.__init__": 1090,
+        "DSparkConfidenceHead.forward": 1095,
+        "DSparkBlock.__init__": 1105,
+        "DSparkBlock.forward": 1122,
+        "DSparkBlock.forward_embed": 1128,
+        "DSparkBlock.forward_head": 1137,
+        "SharedAttentionRuntime.__init__": 1172,
+        "Transformer.__init__": 1187,
+        "Transformer.encode_image": 1225,
+        "Transformer.merge_image_embeddings": 1228,
+        "Transformer.forward": 1242,
+        "Transformer.forward_spec": 1275
+      }
+    },
+    "models/DeepSeek-V4.1-Flash/config.json": {
+      "sha256": "2e84f45cf1dac8c7fcbb200e96667d4b913275690668ed496f24c7747207a809"
+    },
+    "models/DeepSeek-V4.1-Flash/engram.py": {
+      "sha256": "11f35ecbead8150c35aa002b3d180ef290b05a25afe883a11884f94d476d3897",
+      "functions": {
+        "EngramLayout.from_args": 103,
+        "NgramHashState.__init__": 140,
+        "NgramHashState.forward": 160
+      }
+    },
+    "references/deepseek/inference/model.py": {
+      "sha256": "e5decd76fe70fd56ef2f10124d245c6f64fb6a0003cc9068a1d3182a168b8d2d",
+      "functions": {
+        "ModelArgs.vision_enabled": 139,
+        "ModelArgs.get_moe_config": 142,
+        "ParallelEmbedding.__init__": 156,
+        "ParallelEmbedding.forward": 168,
+        "Linear.__init__": 214,
+        "Linear.forward": 242,
+        "ColumnParallelLinear.__init__": 249,
+        "ColumnParallelLinear.forward": 256,
+        "RowParallelLinear.__init__": 264,
+        "RowParallelLinear.forward": 271,
+        "RMSNorm.__init__": 282,
+        "RMSNorm.forward": 288,
+        "ParallelEngramEmbedding.__init__": 299,
+        "ParallelEngramEmbedding.forward": 312,
+        "Engram.__init__": 335,
+        "Engram.forward": 350,
+        "Compressor.__init__": 437,
+        "Compressor.forward": 458,
+        "Indexer.__init__": 496,
+        "Indexer.forward": 527,
+        "Attention.__init__": 623,
+        "Attention._window_kv": 701,
+        "Attention._compress_topk_idxs": 723,
+        "Attention._compress_kv": 740,
+        "Attention.forward": 766,
+        "Gate.__init__": 798,
+        "Gate.forward": 811,
+        "Expert.__init__": 836,
+        "Expert.forward": 843,
+        "MoE.__init__": 860,
+        "MoE.forward": 891,
+        "Block.__init__": 921,
+        "Block.hc_mixes": 950,
+        "Block.hc_pre": 959,
+        "Block.hc_post": 964,
+        "Block.forward": 970,
+        "ParallelHead.__init__": 1000,
+        "ParallelHead.forward": 1010,
+        "DSparkAttention.forward": 1035,
+        "DSparkMarkovHead.__init__": 1081,
+        "DSparkMarkovHead.forward": 1086,
+        "DSparkConfidenceHead.__init__": 1093,
+        "DSparkConfidenceHead.forward": 1098,
+        "DSparkBlock.__init__": 1108,
+        "DSparkBlock.forward": 1125,
+        "DSparkBlock.forward_embed": 1131,
+        "DSparkBlock.forward_head": 1140,
+        "SharedAttentionRuntime.__init__": 1175,
+        "Transformer.__init__": 1190,
+        "Transformer.encode_image": 1228,
+        "Transformer.merge_image_embeddings": 1231,
+        "Transformer.forward": 1245,
+        "Transformer.forward_spec": 1278
+      }
+    },
+    "references/deepseek/inference/config.json": {
+      "sha256": "2e84f45cf1dac8c7fcbb200e96667d4b913275690668ed496f24c7747207a809"
+    },
+    "references/deepseek/inference/engram.py": {
+      "sha256": "11f35ecbead8150c35aa002b3d180ef290b05a25afe883a11884f94d476d3897",
+      "functions": {
+        "EngramLayout.from_args": 103,
+        "NgramHashState.__init__": 140,
+        "NgramHashState.forward": 160
+      }
+    }
+  },
+  "sourceDifferences": [
+    "Local Indexer.forward publishes shared index_k inside the latent-present branch; pinned reference rebinds on every owns_k call.",
+    "Pinned Attention.forward and DSparkAttention.forward quantize grouped output before einsum; local model omits that act_quant call."
+  ],
+  "scope": "Forward control flow inspected; weights, GPU kernels and acceptance scheduler not executed."
+}

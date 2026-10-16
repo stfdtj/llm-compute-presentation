@@ -16,6 +16,8 @@ AUDIT=apply(DATA)
 write_docs(AUDIT,DATA)
 (ROOT/'src/deepseek/audit_data.json').write_text(json.dumps(AUDIT,ensure_ascii=False,indent=2),encoding='utf-8')
 svg=build()
+from attention_preservation import validate
+validate(svg)
 root=ET.fromstring(svg)
 ids=[e.attrib['data-module'] for e in root.iter() if 'data-module' in e.attrib]
 assert all(i in DATA for i in ids)
@@ -41,6 +43,7 @@ indexer_fields=['dim','n_layers','n_heads','q_lora_rank','head_dim','index_n_hea
 indexer_config={key:indexer_text_config[indexer_aliases.get(key,key)] for key in indexer_fields}
 indexer_ui=(ROOT/'src/deepseek/indexer_ui.html').read_text(encoding='utf-8').replace('__INDEXER_SVG__',build_indexer(indexer_config)).replace('__INDEXER_CONFIG__',json.dumps({k:indexer_config[k] for k in indexer_fields}))
 result=result.replace('</body>',indexer_ui+'\n</body>')
+result=result.replace('</body>',(ROOT/'src/deepseek/attention_blocks_ui.html').read_text(encoding='utf-8')+'\n</body>')
 (ROOT/'deepseek_v4_1_interactive.html').write_text(result,encoding='utf-8')
 (ROOT/'src/deepseek/architecture.svg').write_text(svg,encoding='utf-8')
 print(f'Built standalone HTML: {len(result.encode("utf-8")):,} bytes; {len(ids)} interactive SVG elements / {len(set(ids))} keys; {len(DATA)} calculation entries.')
