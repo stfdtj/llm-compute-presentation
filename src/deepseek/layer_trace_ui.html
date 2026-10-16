@@ -1,0 +1,51 @@
+<style>
+.csa2-boundary{pointer-events:none}.trace-layer{display:none}.trace-layer.trace-visible{display:block}
+#layer-trace-bar[hidden]{display:none!important}#layer-trace-bar{position:absolute;left:10px;right:10px;top:var(--header-height,66px);z-index:4;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;background:white;border:1px solid #dfe5ef;font-size:12px}
+#layer-trace-bar strong{font-size:14px}#layer-trace-bar select{max-width:240px}#layer-trace-bar button{padding:4px 8px;font-size:12px}#layer-trace-bar button[aria-pressed=true]{background:#e7f1ff;border-color:#86a8da}
+.layer-trace-on #stage{top:var(--layer-trace-top,120px)}.layer-trace-on #inspector{top:calc(var(--layer-trace-top,120px) + 8px);max-height:calc(100dvh - var(--layer-trace-top,120px) - 48px)}
+.indexer-on #layer-trace-bar,.flow-on #layer-trace-bar{display:none!important}.layer-trace-on.indexer-on #stage{top:var(--indexer-stage-top,165px)}.layer-trace-on.indexer-on #inspector{top:calc(var(--indexer-stage-top,165px) + 8px);max-height:calc(100dvh - var(--indexer-stage-top,165px) - 48px)}
+#layer-trace-note{margin-left:auto;color:#526986}@media(max-width:780px){#layer-trace-bar{left:5px;right:5px;gap:4px;padding:5px}#layer-trace-note{display:none}}
+</style>
+<section id="layer-trace-bar" hidden aria-label="Layer-by-layer Attention controls">
+ <strong id="layer-trace-title">Encoder layers</strong>
+ <button id="trace-sequence" aria-pressed="true">Layer sequence</button><button id="trace-operations" aria-pressed="false">Attention operations</button>
+ <button id="trace-prev" aria-label="Previous two layers">←</button><label>Layer <select id="trace-layer"></select></label><button id="trace-next" aria-label="Next two layers">→</button>
+ <span id="layer-trace-note">Dashed CSA2 boundary excludes mHC / FFN. Drag to pan; use + to zoom.</span>
+</section>
+<script>
+(()=>{
+ const bar=document.getElementById('layer-trace-bar'),chooser=document.getElementById('region-select'),layerSelect=document.getElementById('trace-layer');
+ let kind=null,start=0,operations=false;
+ const bases={c1:0,c2:1050};
+ function layout(){if(!kind)return;document.documentElement.style.setProperty('--layer-trace-top',(bar.getBoundingClientRect().bottom+9)+'px');}
+ function paintTrace(){
+  if(!kind||window.indexerTeaching?.state.active||window.informationFlow?.state.enabled)return;layout();const base=bases[kind],first=kind==='c1'?0:20,last=first+19,offset=start-first;
+  document.getElementById('layer-trace-title').textContent=(kind==='c1'?'Encoder 0–19':'Decoder 20–39')+(operations?' · operations':` · showing ${start}–${Math.min(start+1,last)}`);
+  document.getElementById('trace-sequence').setAttribute('aria-pressed',String(!operations));document.getElementById('trace-operations').setAttribute('aria-pressed',String(operations));
+  layerSelect.value=start;layerSelect.disabled=operations;document.getElementById('trace-prev').disabled=operations||start<=first;document.getElementById('trace-next').disabled=operations||start>=last-1;
+  svg.querySelectorAll('.trace-layer').forEach(n=>n.classList.toggle('trace-visible',!operations&&Number(n.dataset.traceLayer)>=start&&Number(n.dataset.traceLayer)<=start+1));
+  // The native viewport follows two consecutive rows; all 20 layers remain in the same SVG.
+  if(operations){const w=Math.max(1530,1050*stage.clientWidth/stage.clientHeight);view={x:1720+750-w/2,y:base-5,w,h:w*stage.clientHeight/stage.clientWidth};}
+  else{view={x:1705,y:base+1190+offset*260-(offset===0?110:65),w:1530,h:1530*stage.clientHeight/stage.clientWidth};}
+  const targetY=operations?base+25:base+1190+offset*260-(offset===0?105:60);
+  for(const [entry,entryBase] of [['encoder',25],['decoder',1075]]){
+   const n=svg.querySelector(`[data-indexer-entry="${entry}"]`);if(n)n.setAttribute('transform',`translate(0 ${targetY-entryBase})`);
+  }
+  paint();fitLabels();
+ }
+ function sync(){
+  const next=['c1','c2'].includes(chooser.value)?chooser.value:null;
+  if(next!==kind){kind=next;start=kind==='c2'?20:0;operations=false;layerSelect.replaceChildren();if(kind)for(let n=start;n<start+20;n++){const o=document.createElement('option');o.value=n;o.textContent=`Layer ${n}`;layerSelect.append(o);}}
+  bar.hidden=!kind;document.body.classList.toggle('layer-trace-on',Boolean(kind));
+  if(kind)paintTrace();else{svg.querySelectorAll('.trace-visible').forEach(n=>n.classList.remove('trace-visible'));svg.querySelectorAll('[data-indexer-entry]').forEach(n=>n.setAttribute('transform','translate(0 0)'));}
+ }
+ chooser.addEventListener('change',sync);document.getElementById('reset').addEventListener('click',sync);document.addEventListener('keydown',e=>{if(e.key==='0')sync();});
+ document.getElementById('flow-toggle').addEventListener('click',sync);
+ document.getElementById('trace-sequence').addEventListener('click',()=>{closePanel();operations=false;paintTrace();});document.getElementById('trace-operations').addEventListener('click',()=>{closePanel();operations=true;paintTrace();});
+ layerSelect.addEventListener('change',()=>{closePanel();start=+layerSelect.value;paintTrace();});
+ document.getElementById('trace-prev').addEventListener('click',()=>{start=Math.max(kind==='c1'?0:20,start-2);closePanel();paintTrace();});document.getElementById('trace-next').addEventListener('click',()=>{start=Math.min(kind==='c1'?18:38,start+2);closePanel();paintTrace();});
+ new ResizeObserver(()=>{if(kind){layout();paintTrace();}}).observe(bar);window.addEventListener('resize',()=>{if(kind)paintTrace();});
+ const originalDraw=drawPanel;drawPanel=function(...args){originalDraw(...args);if(selected==='hc'){document.getElementById('panel-title').textContent='Single-Pass mHC · Manifold-Constrained Hyper-Connections';body.querySelectorAll('.section > p,.simple-note').forEach(p=>{for(const n of p.childNodes)if(n.nodeType===Node.TEXT_NODE)n.textContent=n.textContent.replace(/\bHC\b/g,'mHC');});}};
+ sync();window.layerTrace={get state(){return{kind,start,operations};},show:sync};
+})();
+</script>

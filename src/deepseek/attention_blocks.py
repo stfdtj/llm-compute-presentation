@@ -11,6 +11,8 @@ def compact():
         d.frame(key, x, 585, w, 333, color, title, 21)
         center = x + w/2
         d.text(x+w-90, 640, 'X: [1,5120]', 13)
+        d.raw(f'<rect class="csa2-boundary" data-csa2-compact="{key}" x="{x+8}" y="650" width="{w-16}" height="242" rx="8" fill="none" stroke="#247b9f" stroke-width="1.5" stroke-dasharray="6 4"/>')
+        d.text(x+w*.53,648,'CSA2 (L20–39)' if decoder else 'CSA2 (L2–19)',11)
         d.box('query', x+12, 654, w*.48-18, 64,
               ['Low-rank Query + RoPE', '5120 → 1280 → 64 × 512'], 'blue', 14)
         d.box('kv', x+w*.48+6, 654, w*.52-18, 64,
@@ -48,12 +50,15 @@ def expanded(decoder=False):
     key = 'decoderattn' if decoder else 'encoderattn'
     ox, oy = 1720, 1050 if decoder else 0
     d.raw(f'<g class="attention-expanded" id="{name}-attention-expanded" data-attention-expanded="{name}" transform="translate({ox} {oy})" font-family="Times New Roman, Microsoft YaHei, serif">')
-    d.frame(key, 10, 10, 1480, 950, 'orange' if decoder else 'blue',
+    d.frame(key, 10, 10, 1480, 1025, 'orange' if decoder else 'blue',
             ('Decoder · Layers 20–39' if decoder else 'Encoder · Layers 0–19') + ' — Attention (Detail)', 28)
-    d.text(35, 80, 'Input X = this Block’s HC Pre + RMSNorm: [1,5120]. B=1; sequence axis omitted below.', 21, anchor='start')
+    d.text(35, 80, 'Input X = this Block’s mHC Pre + RMSNorm: [1,5120]. B=1; sequence axis omitted below.', 21, anchor='start')
     d.text(35, 113, 'Generate KV: 20. Reindex: 24 / 28 / 32 / 36. Reuse KV20 throughout 20–39.' if decoder else
            '0–1: window only. Generate KV + Index Keys + Top-k: 2 / 8 / 14. Reuse: 3–7 / 9–13 / 15–19.', 20, anchor='start')
 
+    d.raw(f'<rect class="csa2-boundary" data-csa2-operations="{name}" x="20" y="139" width="1460" height="776" rx="12" fill="none" stroke="#247b9f" stroke-width="2.5" stroke-dasharray="10 6"/>')
+    d.raw('<rect x="1020" y="124" width="430" height="25" fill="white"/>')
+    d.text(1235,143,'CSA2 · Layers 20–39' if decoder else 'CSA2 · Layers 2–19',20,True)
     def node(key, x, y, w, h, lines, color='blue', inline=False):
         if inline:d.raw('<g class="inline-indexer">')
         inline_start=len(d.S)
@@ -113,13 +118,16 @@ def expanded(decoder=False):
     d.arrow('M1245 510 V575',width=1.8)
     d.arrow('M750 285 V310 H995 V550 H1390 V575',width=1.8)
     d.text(1125,546,'Local KV',18,anchor='start',fill='#238461')
-    node('output',35,800,1430,105,['Main Attention → inverse RoPE → grouped output projection → HC Post',
+    node('output',35,800,1430,105,['Main Attention → inverse RoPE → grouped output projection',
          'Per head: Q[1,512] × Kᵀ[512,N+k] → scaled softmax with learned sink → weighted V[N+k,512] → [1,512].',
-         '64 heads → inverse RoPE → 8 groups [4096] × [4096,1024] → [8192] × [8192,5120] → U[5120] → four HC streams.'])
+         '64 heads → inverse RoPE → 8 groups [4096] × [4096,1024] → [8192] × [8192,5120] → U[5120].'])
     d.arrow('M35 220 H22 V770 H200 V800',width=1.8)
     d.arrow('M1245 730 V800',width=1.8)
-    d.text(35,938,'Candidate blocks: 8 positions/block, ≤2048 blocks, newest pinned. Source scores first, masks later.' if decoder else
+    node('hc',35,933,1430,40,['Outside CSA2: mHC Post distributes U and mixes the four residual streams → [1,1,4,5120].'],'orange')
+    d.text(35,1007,'Candidate blocks: 8 positions/block, ≤2048 blocks, newest pinned. Source scores first, masks later.' if decoder else
            'Incomplete ratio-2 groups: local/pinned Index Key publication differs; see Full Indexer calculations note.',18,anchor='start')
+    from layer_trace import draw
+    draw(decoder)
     d.raw('</g>')
 
 
@@ -134,27 +142,27 @@ def draft():
     d.frame('overview',10,10,1480,950,'purple','DSpark · three draft stages, separate from the 40-layer backbone',28)
     d.text(35,85,'Transformer.forward_spec(): a separate draft call. No backbone Layers 40–42 are appended to forward().',22,anchor='start')
     d.box('hidden',35,125,690,145,['Main features before Blocks 37 / 38 / 39',
-          'Mean over four HC streams → concatenate [B,L,15360]',
+          'Mean over four mHC streams → concatenate [B,L,15360]',
           'main_proj[15360,5120] → RMSNorm → main_x[B,L,5120]',
           'Each draft stage reprojects main_x into its own window KV.'],'blue',22,leading=29)
     d.box('ids',775,125,690,145,['Five draft slots: [current token, noise, noise, noise, noise]',
           'Noise ID 128799; main embedding table is shared.',
           '[B,5,5120] → expand to [B,5,4,5120].',
-          'Initialize HC pre_mix; pass the draft states through all three stages.'],'purple',22,leading=29)
+          'Initialize mHC pre_mix; pass the draft states through all three stages.'],'purple',22,leading=29)
     for i in range(3):
         x=235+i*365
         d.box('moe',x,355,310,170,[f'mtp[{i}] · DSparkBlock',
-              'HC Pre → Norm → Draft Attn', 'HC Post → HC Pre → Norm',
-              'MoE → HC Post', '128 routed, Top-3 + 1 shared'],'purple',22,leading=28)
+              'mHC Pre → Norm → Draft Attn', 'mHC Post → mHC Pre → Norm',
+              'MoE → mHC Post', '128 routed, Top-3 + 1 shared'],'purple',22,leading=28)
         if i<2:d.arrow(f'M{x+310} 440 H{x+365}',width=2)
     d.arrow('M1120 270 V310 H390 V355',width=2)
     d.arrow('M380 270 V300 H210 V440 H235',width=2)
     d.box('multi',35,600,690,165,['DSparkAttention: own Local KV, no Compressor / Indexer',
           'Q[B,5,64,512]; private main-conditioned window [B,128,512]',
           '+ current draft KV[B,5,512] → sparse_attn → inverse RoPE',
-          '8 grouped projections → [B,5,5120] → HC Post',
+          '8 grouped projections → [B,5,5120] → mHC Post',
           'All five current draft slots are visible to each draft Query.'],'blue',21,leading=27)
-    d.box('head',775,600,690,165,['Final HC collapse → Norm → shared vocabulary Head',
+    d.box('head',775,600,690,165,['Final mHC collapse → Norm → shared vocabulary Head',
           'Logits[B,5,129280] + Markov bias (rank 256)',
           'Sample 5 IDs sequentially; return seed + 5 candidates.',
           'Confidence: [hidden5120, Markov256] × [5376,1] → [B,5]',

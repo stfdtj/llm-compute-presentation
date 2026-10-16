@@ -6,7 +6,15 @@ The original page, header, calculation inspector, zoom/pan controls and 1672×94
 
 ## Final behavior
 
-The original Encoder and Decoder Attention blocks now show independent Query and Local KV paths, configured source/reuse behavior, inline Indexer selection and their common Attention output. **Enlarge detail** and the original C · Encoder / C · Decoder focus menu reveal larger drawings within the **same architecture SVG**. No new page or modal is used for the diagrams. Indexer boxes highlight inline; the explicit **Full Indexer calculations** link preserves the Full / Reindex / Reuse teaching tool from `eb9356c`. Parameter, Forward and Backward modes still use the existing calculation ledger.
+The original Encoder and Decoder Attention blocks now show independent Query and Local KV paths, configured source/reuse behavior, inline Indexer selection and their common Attention output. **Enlarge detail** and the original C · Encoder / C · Decoder focus menu reveal larger drawings within the **same architecture SVG**. They now default to the **layer sequence**: all Encoder layers 0–19 and Decoder layers 20–39 exist in order, with a readable two-layer viewport, previous/next controls and a per-layer jump selector. **Attention operations** retains the detailed projection/scoring/output diagram. No new page or modal is used for the diagrams. Indexer boxes highlight inline; the explicit **Full Indexer calculations** link preserves the Full / Reindex / Reuse teaching tool from `eb9356c`. Parameter, Forward and Backward modes still use the existing calculation ledger.
+
+The layer trace follows the central-state path and shared-KV/index side lanes in the supplied `deepseek_v41_43_layer_mainline_en.drawio`. Each row states its own Local KV and Full/Reindex/Reuse behavior, KV owner and selected-index owner. Engram is annotated before 1/14; Draft feature capture is annotated before 37/38/39. The Encoder trace continues explicitly to Layer 20; Layer 20 is correctly part of Decoder rather than an extra Encoder layer. The supplied drawio remains untouched and untracked, as it was at the start of this follow-up.
+
+## mHC naming and CSA2 scope
+
+The correct expansion is **Manifold-Constrained Hyper-Connections**, from the [mHC paper](https://arxiv.org/abs/2512.24880). The fixed V4.1 technical report, §2.4.1, calls this model's variant **Single-Pass mHC**. Diagram labels, legend and the mHC inspector title use that name. Source identifiers such as `hc_pre` and audited formulas retain their original names. The colored stream blocks now contain exactly h⁽¹⁾, h⁽²⁾, h⁽³⁾, h⁽⁴⁾; the extra label above the blocks is removed.
+
+**CSA2 = Compressed Sparse Attention 2** (fixed technical report §2.3). Blue dashed boundaries enclose the Attention path: Query, local/global KV, Indexer, sparse attention and output projection. mHC Pre/normalization and mHC Post/FFN remain outside these boundaries. Layer-sequence rows 0/1 explicitly show local-window attention with no CSA2 outline; rows 2–39 have a CSA2 outline and their compression ratio/mode. The operations diagram places mHC Post in its own box outside the dashed boundary.
 
 The larger blocks include low-rank Query projection/RMSNorm, own Local KV/RoPE/window cache, source Compressor, Index Query/Key projections, learned per-head weights, weighted ReLU scoring, causal/candidate masks, Top-k positions, KV gathering, sink softmax, inverse RoPE and grouped output projection. Decoder-only candidate-block masking is excluded from the Encoder path.
 
@@ -43,7 +51,7 @@ DSpark uses its own projections and private window caches; it does not directly 
 
 The numeric/parameter ledger files remain byte-for-byte unchanged. The only changed entry in `step4_preservation.json` is the intentionally revised architecture SVG hash. The new geometry guard runs at build time and in numeric regression, checking 157 protected original geometry elements outside the authorized Attention blocks and KV boundary arrows. The root viewBox remains exactly `0 0 1672 941`.
 
-All suites passed: 189 module/mode combinations, 83 numeric equations, 160 matrix products, original Indexer Full/Reindex/Reuse behavior across 38 layers, original information flow and zoom/pan, and the new original-layout/detail checks. New checks cover 1920×1080 and 1366×768, inline Indexer behavior, twelve Attention calculation-mode checks, panel close/return and the three Draft stages, with zero JavaScript errors and zero network requests. Actual screenshots were inspected for clipping and overlap. No weights, GPU model execution or official training/backward implementation was run.
+All suites passed: 189 module/mode combinations, 83 numeric equations, 160 matrix products, original Indexer Full/Reindex/Reuse behavior across 38 layers, original information flow and zoom/pan, and the new original-layout/detail checks. New checks cover 1920×1080 and 1366×768, all 40 layer roles and cache owners against config, four unique colored stream labels with no orphan label, CSA2 boundaries, inline Indexer behavior, twelve Attention calculation-mode checks, panel close/return and the three Draft stages, with zero JavaScript errors and zero network requests. Actual screenshots were inspected for clipping and overlap. No weights, GPU model execution or official training/backward implementation was run.
 
 Screenshots:
 
@@ -55,5 +63,7 @@ Screenshots:
 | DSpark | [draft_1920.png](../../src/deepseek/qa/attention_inplace/draft_1920.png) | [draft_1366.png](../../src/deepseek/qa/attention_inplace/draft_1366.png) |
 
 Calculation-panel screenshots and machine-readable `validation.json` are in that same directory. The `.claude/` directory present before this work is not included in the commit.
+
+Layer screenshots use `encoder_layers_{0,2,8,14,19}_{1920,1366}.png` and `decoder_layers_{20,22,28,34,39}_{1920,1366}.png`. These cover the start, generated/reused KV, late layers and the Encoder/Decoder boundary. The controls expose every remaining layer; screenshot samples do not limit the implemented layer sequence.
 
 Remote `main` already has six later commits with a different layout, so this requested `eb9356c`-based revision is published on a separate branch without force-pushing or replacing remote main.

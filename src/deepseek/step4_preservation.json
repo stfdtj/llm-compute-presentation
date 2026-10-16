@@ -1,7 +1,7 @@
 {
   "src/deepseek/module_data.json": "c0119f8f6f262c2186608f778cf4d494224938aa40c84e697d0126a836329466",
   "src/deepseek/audit_data.json": "2f9ff58827bff99446a5843bed9b2e47cc0631580f559247e180aabff00fdc31",
-  "src/deepseek/architecture.svg": "ff9055f628bdca588daa32b7c70e44666497e9e4c0d7fa9fd496ce64aabb08dd",
+  "src/deepseek/architecture.svg": "c5dd6f99bf8f1600072f3d327eb7ca9709f4f01da5cb56c2a49ce8ccc17ea173",
   "docs/architecture/calculation_audit.md": "33da7e29e29b09b38d6e06e0d2fa73524654679870f908b1dd7b59dbfc8e5c2d",
   "docs/architecture/assumptions.md": "3b6e85fd069224f9bfae6f62c5c77ecf882765da6de2f4c2e39aa7eb22442860"
 }

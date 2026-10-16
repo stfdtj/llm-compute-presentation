@@ -2,6 +2,8 @@
 
 ## Original layout / expanded Attention blocks
 
+Enlarged Encoder/Decoder views now default to a layer-by-layer sequence matching the supplied drawio: Encoder 0–19, Decoder 20–39, with per-layer jump and two-layer stepping. Switch to **Attention operations** for the projection/Indexer computation diagram. Blue dashed outlines identify CSA2 while leaving mHC/FFN outside. Stream labels are h⁽¹⁾–h⁽⁴⁾ once each. mHC means **Manifold-Constrained Hyper-Connections**; this implementation uses the **Single-Pass mHC** variant.
+
 The original page, 1672×941 canvas and four detail-block positions remain. Encoder and Decoder Attention are updated in place; click **Enlarge detail** or choose C · Encoder / C · Decoder in the original focus menu. The larger drawings are part of the same SVG and include Query, Local KV, Compressor, inline Indexer scoring/Top-k, KV gathering and output projection. Indexer nodes highlight inline; the explicit Full Indexer calculations link retains the eb9356c calculation tool. DSpark is a small overview entry and an original-menu focus target. No replacement workspace or tab bar is built.
 
 Source discrepancies, retained geometry checks, tests and screenshots: [validation](../../docs/architecture/attention_inplace_validation.md).
