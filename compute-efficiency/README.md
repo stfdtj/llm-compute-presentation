@@ -1,7 +1,12 @@
 # Compute Efficiency — Roofline Analysis & MFU (DeepSeek V4.1 Flash)
 
-A standalone, offline, two-tab page explaining the **Roofline model** and **Model
-FLOPs Utilization (MFU)**, using DeepSeek V4.1 Flash as the worked example.
+A standalone, offline, two-tab **teaching slide**, not a performance-analysis
+dashboard: one main idea, one chart, one worked example, one takeaway per
+tab, explaining the **Roofline model** and **Model FLOPs Utilization (MFU)**
+using DeepSeek V4.1 Flash as the worked example. Deeper derivations and
+secondary controls are intentionally tucked behind "Show Calculation" and
+"Advanced Settings" — the page is designed to be read and understood on a
+single screen during a live presentation, without opening either.
 
 ## How to open
 
@@ -114,7 +119,20 @@ Model FLOPs/s = Training FLOPs/token × Tokens/s
 Theoretical Peak FLOPs/s = Peak TFLOP/s per device × 1e12 × Device Count
 ```
 
-### DeepSeek V4.1 Flash MoE active-vs-total (used in the MFU tab)
+### The MFU tab's worked example is explicitly hypothetical
+
+The visible MFU example uses clearly-labeled illustrative numbers (1
+TFLOP/token, 4 devices, 1000 TFLOP/s/device, 8,000 tokens/step) — it does
+**not** claim to be DeepSeek V4.1 Flash's real training MFU. The repository
+does not contain a verified complete (attention + MoE + HC + Indexer +
+Compressor + Engram, forward + backward) training-FLOPs-per-token figure for
+DeepSeek V4.1 Flash, so none is presented as if it were one.
+
+`calculations.js` still exports `deepseekMoeActiveVsTotal()` /
+`deepseekMoePartialTrainingFlopsPerToken()` (unchanged, still correct) for
+anyone who wants to see *why* a MoE model's "FLOPs per token" isn't simply
+`6 × total parameters` — referenced in the MFU tab's "Show Calculation"
+note, but deliberately not used to drive the headline percentage:
 
 ```
 expertParams          = 3 × dim × moe_inter_dim                      = 35,389,440
@@ -122,13 +140,7 @@ routerParams           = dim × n_routed_experts                       = 1,966,0
 totalParamsPerLayer     = (n_routed_experts + n_shared_experts) × expertParams + routerParams
 activeParamsPerLayer     = (n_activated_experts + n_shared_experts) × expertParams + routerParams
 × 40 layers → totalParamsAllLayers ≈ 545.08B, activeParamsAllLayers ≈ 9.99B (≈1.83% active)
-
-"DeepSeek V4.1 Flash — MoE-only (partial)" MFU mode:
-  trainingFlopsPerToken ≈ 6 × activeParamsAllLayers ≈ 59.93 GFLOPs/token
 ```
-
-This is explicitly a **partial, lower-bound** estimate — see "Known
-limitations" below.
 
 ## Hardware assumptions
 
@@ -164,17 +176,13 @@ specific-vendor hardware specifications.
 - The Roofline worked example covers **only the two Query-projection linear
   layers**. It does not model RMSNorm, the rest of Attention, MoE, HC
   mixing, the Indexer, the Compressor, or Engram.
-- The "DeepSeek V4.1 Flash — MoE-only" MFU estimate is **explicitly
-  partial**: it applies the 6×N convention only to the MoE expert+router
-  weights (where the total-vs-active distinction actually matters). It
-  excludes attention, HC mixing, Indexer, Compressor and Engram FLOPs
-  entirely, and does not account for how attention cost scales with sequence
-  length. It is a documented **lower bound** on the MoE-layer contribution,
-  not a complete per-token training FLOPs figure for the whole model — no
-  such complete figure is asserted anywhere on this page.
-- The Roofline chart's "Custom" point (driven by the Tokens-processed-together
-  control) uses the same Query-projection formula as Scenarios A/B; it does
-  not represent a different operation.
+- The MFU example is **explicitly and only hypothetical** — see above. No
+  complete, verified DeepSeek V4.1 Flash training-FLOPs-per-token figure is
+  claimed anywhere on this page.
+- The Roofline chart's third, slider-driven point ("Tokens Processed
+  Together") uses the same Query-projection formula as the Decode/Batch
+  reference points; it does not represent a different operation, and is
+  hidden automatically whenever it would land on/near Decode or Batch.
 - Multi-device scaling in the MFU calculator is a simple linear
   `peakTF × devices` aggregate — no communication overhead, topology, or
   parallelism strategy is modeled.
@@ -190,19 +198,20 @@ node -e "
 const C = require('./calculations.js');
 console.log(C.queryProjectionScenario(1));
 console.log(C.queryProjectionScenario(1024));
-console.log(C.deepseekMoeActiveVsTotal());
-console.log(C.mfuCalculate({trainingFlopsPerToken:1e12, tokensPerSecond:2000, deviceCount:4, peakTF:1000, rateMode:'rate'}));
+console.log(C.mfuCalculate({trainingFlopsPerToken:1e12, deviceCount:4, peakTF:1000, rateMode:'step', tokensPerStep:8000, stepSeconds:4}));
 "
 ```
 
 Checked by hand against the task's expected values:
-Scenario A ≈96.99 MFLOPs / ≈97.07 MB / AI≈1; Scenario B ≈99.32 GFLOPs /
-≈179.83 MB / AI≈552; ridge ≈295.22 FLOPs/Byte; generic MFU example = 50%.
+Decode ≈96.99 MFLOPs / ≈97.07 MB / AI≈1 (memory-bound); Batch ≈99.32 GFLOPs /
+≈179.83 MB / AI≈552 (compute-bound); ridge ≈295.22 FLOPs/Byte; the default
+MFU example = 50%.
 
 Visual testing was done by loading the page in a real browser (desktop
-1920×1080, 1366×768, and a 390px mobile width) and exercising both tabs,
-every hardware preset, the precision switch, the M/Custom-point control,
-invalid-input handling (zero/negative peak compute, bandwidth, FLOPs/token,
-device count, step time — each produces a clear on-page message instead of a
-crash or silent `NaN`), all three MFU modes, the throughput-mode toggle, the
-sensitivity table, and Reset to Defaults.
+1920×1080, 1366×768, and a 390px mobile width) and exercising both tabs: the
+Tokens-Processed-Together slider across its full range, every hardware
+preset and the precision switch, the Training-Step-Time slider, invalid-input
+handling (zero/negative peak compute, bandwidth, device count — each
+produces a clear on-page message or a safe clamped value instead of a crash
+or silent `NaN`), both "Show Calculation" sections, both "Advanced Settings"
+sections, and Reset.
