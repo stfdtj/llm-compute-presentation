@@ -103,12 +103,20 @@
   <table class="notation-table" id="mfu-notation"></table>
 
   <section class="mfu-example">
-    <p class="hypothetical-tag">An explicitly hypothetical, illustrative training example — not a measurement of DeepSeek V4.1 Flash or any specific hardware.</p>
+    <p class="hypothetical-tag"><strong>Illustrative DeepSeek V4.1 Flash MFU — Not Measured.</strong> The training batch size (100.6M tokens/step) is reported in the technical report; FLOPs/token, GPU count, and step time are hypothetical teaching assumptions.</p>
     <div class="control-row">
-      <label for="in-step-seconds">Training Step Time: <b id="step-readout">4.0 s</b></label>
-      <input type="range" id="in-step-seconds" min="1" max="16" step="0.1" value="4">
+      <label for="in-step-seconds">Training Step Time: <b id="step-readout">6.0 s</b></label>
+      <input type="range" id="in-step-seconds" min="1" max="16" step="0.1" value="6">
     </div>
-    <div id="mfu-equation" class="derivation"></div>
+    <div class="control-row">
+      <label for="in-flops-token-gflops">Training FLOPs per Token: <b id="flops-token-readout">60 GFLOPs</b></label>
+      <input type="range" id="in-flops-token-gflops" min="1" max="300" step="1" value="60">
+    </div>
+    <div class="mfu-derivation">
+      <div class="derivation" id="mfu-step1"></div>
+      <div class="derivation" id="mfu-step2"></div>
+      <div class="derivation" id="mfu-step3"></div>
+    </div>
   </section>
 
   <section class="mfu-bar-section">
@@ -119,22 +127,32 @@
 
   <details class="calc-details">
     <summary>Show Calculation</summary>
-    <p>The equation above already shows every step with real numbers substituted in. One extra note on where "Training FLOPs per token" would come from for a real model:</p>
-    <p class="scope-note">For a Mixture-of-Experts model like DeepSeek V4.1 Flash, only a small fraction of stored parameters are actually used by any one token — applying the common "6 × total parameters" rule of thumb directly would overstate real training cost. This example deliberately keeps that complication out of the headline number and uses clearly hypothetical figures instead; see README.md for a worked MoE active-vs-total comparison.</p>
+    <p>The steps above already show every substitution with real numbers. More detail on where each default value comes from:</p>
+    <p class="scope-note">The default batch size, 100.6 million tokens/step, is the figure reported in the DeepSeek V4.1 Flash technical report. The default peak compute, 989.5 TFLOP/s, is NVIDIA's published H100 SXM BF16 Tensor Core figure of 1,979 TFLOP/s "with sparsity," halved to the dense (non-sparse) rate — the standard convention, since the product page does not list a dense figure directly. GPU count (2,048) and training step time are not published anywhere and are explicitly hypothetical teaching assumptions. See References below for links.</p>
+    <p class="scope-note">For a Mixture-of-Experts model like DeepSeek V4.1 Flash, only a small fraction of stored parameters are actually used by any one token — applying the common "6 × total parameters" rule of thumb directly would overstate real training cost. This example deliberately keeps that complication out of the headline number and uses clearly hypothetical FLOPs/token instead; see README.md for a worked MoE active-vs-total comparison.</p>
   </details>
 
   <details class="advanced-details">
     <summary>Advanced Settings</summary>
     <div class="controls-grid">
-      <label>Number of accelerators<input type="number" id="in-devices" min="1" step="1" value="4"></label>
-      <label>Peak compute per accelerator (TFLOP/s)<input type="number" id="in-mfu-peak-tf" min="0.001" step="any" value="1000"></label>
-      <label>Training tokens per step<input type="number" id="in-tokens-per-step" min="1" step="any" value="8000"></label>
-      <label>Training FLOPs per token<input type="number" id="in-flops-per-token" min="1" step="any" value="1e12"></label>
+      <label>Number of GPUs<input type="number" id="in-devices" min="1" step="1" value="2048"></label>
+      <label>Peak compute per GPU (TFLOP/s)<input type="number" id="in-mfu-peak-tf" min="0.001" step="any" value="989.5"></label>
+      <label>Training tokens per step<input type="number" id="in-tokens-per-step" min="1" step="any" value="100600000"></label>
     </div>
+    <p class="source-note">GPU count and step time: hypothetical assumptions. Tokens/step and peak compute: see References below.</p>
   </details>
 
 </section>
 </main>
+
+<section id="page-references" aria-label="Data sources">
+  <h3>References</h3>
+  <ul class="references-list">
+    <li><strong>DeepSeek V4.1 Flash Technical Report</strong> — source of the 100.6M tokens/step training batch size. <a href="https://arxiv.org/html/2609.19969" target="_blank" rel="noopener">arXiv:2609.19969</a></li>
+    <li><strong>NVIDIA H100 Tensor Core GPU</strong> — source of the 1,979 TFLOP/s BF16 "with sparsity" figure (989.5 TFLOP/s dense is half of it). <a href="https://www.nvidia.com/en-us/data-center/h100/" target="_blank" rel="noopener">nvidia.com/data-center/h100</a></li>
+  </ul>
+  <p class="scope-note">Everything else on this page — GPU counts, training step times, FLOPs/token, the illustrative hardware preset, and the Roofline worked example's traffic model — is a clearly labeled hypothetical teaching assumption, not a published or measured figure.</p>
+</section>
 
 <footer>
   <p>Standalone, offline page — open <code>index.html</code> directly. See <a href="README.md">README.md</a> for sources, full formulas, and known limitations.</p>

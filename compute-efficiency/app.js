@@ -6,6 +6,8 @@
 
   // ---------------------------------------------------------------- format
   const fmtFlops = (n) => n == null ? 'N/A' :
+    n >= 1e18 ? (n / 1e18).toFixed(2) + ' EFLOPs' :
+    n >= 1e15 ? (n / 1e15).toFixed(2) + ' PFLOPs' :
     n >= 1e12 ? (n / 1e12).toFixed(2) + ' TFLOPs' :
     n >= 1e9 ? (n / 1e9).toFixed(2) + ' GFLOPs' :
     n >= 1e6 ? (n / 1e6).toFixed(2) + ' MFLOPs' :
@@ -42,7 +44,7 @@
     renderMath('math-ai', 'AI = \\dfrac{F_{\\mathrm{ops}}}{M_{\\mathrm{bytes}}}');
     renderMath('math-proof', 'P_{\\mathrm{roof}}(AI) = \\min\\left(P_{\\mathrm{peak}},\\ AI \\times B_{\\mathrm{peak}}\\right)');
     renderMath('math-ridge', 'AI_{\\mathrm{ridge}} = \\dfrac{P_{\\mathrm{peak}}}{B_{\\mathrm{peak}}}');
-    renderMath('math-mfu', '\\mathrm{MFU} = \\dfrac{F_{\\mathrm{model}}/t_{\\mathrm{step}}}{N_{\\mathrm{devices}} \\times P_{\\mathrm{peak}}} \\times 100\\%');
+    renderMath('math-mfu', '\\mathrm{MFU} = \\dfrac{F_{\\mathrm{step}}}{t_{\\mathrm{step}} \\times N_{\\mathrm{GPU}} \\times P_{\\mathrm{peak}}} \\times 100\\%');
     renderMath('math-flops-formula', 'F_{\\mathrm{ops}} = 2 \\times \\mathrm{Tokens} \\times (5120\\times1280 + 1280\\times32768)');
     renderNotationTable('roofline-notation', [
       ['F_{\\mathrm{ops}}', 'Floating-point operations', 'FLOPs'],
@@ -53,10 +55,10 @@
       ['AI_{\\mathrm{ridge}}', 'Arithmetic intensity at the ridge point', 'FLOPs/Byte'],
     ]);
     renderNotationTable('mfu-notation', [
-      ['F_{\\mathrm{model}}', 'Useful model FLOPs for one training step', 'FLOPs'],
+      ['F_{\\mathrm{step}}', 'Useful model FLOPs for one training step', 'FLOPs'],
       ['t_{\\mathrm{step}}', 'Training step time', 's'],
-      ['N_{\\mathrm{devices}}', 'Number of accelerators', 'count'],
-      ['P_{\\mathrm{peak}}', 'Peak compute per accelerator', 'FLOP/s'],
+      ['N_{\\mathrm{GPU}}', 'Number of GPUs', 'count'],
+      ['P_{\\mathrm{peak}}', 'Peak compute per GPU', 'FLOP/s'],
       ['\\mathrm{MFU}', 'Model FLOPs Utilization', '%'],
     ]);
   }
@@ -248,7 +250,7 @@
       deviceCount: Math.max(1, Math.round(Number($('in-devices').value) || 1)),
       peakTF: Number($('in-mfu-peak-tf').value),
       tokensPerStep: Number($('in-tokens-per-step').value),
-      trainingFlopsPerToken: Number($('in-flops-per-token').value),
+      trainingFlopsPerToken: Number($('in-flops-token-gflops').value) * 1e9,
       stepSeconds: Number($('in-step-seconds').value),
       rateMode: 'step',
     };
@@ -256,27 +258,48 @@
 
   function updateMfu() {
     $('step-readout').textContent = Number($('in-step-seconds').value).toFixed(1) + ' s';
+    $('flops-token-readout').textContent = fmtNum(Number($('in-flops-token-gflops').value), 0) + ' GFLOPs';
     const input = mfuInputs();
     let result, error = null;
     try { result = C.mfuCalculate(input); } catch (e) { error = e.message; }
     if (error) {
-      $('mfu-equation').textContent = error;
+      ['mfu-step1', 'mfu-step2', 'mfu-step3'].forEach((id) => { $(id).textContent = ''; });
+      $('mfu-step1').textContent = error;
       $('mfu-percent').textContent = 'N/A';
       $('mfu-bar').innerHTML = '';
       $('mfu-takeaway').textContent = '';
       return;
     }
-    const fModel = input.trainingFlopsPerToken * input.tokensPerStep;
-    renderMath('mfu-equation',
+    const fStep = input.trainingFlopsPerToken * input.tokensPerStep;
+    const peakTotal = input.deviceCount * input.peakTF;
+
+    renderMath('mfu-step1',
       '\\begin{aligned}' +
-      '\\mathrm{MFU} &= \\dfrac{F_{\\mathrm{model}}}{t_{\\mathrm{step}} \\times N_{\\mathrm{devices}} \\times P_{\\mathrm{peak}}} \\times 100\\%\\\\[6pt]' +
-      `&= \\dfrac{${tx(fmtFlops(fModel))}}{${tx(input.stepSeconds.toFixed(1) + ' s')} \\times ${input.deviceCount} \\times ${tx(fmtNum(input.peakTF, 0) + ' TFLOP/s')}} \\times 100\\%\\\\[6pt]` +
-      `&= \\boxed{${tx(result.percent.toFixed(1) + '\\%')}}` +
+      'F_{\\mathrm{step}} &= N_{\\mathrm{tokens}} \\times F_{\\mathrm{token}}\\\\[6pt]' +
+      `&= ${tx(fmtNum(input.tokensPerStep, 0) + ' tokens')} \\times ${tx(fmtFlops(input.trainingFlopsPerToken))}\\\\[6pt]` +
+      `&= \\boxed{${tx(fmtFlops(fStep))}}` +
       '\\end{aligned}');
+    $('mfu-step1').insertAdjacentHTML('afterbegin', '<h4>Step 1 — Useful model FLOPs per training step</h4>');
+
+    renderMath('mfu-step2',
+      '\\begin{aligned}' +
+      'P_{\\mathrm{total}} &= N_{\\mathrm{GPU}} \\times P_{\\mathrm{peak}}\\\\[6pt]' +
+      `&= ${input.deviceCount.toLocaleString('en-US')} \\times ${tx(fmtNum(input.peakTF) + ' TFLOP/s')}\\\\[6pt]` +
+      `&= \\boxed{${tx(fmtNum(peakTotal, 0) + ' TFLOP/s')}}` +
+      '\\end{aligned}');
+    $('mfu-step2').insertAdjacentHTML('afterbegin', '<h4>Step 2 — Total hardware peak throughput</h4>');
+
+    renderMath('mfu-step3',
+      '\\begin{aligned}' +
+      '\\mathrm{MFU} &= \\dfrac{F_{\\mathrm{step}}}{t_{\\mathrm{step}} \\times N_{\\mathrm{GPU}} \\times P_{\\mathrm{peak}}} \\times 100\\%\\\\[6pt]' +
+      `&= \\dfrac{${tx(fmtFlops(fStep))}}{${tx(input.stepSeconds.toFixed(1) + ' s')} \\times ${input.deviceCount.toLocaleString('en-US')} \\times ${tx(fmtNum(input.peakTF) + ' TFLOP/s')}} \\times 100\\%\\\\[6pt]` +
+      `&\\approx \\boxed{${tx(result.percent.toFixed(1) + '\\%')}}` +
+      '\\end{aligned}');
+    $('mfu-step3').insertAdjacentHTML('afterbegin', '<h4>Step 3 — MFU</h4>');
+
     $('mfu-percent').textContent = result.percent.toFixed(0) + '%';
     drawMfuBar(Math.min(100, result.percent));
-    const pct = result.percent.toFixed(0);
-    $('mfu-takeaway').textContent = `${pct}% means useful model training computation achieves throughput equivalent to ${pct}% of the hardware's theoretical peak. The rest is not necessarily idle — it can reflect communication, memory stalls, recomputation, or scheduling overhead.`;
+    $('mfu-takeaway').textContent = `Under these illustrative assumptions, useful model training computations achieve throughput equivalent to approximately ${result.percent.toFixed(1)}% of the hardware's theoretical peak.`;
     if (result.exceedsPeak) $('mfu-takeaway').textContent = 'This configuration exceeds 100% of peak — check the Advanced Settings values.';
   }
 
@@ -288,13 +311,13 @@
     $('mfu-bar').innerHTML = svg;
   }
 
-  ['in-devices', 'in-mfu-peak-tf', 'in-tokens-per-step', 'in-flops-per-token'].forEach((id) => $(id).addEventListener('input', updateMfu));
+  ['in-devices', 'in-mfu-peak-tf', 'in-tokens-per-step', 'in-flops-token-gflops'].forEach((id) => $(id).addEventListener('input', updateMfu));
   $('in-step-seconds').addEventListener('input', updateMfu);
 
   // ======================================================= RESET
   const DEFAULTS = {
     'in-M': '3.0103', 'in-precision': 'BF16', 'in-hw-preset': 'h100', 'in-peak-tf': '989', 'in-bandwidth': '3.35', 'in-bw-unit': 'TB/s',
-    'in-devices': '4', 'in-mfu-peak-tf': '1000', 'in-tokens-per-step': '8000', 'in-flops-per-token': '1e12', 'in-step-seconds': '4',
+    'in-devices': '2048', 'in-mfu-peak-tf': '989.5', 'in-tokens-per-step': '100600000', 'in-flops-token-gflops': '60', 'in-step-seconds': '6',
   };
   function resetDefaults() {
     Object.entries(DEFAULTS).forEach(([id, v]) => { $(id).value = v; });

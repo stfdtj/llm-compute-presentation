@@ -91,13 +91,14 @@ checked against `src/compute_lab/model.js`:
   the exact figures and sources from `src/compute_lab/model.js:
   hardwarePresets.h100`, re-verified here (see "Hardware assumptions" below)
   rather than taken on faith.
-- **MFU formula** (`MFU = ModelFLOPs/s ÷ (PeakTF × 1e12 × devices)`) and the
-  generic 50%-MFU hypothetical example (1 TFLOP/token × 2000 tokens/s ÷ (1000
-  TFLOP/s × 4 devices)) — identical to `src/compute_lab/model.js:
-  calculateMfu()` / `mfuDefaults`.
+- **MFU formula** (`MFU = ModelFLOPs/s ÷ (PeakTF × 1e12 × devices)`) —
+  identical to `src/compute_lab/model.js: calculateMfu()`. The page's default
+  MFU example is **not** reused from `compute_lab` — it uses DeepSeek V4.1
+  Flash's own reported training batch size plus illustrative hardware/step
+  assumptions; see "The MFU tab's worked example" below.
 
-Everything DeepSeek-specific (the Query Projection worked example, the MoE
-active-vs-total parameter comparison, the "DeepSeek V4.1 Flash — MoE-only"
+Everything DeepSeek-specific (the Query Projection worked example, the MFU
+worked example, the MoE active-vs-total parameter comparison, the "DeepSeek V4.1 Flash — MoE-only"
 MFU mode) is new, computed directly from `config.json`/`model.py`, not
 reused from `compute_lab`.
 
@@ -141,14 +142,29 @@ Model FLOPs/s = Training FLOPs/token × Tokens/s
 Theoretical Peak FLOPs/s = Peak TFLOP/s per device × 1e12 × Device Count
 ```
 
-### The MFU tab's worked example is explicitly hypothetical
+### The MFU tab's worked example — what's real and what's illustrative
 
-The visible MFU example uses clearly-labeled illustrative numbers (1
-TFLOP/token, 4 devices, 1000 TFLOP/s/device, 8,000 tokens/step) — it does
-**not** claim to be DeepSeek V4.1 Flash's real training MFU. The repository
-does not contain a verified complete (attention + MoE + HC + Indexer +
-Compressor + Engram, forward + backward) training-FLOPs-per-token figure for
-DeepSeek V4.1 Flash, so none is presented as if it were one.
+The default MFU example mixes one figure taken directly from the DeepSeek
+V4.1 Flash technical report with several explicitly hypothetical teaching
+assumptions. It does **not** claim to be DeepSeek V4.1 Flash's real training
+MFU — the repository does not contain a verified complete (attention + MoE +
+HC + Indexer + Compressor + Engram, forward + backward) training-FLOPs-per-
+token figure for DeepSeek V4.1 Flash, so none is presented as if it were one.
+
+| Parameter | Default value | Status |
+|---|---|---|
+| Tokens per training step | 100,600,000 (100.6M) | **Reported** — "We keep the batch size fixed at 100.6 million tokens throughout training," DeepSeek V4.1 Flash technical report (arXiv:2609.19969) |
+| Peak compute per GPU | 989.5 TFLOP/s | **Derived from a published spec** — NVIDIA's H100 SXM product page lists BF16 Tensor Core at 1,979 TFLOP/s "with sparsity"; the dense (non-sparse) figure is exactly half, the standard convention, since NVIDIA does not list a dense number directly |
+| Training FLOPs per token | 60 GFLOPs | Hypothetical teaching assumption |
+| Number of GPUs | 2,048 | Hypothetical teaching assumption |
+| Training step time | 6 s | Hypothetical teaching assumption |
+
+Worked out: `F_step = 100.6×10⁶ × 60×10⁹ = 6.036×10¹⁸ FLOPs`;
+`P_total = 2048 × 989.5 = 2,026,496 TFLOP/s`;
+`MFU = 6.036×10¹⁸ / (6 × 2,026,496×10¹²) × 100% ≈ 49.6%` — matches what the
+page computes live via `calculations.js: mfuCalculate()`. Both sources are
+linked in the page's "References" section at the bottom, and in the MFU
+tab's "Show Calculation" and "Advanced Settings" notes.
 
 `calculations.js` still exports `deepseekMoeActiveVsTotal()` /
 `deepseekMoePartialTrainingFlopsPerToken()` (unchanged, still correct) for
@@ -198,9 +214,11 @@ specific-vendor hardware specifications.
 - The Roofline worked example covers **only the two Query-projection linear
   layers**. It does not model RMSNorm, the rest of Attention, MoE, HC
   mixing, the Indexer, the Compressor, or Engram.
-- The MFU example is **explicitly and only hypothetical** — see above. No
-  complete, verified DeepSeek V4.1 Flash training-FLOPs-per-token figure is
-  claimed anywhere on this page.
+- The MFU example's batch size (100.6M tokens/step) is a reported figure, and
+  its peak compute (989.5 TFLOP/s) is derived from a published spec, but
+  FLOPs/token, GPU count, and step time remain explicitly hypothetical — see
+  "The MFU tab's worked example" above. No complete, verified DeepSeek V4.1
+  Flash training-FLOPs-per-token figure is claimed anywhere on this page.
 - The Roofline chart's third, slider-driven point ("Tokens Processed
   Together") uses the same Query-projection formula as the Decode/Batch
   reference points; it does not represent a different operation, and is
@@ -220,14 +238,14 @@ node -e "
 const C = require('./calculations.js');
 console.log(C.queryProjectionScenario(1));
 console.log(C.queryProjectionScenario(1024));
-console.log(C.mfuCalculate({trainingFlopsPerToken:1e12, deviceCount:4, peakTF:1000, rateMode:'step', tokensPerStep:8000, stepSeconds:4}));
+console.log(C.mfuCalculate({trainingFlopsPerToken:60e9, deviceCount:2048, peakTF:989.5, rateMode:'step', tokensPerStep:100.6e6, stepSeconds:6}));
 "
 ```
 
 Checked by hand against the task's expected values:
 Decode ≈96.99 MFLOPs / ≈97.07 MB / AI≈1 (memory-bound); Batch ≈99.32 GFLOPs /
 ≈179.83 MB / AI≈552 (compute-bound); ridge ≈295.22 FLOPs/Byte; the default
-MFU example = 50%.
+MFU example ≈ 49.6%.
 
 Visual testing was done by loading the page in a real browser (desktop
 1920×1080, 1366×768, and a 390px mobile width) and exercising both tabs: the

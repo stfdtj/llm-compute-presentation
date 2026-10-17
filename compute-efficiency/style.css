@@ -117,8 +117,18 @@ details p { color: #3a4763; font-size: 14.5px; }
 #mfu-bar { width: 100%; height: auto; }
 .mfu-bar-section .takeaway { text-align: left; max-width: 760px; margin: 18px auto 0; }
 
+#page-references {
+  max-width: 980px; margin: 10px auto 0; padding: 18px 24px; border-top: 1px solid var(--line);
+}
+#page-references h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; }
+.references-list { margin: 0 0 10px; padding-left: 20px; font-size: 14px; color: #3a4763; }
+.references-list li { margin-bottom: 5px; }
+.references-list a { color: var(--accent); }
+
 footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 20px; }
 footer code { background: #eef2f9; padding: 1px 5px; border-radius: 4px; }
+
+.mfu-derivation .derivation h4 { margin: 0 0 6px; font-size: 13.5px; color: var(--muted); font-weight: 700; text-align: left; }
 
 @media (max-width: 760px) {
   .formula-row, .formula-row.three, .compare-grid, .controls-grid, .derivation-grid { grid-template-columns: 1fr; }
