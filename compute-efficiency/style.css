@@ -37,15 +37,31 @@ main > section > h1 { font-size: 36px; margin: 6px 0 10px; line-height: 1.2; }
 
 .formula-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0 26px; }
 .formula-row.one { grid-template-columns: 1fr; }
-.formula-card { background: var(--accent-soft); border-radius: 12px; padding: 16px 20px; }
-.formula-card .math { font: 700 22px/1.4 "Cambria Math", "STIX Two Math", Consolas, serif; color: #152042; }
-.formula-card p { margin: 8px 0 0; font-size: 14.5px; color: var(--muted); }
-.math { font: 22px "Cambria Math", "STIX Two Math", Consolas, serif; }
+.formula-row.three { grid-template-columns: repeat(3, 1fr); }
+.formula-card { background: var(--accent-soft); border-radius: 12px; padding: 18px 20px 14px; text-align: center; }
+.formula-card .math { color: #152042; min-height: 1.6em; }
+.formula-card .math .katex { font-size: 1.28em; }
+.formula-card p { margin: 10px 0 0; font-size: 14.5px; color: var(--muted); text-align: left; }
 .math-block {
-  font: 17px/1.7 "Cambria Math", "STIX Two Math", Consolas, serif;
   background: #f1f4fa; border: 1px solid var(--line); border-radius: 9px;
-  padding: 12px 16px; margin: 10px 0; white-space: pre-wrap; overflow-x: auto;
+  padding: 14px 16px; margin: 10px 0; overflow-x: auto; text-align: center;
 }
+.math-block .katex-display { margin: 0; }
+.derivation {
+  background: #f8fafd; border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px 18px; margin: 10px 0; overflow-x: auto; text-align: center;
+}
+.derivation .katex-display { margin: 0; }
+.derivation .katex { font-size: 1.08em; }
+.derivation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0; }
+.derivation-grid h4, .derivation h4 { margin: 0 0 6px; font-size: 13.5px; color: var(--muted); font-weight: 700; text-align: left; }
+.notation-table { width: 100%; border-collapse: collapse; margin: 0 0 22px; font-size: 14.5px; }
+.notation-table th, .notation-table td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; }
+.notation-table th { background: #f4f7fd; color: var(--muted); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: .03em; }
+.notation-table td:first-child { width: 90px; text-align: center; }
+.notation-table td:last-child { color: var(--muted); white-space: nowrap; }
+/* KaTeX's own boxed result gets a subtle accent so the final answer stands out. */
+.derivation .katex .boxed, .derivation .katex .fbox { border-color: var(--accent) !important; border-width: 2px !important; padding: 3px 7px; }
 
 .chart-section { margin: 10px 0 30px; }
 .control-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -105,8 +121,17 @@ footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 20
 footer code { background: #eef2f9; padding: 1px 5px; border-radius: 4px; }
 
 @media (max-width: 760px) {
-  .formula-row, .compare-grid, .controls-grid { grid-template-columns: 1fr; }
+  .formula-row, .formula-row.three, .compare-grid, .controls-grid, .derivation-grid { grid-template-columns: 1fr; }
   main > section > h1 { font-size: 28px; }
   .mfu-big-number span { font-size: 54px; }
   header.top { padding: 8px 14px; flex-wrap: wrap; }
+  .formula-card .math .katex { font-size: 1.05em; }
+  .derivation .katex { font-size: 0.82em; }
+  .math-block .katex { font-size: 0.82em; }
+}
+@media (max-width: 420px) {
+  .derivation .katex { font-size: 0.72em; }
+}
+@media (max-width: 980px) and (min-width: 761px) {
+  .formula-row.three { grid-template-columns: 1fr 1fr; }
 }

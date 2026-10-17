@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DeepSeek V4.1 Flash · Roofline &amp; MFU</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,10 +24,12 @@
   <h1>What Limits Our Computing Speed?</h1>
   <p class="lede">A processor has to <b>load data</b> and <b>do calculations</b>. Depending on the job, either one can be the bottleneck. Roofline analysis tells us which one — for a given computation, on given hardware.</p>
 
-  <div class="formula-row">
-    <div class="formula-card"><div class="math">AI = FLOPs ÷ Bytes</div><p>How much computing happens per byte of data moved.</p></div>
-    <div class="formula-card"><div class="math">Ceiling = min( Peak&nbsp;Compute ,  AI × Peak&nbsp;Bandwidth )</div><p>The fastest this computation could theoretically run.</p></div>
+  <div class="formula-row three">
+    <div class="formula-card"><div class="math" id="math-ai"></div><p>How much computing happens per byte of data moved.</p></div>
+    <div class="formula-card"><div class="math" id="math-proof"></div><p>The fastest this computation could theoretically run.</p></div>
+    <div class="formula-card"><div class="math" id="math-ridge"></div><p>Where the two limits cross over.</p></div>
   </div>
+  <table class="notation-table" id="roofline-notation"></table>
 
   <section class="chart-section">
     <div class="control-row">
@@ -59,11 +62,17 @@
   <details class="calc-details">
     <summary>Show Calculation</summary>
     <p>DeepSeek V4.1 Flash's Query Low-Rank Projection uses two matrices: <code>[5120, 1280]</code> and <code>[1280, 32768]</code> — a token's hidden vector is compressed, then expanded back out into 64 attention-head queries.</p>
-    <div class="math-block">FLOPs = 2 × Tokens × (5120×1280 + 1280×32768)</div>
+    <div class="math-block" id="math-flops-formula"></div>
     <p>Memory traffic (simplified BF16 model): weights are read once per batch; the input, the intermediate result, and the output each scale with the number of tokens.</p>
     <div id="traffic-formula" class="math-block"></div>
     <div id="full-breakdown"></div>
     <p class="scope-note">Scope: only these two linear layers. RMSNorm and the rest of Attention are excluded from this teaching example.</p>
+    <h3>Arithmetic Intensity, worked step by step</h3>
+    <div class="derivation-grid">
+      <div class="derivation" id="derive-decode"></div>
+      <div class="derivation" id="derive-batch"></div>
+    </div>
+    <div class="derivation" id="derive-ridge"></div>
   </details>
 
   <details class="advanced-details">
@@ -89,8 +98,9 @@
   <p class="lede">MFU compares the model's <b>useful training computation per second</b> with the hardware's <b>theoretical peak</b> computing power.</p>
 
   <div class="formula-row one">
-    <div class="formula-card"><div class="math">MFU = Useful&nbsp;Model&nbsp;FLOPs/s ÷ Hardware&nbsp;Peak&nbsp;FLOPs/s × 100%</div></div>
+    <div class="formula-card"><div class="math" id="math-mfu"></div></div>
   </div>
+  <table class="notation-table" id="mfu-notation"></table>
 
   <section class="mfu-example">
     <p class="hypothetical-tag">An explicitly hypothetical, illustrative training example — not a measurement of DeepSeek V4.1 Flash or any specific hardware.</p>
@@ -98,7 +108,7 @@
       <label for="in-step-seconds">Training Step Time: <b id="step-readout">4.0 s</b></label>
       <input type="range" id="in-step-seconds" min="1" max="16" step="0.1" value="4">
     </div>
-    <div id="mfu-equation" class="math-block"></div>
+    <div id="mfu-equation" class="derivation"></div>
   </section>
 
   <section class="mfu-bar-section">
@@ -130,6 +140,7 @@
   <p>Standalone, offline page — open <code>index.html</code> directly. See <a href="README.md">README.md</a> for sources, full formulas, and known limitations.</p>
 </footer>
 
+<script src="vendor/katex/katex.min.js"></script>
 <script src="calculations.js"></script>
 <script src="app.js"></script>
 </body>

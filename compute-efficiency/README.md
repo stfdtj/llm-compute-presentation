@@ -19,14 +19,36 @@ No server, build step, or dependency installation is required. `app.js` and
 ```
 compute-efficiency/
 ├── index.html        # page shell + static explanatory content for both tabs
-├── style.css          # layout, typography, chart container styling
+├── style.css          # layout, typography, chart container styling, KaTeX sizing
 ├── calculations.js    # pure calculation functions (Node + browser compatible, no DOM)
-└── app.js              # DOM wiring: tabs, controls, SVG charts, formatting
+├── app.js              # DOM wiring: tabs, controls, SVG charts, formatting, KaTeX rendering
+└── vendor/katex/       # self-hosted KaTeX 0.16.9 (JS, CSS, woff2 fonts) — see "Math typesetting" below
 ```
 
 `calculations.js` has no dependency on `app.js` or the DOM, so it can also be
 loaded under Node for independent testing (see "Independent verification"
 below).
+
+## Math typesetting
+
+All formulas, worked derivations, and notation tables are rendered with
+[KaTeX](https://katex.org/) 0.16.9 instead of plain text, so fractions,
+subscripts, and multi-step derivations (`\begin{aligned}...\end{aligned}`,
+`\boxed{}`) render as proper typeset math.
+
+KaTeX is **vendored locally** under `vendor/katex/` (`katex.min.js`,
+`katex.min.css`, and its `fonts/*.woff2`) rather than loaded from a CDN, so
+the page keeps working when opened directly via `file://` with no network
+access. Nothing here needs rebuilding — `vendor/katex/` is a static,
+version-pinned copy; to upgrade it, re-download the same three asset types
+for a newer KaTeX release.
+
+`app.js` renders math through a small set of helpers (`renderMath`,
+`katexSpan`, `renderNotationTable`) that call into `window.katex`. Every
+numerical substitution shown in a derivation (the Roofline AI examples, the
+MFU worked example) is computed live from `calculations.js` and re-rendered
+whenever a slider or Advanced Settings input changes — nothing is a
+hardcoded example value.
 
 ## Where the model parameters come from
 
@@ -215,3 +237,10 @@ handling (zero/negative peak compute, bandwidth, device count — each
 produces a clear on-page message or a safe clamped value instead of a crash
 or silent `NaN`), both "Show Calculation" sections, both "Advanced Settings"
 sections, and Reset.
+
+The KaTeX-rendered math was separately checked at all three widths above:
+every formula card, notation table, and expandable derivation was confirmed
+free of clipping/overflow (`scrollWidth` vs. `clientWidth` on every math
+container, plus whole-page overflow), hardware-input changes were confirmed
+to live-update the Roofline derivations (not just the chart), and the
+browser console was checked clean of errors.

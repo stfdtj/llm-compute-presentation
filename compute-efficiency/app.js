@@ -16,6 +16,50 @@
     n >= 1e3 ? (n / 1e3).toFixed(2) + ' KB' :
     n.toFixed(0) + ' B';
   const fmtNum = (n, d = 2) => n == null ? 'N/A' : n.toLocaleString('en-US', { maximumFractionDigits: d });
+  // Wrap a formatted "value + unit" string for use inside KaTeX math mode as upright text
+  // (avoids math-mode comma/spacing quirks for thousands separators and unit abbreviations).
+  const tx = (s) => `\\text{${s}}`;
+
+  // ---------------------------------------------------------------- KaTeX
+  function renderMath(id, tex, displayMode = true) {
+    const el = $(id);
+    if (!el || !window.katex) return;
+    try { katex.render(tex, el, { throwOnError: false, displayMode, strict: false }); }
+    catch (e) { el.textContent = tex; }
+  }
+  function katexSpan(tex) {
+    if (!window.katex) return tex;
+    try { return katex.renderToString(tex, { throwOnError: false, displayMode: false, strict: false }); }
+    catch (e) { return tex; }
+  }
+  function renderNotationTable(id, rows) {
+    $(id).innerHTML = `<thead><tr><th>Symbol</th><th>Meaning</th><th>Unit</th></tr></thead><tbody>` +
+      rows.map(([sym, meaning, unit]) => `<tr><td>${katexSpan(sym)}</td><td>${meaning}</td><td>${unit}</td></tr>`).join('') +
+      `</tbody>`;
+  }
+
+  function renderStaticMath() {
+    renderMath('math-ai', 'AI = \\dfrac{F_{\\mathrm{ops}}}{M_{\\mathrm{bytes}}}');
+    renderMath('math-proof', 'P_{\\mathrm{roof}}(AI) = \\min\\left(P_{\\mathrm{peak}},\\ AI \\times B_{\\mathrm{peak}}\\right)');
+    renderMath('math-ridge', 'AI_{\\mathrm{ridge}} = \\dfrac{P_{\\mathrm{peak}}}{B_{\\mathrm{peak}}}');
+    renderMath('math-mfu', '\\mathrm{MFU} = \\dfrac{F_{\\mathrm{model}}/t_{\\mathrm{step}}}{N_{\\mathrm{devices}} \\times P_{\\mathrm{peak}}} \\times 100\\%');
+    renderMath('math-flops-formula', 'F_{\\mathrm{ops}} = 2 \\times \\mathrm{Tokens} \\times (5120\\times1280 + 1280\\times32768)');
+    renderNotationTable('roofline-notation', [
+      ['F_{\\mathrm{ops}}', 'Floating-point operations', 'FLOPs'],
+      ['M_{\\mathrm{bytes}}', 'Data transferred', 'Bytes'],
+      ['AI', 'Arithmetic intensity', 'FLOPs/Byte'],
+      ['P_{\\mathrm{peak}}', 'Peak compute throughput', 'TFLOP/s'],
+      ['B_{\\mathrm{peak}}', 'Peak memory bandwidth', 'TB/s or GB/s'],
+      ['AI_{\\mathrm{ridge}}', 'Arithmetic intensity at the ridge point', 'FLOPs/Byte'],
+    ]);
+    renderNotationTable('mfu-notation', [
+      ['F_{\\mathrm{model}}', 'Useful model FLOPs for one training step', 'FLOPs'],
+      ['t_{\\mathrm{step}}', 'Training step time', 's'],
+      ['N_{\\mathrm{devices}}', 'Number of accelerators', 'count'],
+      ['P_{\\mathrm{peak}}', 'Peak compute per accelerator', 'FLOP/s'],
+      ['\\mathrm{MFU}', 'Model FLOPs Utilization', '%'],
+    ]);
+  }
 
   // ---------------------------------------------------------------- tabs
   document.querySelectorAll('nav.tabs button').forEach((btn) => {
@@ -70,18 +114,49 @@
   function renderCalcDetails() {
     const p = C.DEEPSEEK;
     const totalQDim = p.nHeads * p.headDim;
-    $('traffic-formula').textContent =
-      `Weight bytes   = (5120×1280 + 1280×${totalQDim}) × bytes-per-element   — read once\n` +
-      `Input bytes    = Tokens × 5120 × bytes-per-element\n` +
-      `Intermediate   = Tokens × 1280 × bytes-per-element × 2   (written, then read back)\n` +
-      `Output bytes   = Tokens × ${totalQDim} × bytes-per-element\n` +
-      `Total          = Weight + Input + Intermediate + Output`;
+    renderMath('traffic-formula',
+      '\\begin{aligned}' +
+      `\\text{Weight bytes} &= (5120{\\times}1280 + 1280{\\times}${totalQDim}) \\times \\text{bytes} \\quad \\text{(read once)}\\\\[4pt]` +
+      '\\text{Input bytes} &= \\text{Tokens} \\times 5120 \\times \\text{bytes}\\\\[4pt]' +
+      '\\text{Intermediate} &= \\text{Tokens} \\times 1280 \\times \\text{bytes} \\times 2 \\quad \\text{(write, then read back)}\\\\[4pt]' +
+      `\\text{Output bytes} &= \\text{Tokens} \\times ${totalQDim} \\times \\text{bytes}\\\\[4pt]` +
+      '\\text{Total} &= \\text{Weight} + \\text{Input} + \\text{Intermediate} + \\text{Output}' +
+      '\\end{aligned}');
     const precision = $('in-precision').value;
     const rows = [1, 1024].map((M) => {
       const s = C.queryProjectionScenario(M, precision);
       return `<tr><td>${M.toLocaleString()}</td><td>${fmtBytes(s.traffic.weightBytes)}</td><td>${fmtBytes(s.traffic.inputBytes)}</td><td>${fmtBytes(s.traffic.intermediateBytes)}</td><td>${fmtBytes(s.traffic.outputBytes)}</td><td>${fmtBytes(s.traffic.totalBytes)}</td></tr>`;
     }).join('');
     $('full-breakdown').innerHTML = `<table class="mini-table"><thead><tr><th>Tokens</th><th>Weights</th><th>Input</th><th>Intermediate</th><th>Output</th><th>Total</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function aiDerivationTex(scenario) {
+    return '\\begin{aligned}' +
+      'AI &= \\dfrac{F_{\\mathrm{ops}}}{M_{\\mathrm{bytes}}}\\\\[6pt]' +
+      `&= \\dfrac{${tx(fmtNum(scenario.flops, 0) + ' FLOPs')}}{${tx(fmtNum(scenario.traffic.totalBytes, 0) + ' Bytes')}}\\\\[6pt]` +
+      `&= \\boxed{${tx(fmtNum(scenario.arithmeticIntensity) + ' FLOPs/Byte')}}` +
+      '\\end{aligned}';
+  }
+
+  function renderDerivations() {
+    const precision = $('in-precision').value;
+    const { peak, bw } = hardwareBytesPerSecond();
+    const decode = C.queryProjectionScenario(1, precision);
+    const batch = C.queryProjectionScenario(1024, precision);
+    renderMath('derive-decode', aiDerivationTex(decode));
+    $('derive-decode').insertAdjacentHTML('afterbegin', '<h4>Decode — 1 token</h4>');
+    renderMath('derive-batch', aiDerivationTex(batch));
+    $('derive-batch').insertAdjacentHTML('afterbegin', '<h4>Batch — 1,024 tokens</h4>');
+    if (peak > 0 && bw > 0) {
+      const h = hardwareInputs();
+      renderMath('derive-ridge',
+        '\\begin{aligned}' +
+        'AI_{\\mathrm{ridge}} &= \\dfrac{P_{\\mathrm{peak}}}{B_{\\mathrm{peak}}}\\\\[6pt]' +
+        `&= \\dfrac{${tx(fmtNum(h.peakTF) + ' TFLOP/s')}}{${tx(fmtNum(h.bandwidth) + ' ' + h.bandwidthUnit)}}\\\\[6pt]` +
+        `&= \\boxed{${tx(fmtNum(peak / bw) + ' FLOPs/Byte')}}` +
+        '\\end{aligned}');
+      $('derive-ridge').insertAdjacentHTML('afterbegin', '<h4>Ridge Point — at the current hardware setting</h4>');
+    }
   }
 
   function drawRooflineChart() {
@@ -156,14 +231,15 @@
   function updateRoofline() {
     renderComparisonCards();
     renderCalcDetails();
+    renderDerivations();
     drawRooflineChart();
   }
 
   $('in-M').addEventListener('input', drawRooflineChart);
   $('in-precision').addEventListener('change', updateRoofline);
-  $('in-peak-tf').addEventListener('input', () => { $('in-hw-preset').value = 'custom'; drawRooflineChart(); });
-  $('in-bandwidth').addEventListener('input', () => { $('in-hw-preset').value = 'custom'; drawRooflineChart(); });
-  $('in-bw-unit').addEventListener('change', () => { $('in-hw-preset').value = 'custom'; drawRooflineChart(); });
+  $('in-peak-tf').addEventListener('input', () => { $('in-hw-preset').value = 'custom'; drawRooflineChart(); renderDerivations(); });
+  $('in-bandwidth').addEventListener('input', () => { $('in-hw-preset').value = 'custom'; drawRooflineChart(); renderDerivations(); });
+  $('in-bw-unit').addEventListener('change', () => { $('in-hw-preset').value = 'custom'; drawRooflineChart(); renderDerivations(); });
   $('in-hw-preset').addEventListener('change', (e) => { applyHardwarePreset(e.target.value); updateRoofline(); });
 
   // ======================================================= MFU TAB
@@ -190,10 +266,13 @@
       $('mfu-takeaway').textContent = '';
       return;
     }
-    $('mfu-equation').textContent =
-      `Useful Model FLOPs/s  = ${fmtFlops(input.trainingFlopsPerToken)}/token × (${fmtNum(input.tokensPerStep)} tokens ÷ ${input.stepSeconds.toFixed(1)} s) = ${fmtFlops(result.modelFlopsPerSecond)}/s\n` +
-      `Hardware Peak         = ${input.peakTF} × 10¹² × ${input.deviceCount} devices = ${fmtFlops(result.hardwarePeakFlopsPerSecond)}/s\n` +
-      `MFU                   = ${fmtFlops(result.modelFlopsPerSecond)}/s ÷ ${fmtFlops(result.hardwarePeakFlopsPerSecond)}/s × 100% = ${result.percent.toFixed(1)}%`;
+    const fModel = input.trainingFlopsPerToken * input.tokensPerStep;
+    renderMath('mfu-equation',
+      '\\begin{aligned}' +
+      '\\mathrm{MFU} &= \\dfrac{F_{\\mathrm{model}}}{t_{\\mathrm{step}} \\times N_{\\mathrm{devices}} \\times P_{\\mathrm{peak}}} \\times 100\\%\\\\[6pt]' +
+      `&= \\dfrac{${tx(fmtFlops(fModel))}}{${tx(input.stepSeconds.toFixed(1) + ' s')} \\times ${input.deviceCount} \\times ${tx(fmtNum(input.peakTF, 0) + ' TFLOP/s')}} \\times 100\\%\\\\[6pt]` +
+      `&= \\boxed{${tx(result.percent.toFixed(1) + '\\%')}}` +
+      '\\end{aligned}');
     $('mfu-percent').textContent = result.percent.toFixed(0) + '%';
     drawMfuBar(Math.min(100, result.percent));
     const pct = result.percent.toFixed(0);
@@ -226,6 +305,7 @@
   $('reset-defaults').addEventListener('click', resetDefaults);
 
   // ======================================================= INIT
+  renderStaticMath();
   applyHardwarePreset('h100');
   updateRoofline();
   updateMfu();
