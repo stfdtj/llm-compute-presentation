@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "steps": 6,
+  "modes": [
+    "Full",
+    "Reindex",
+    "Reuse"
+  ],
+  "matrixSteps": 8,
+  "playPauseReset": true,
+  "timerCleanup": true,
+  "keyboard": true,
+  "presentationView": true,
+  "responsiveWidths": [
+    1920,
+    1366,
+    768,
+    390
+  ],
+  "architectureDataAndGeometryPreserved": true,
+  "offline": true,
+  "errors": []
+}
