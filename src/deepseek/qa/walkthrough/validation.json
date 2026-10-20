@@ -1,23 +1,248 @@
 {
   "passed": true,
-  "steps": 6,
+  "actions": 23,
+  "persistentSvg": true,
+  "elementReplacements": 0,
+  "realAnimationEvidence": {
+    "swa-window": {
+      "begin": {
+        "x": 480,
+        "y": 133,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0,
+        "height": 288
+      },
+      "middle": {
+        "x": 480,
+        "y": 163.93350219726562,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0.48333607681755825,
+        "height": 257.0664910836763
+      },
+      "end": {
+        "x": 480,
+        "y": 197,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 1,
+        "height": 224
+      },
+      "phaseAtMiddle": 0.4888888888888889
+    },
+    "swa-gather": {
+      "begin": {
+        "x": 490,
+        "y": 205,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0,
+        "height": 0
+      },
+      "middle": {
+        "x": 703.566650390625,
+        "y": 182.64999389648438,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0.4966666886145404,
+        "height": 0
+      },
+      "end": {
+        "x": 920,
+        "y": 160,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 1,
+        "height": 0
+      },
+      "phaseAtMiddle": 0.49777777777777776
+    },
+    "swa-backward": {
+      "begin": {
+        "x": 920,
+        "y": 160,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 1,
+        "height": 0
+      },
+      "middle": {
+        "x": 712.1654663085938,
+        "y": 181.7501220703125,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0.5166639231824417,
+        "height": 0
+      },
+      "end": {
+        "x": 490,
+        "y": 205,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0,
+        "height": 0
+      },
+      "phaseAtMiddle": 0.4888888888888889
+    },
+    "compression": {
+      "begin": {
+        "x": 470,
+        "y": 270,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 1,
+        "height": 0
+      },
+      "middle": {
+        "x": 656.0844116210938,
+        "y": 271.68499755859375,
+        "sx": 1,
+        "sy": 0.6858315467834473,
+        "opacity": 0.9993908270190958,
+        "height": 0
+      },
+      "end": {
+        "x": 855,
+        "y": 167,
+        "sx": 1,
+        "sy": 0.3500000238418579,
+        "opacity": 0,
+        "height": 0
+      },
+      "phaseAtMiddle": 0.4888888888888889
+    },
+    "indexer-sort": {
+      "begin": {
+        "x": 850,
+        "y": 200,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 1,
+        "height": 0
+      },
+      "middle": {
+        "x": 959.9329833984375,
+        "y": 169.54981994628906,
+        "sx": 0.7501523494720459,
+        "sy": 0.6502131819725037,
+        "opacity": 1,
+        "height": 0
+      },
+      "end": {
+        "x": 850,
+        "y": 137,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 1,
+        "height": 0
+      },
+      "phaseAtMiddle": 0.4888888888888889
+    },
+    "indexer-topk": {
+      "begin": {
+        "x": 865,
+        "y": 137,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0,
+        "height": 0
+      },
+      "middle": {
+        "x": 857.7499389648438,
+        "y": 295.53424072265625,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0.48333607681755825,
+        "height": 0
+      },
+      "end": {
+        "x": 850,
+        "y": 465,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 1,
+        "height": 0
+      },
+      "phaseAtMiddle": 0.4888888888888889
+    },
+    "attention-gather": {
+      "begin": {
+        "x": 75,
+        "y": 205,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0,
+        "height": 0
+      },
+      "middle": {
+        "x": 386.75177001953125,
+        "y": 272.1837158203125,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0.48333607681755825,
+        "height": 0
+      },
+      "end": {
+        "x": 720,
+        "y": 344,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 1,
+        "height": 0
+      },
+      "phaseAtMiddle": 0.4888888888888889
+    },
+    "attention-output": {
+      "begin": {
+        "x": 720,
+        "y": 140,
+        "sx": 1,
+        "sy": 1,
+        "opacity": 0.7,
+        "height": 0
+      },
+      "middle": {
+        "x": 769.6666870117188,
+        "y": 324.760009765625,
+        "sx": 1,
+        "sy": 0.5827999114990234,
+        "opacity": 0.3523333179698217,
+        "height": 0
+      },
+      "end": {
+        "x": 820,
+        "y": 512,
+        "sx": 1,
+        "sy": 0.1599999964237213,
+        "opacity": 0,
+        "height": 0
+      },
+      "phaseAtMiddle": 0.49777777777777776
+    }
+  },
+  "pauseFreezesGeometry": true,
+  "reverse": true,
+  "replay": true,
+  "scrub": true,
+  "playToEnd": true,
+  "originalCalculationModes": [
+    "parameter",
+    "forward",
+    "backward"
+  ],
+  "architectureDataAndGeometryPreserved": true,
   "modes": [
     "Full",
     "Reindex",
     "Reuse"
   ],
-  "matrixSteps": 8,
-  "playPauseReset": true,
-  "timerCleanup": true,
-  "keyboard": true,
-  "presentationView": true,
   "responsiveWidths": [
     1920,
     1366,
     768,
     390
   ],
-  "architectureDataAndGeometryPreserved": true,
   "offline": true,
   "errors": []
 }
