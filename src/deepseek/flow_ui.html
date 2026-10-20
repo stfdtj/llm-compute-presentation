@@ -39,9 +39,8 @@
   svg.querySelectorAll('.module').forEach(n=>{const b=n.getBBox();const inRegion=index===3?b.x>=508&&b.x<877&&b.y>=650:index<3?b.y<300:true;if(keys.includes(n.dataset.module)&&inRegion){n.classList.add('flow-hot');n.style.setProperty('--flow-color',colors[n.dataset.module==='global'?'global':n.dataset.module==='localstates'?'local':n.dataset.module==='multi'?'attention':'hidden']);}});
   if(index<3){
    if(index===0)for(const [a,b]of [[110,123],[213,223],[303,313]])path(`M${a} 232H${b}`,'hidden','当前 token 的文字、编号与词嵌入依次传到下一阶段；数值网络只跟踪当前这一行。');
-   path('M441 232H508','hidden','当前 token 的词嵌入从输入侧进入 Encoder，更新它的特征。');path('M859 233H870','hidden','Encoder 更新后的状态沿主干继续传递。');
-   path('M913 184V163H1186V184','hidden','Hidden State 从 Encoder 继续到 Decoder。蓝色主干绕过 KV 投影；源码在跨层处保留四路残差。');label(1098,157,'Hidden State 主干 · 5120 特征');
-   if(index>0){path('M956 235H963','global','经 HC 合并与归一化的 layer 20 Attention 输入，分支送入 Compressor 的学习投影。');path('M1013 184V149','global','投影的 512 维向量经过 RMSNorm、尾部 RoPE 和量化后写入共享缓存。');label(879,176,'[1,5120]');auxiliary(947,94,154,55,'Global KV Cache',`[${index===2?written:'S'},512] · 辅助视图`);path('M1101 120H1274V184','global','共享缓存被 Decoder Attention 查询；不是替代 Decoder Hidden State 的直接输入。');label(1123,111,'读取 KV → Attention','global');}
+   path('M441 232H508','hidden','当前 token 的词嵌入从输入侧进入 Encoder，更新它的特征。');
+   if(index>0){path('M859 247H963','global','经 HC 合并与归一化的 layer 20 Attention 输入，分支送入 Compressor 的学习投影。');path('M1013 184V149','global','投影的 512 维向量经过 RMSNorm、尾部 RoPE 和量化后写入共享缓存。');label(879,176,'[1,5120]');auxiliary(947,94,154,55,'Global KV Cache',`[${index===2?written:'S'},512] · 辅助视图`);path('M1101 120H1274V184','global','共享缓存被 Decoder Attention 查询；不是替代 Decoder Hidden State 的直接输入。');label(1123,111,'读取 KV → Attention','global');}
   }
   if(index===3){
    const show=t=>filter==='all'||filter===t;

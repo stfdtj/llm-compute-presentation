@@ -35,6 +35,13 @@ def validate(svg):
     actual=elements(after)
     protected=elements(before)
     for item in protected:
+        # User-requested removal of the standalone R19 state box. Its incoming
+        # stub is replaced by direct Encoder → layer-20 connections.
+        name,attrs=item
+        if name=='rect' and tuple(attrs.get(k) for k in ('x','y','width','height'))==('870','184','86','110'):
+            continue
+        if name=='path' and attrs.get('d')=='M859 233 H869':
+            continue
         assert item in actual, f'Original non-Attention geometry changed: {item}'
     return len(protected)
 

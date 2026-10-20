@@ -76,7 +76,6 @@ def build():
     arrow('M587 170 V217','#ee152e',True,1.6);arrow('M774 170 V217','#ee152e',True,1.6)
     line('M511 282 Q511 289 517 289 H852 Q858 289 858 282','#003c45',1.4)
     text(684,308,'20 Encoder Layers',18,True);text(684,327,['KV sources: 2 / 8 / 14 (2:1)','Reuse: 3–7 / 9–13 / 15–19'],14)
-    box('hidden',870,184,86,110,['Four mHC','streams','R19','','1 × 4 × 5120'],'blue',13)
     start('global','Layer 20 Compressor');rect(963,184,100,109,'orange');text(1013,203,['Layer 20','Compressor'],15,True);text(1013,235,'mHC Pre → Norm',12)
     rect(980,245,63,11,'blue');rect(980,260,63,11,'orange');text(1013,287,'1 × 512',15,italic=True);end()
     text(1013,313,['X20 → new KV20','1 token → 1 KV','shared through 39'],14)
@@ -92,12 +91,10 @@ def build():
     for y,word,prob in [(194,'“在”','0.42'),(221,'“it”','0.18'),(248,'“is”','0.06')]:
         rect(1572,y,41,24,'white');rect(1618,y,35,24,'white');text(1592.5,y+17,word,13);text(1635.5,y+17,prob,13)
     text(1613,285,'…',16);end()
-    for x1,x2 in [(859,870),(1323,1333),(1397,1407),(1479,1488),(1556,1566)]:arrow(f'M{x1} 233 H{x2-1}')
+    for x1,x2 in [(1323,1333),(1397,1407),(1479,1488),(1556,1566)]:arrow(f'M{x1} 233 H{x2-1}')
 
-    arrow('M956 207 V176 H1071 V207')
-    arrow('M956 247 H963')
+    arrow('M859 247 H963')
     arrow('M1063 253 H1071')
-    text(1012,166,'R19 + pre_mix → layer 20',11)
 
     raw('<g class="attention-focus" data-attention-focus="draft" role="button" tabindex="0" aria-label="DSpark three draft stages">')
     rect(1380,314,280,42,'purple')
