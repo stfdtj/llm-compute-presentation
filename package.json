@@ -11,7 +11,7 @@
     "test:browser:lab": "node src/compute_lab/browser_test.mjs",
     "test:browser:walkthrough": "node src/deepseek/verify_walkthrough.cjs",
     "test:browser:layout": "node src/deepseek/verify_walkthrough_layout.cjs",
-    "test:browser:deepseek": "node src/deepseek/verify_browser.cjs && node src/deepseek/verify_parameters.cjs && node src/deepseek/verify_flow.cjs && node src/deepseek/verify_step4.cjs && node src/deepseek/verify_indexer.cjs && node src/deepseek/verify_attention_blocks.cjs"
+    "test:browser:deepseek": "node src/deepseek/verify_browser.cjs && node src/deepseek/verify_parameters.cjs && node src/deepseek/verify_shape_trace.cjs && node src/deepseek/verify_indexer.cjs && node src/deepseek/verify_attention_blocks.cjs"
   },
   "devDependencies": {
     "playwright": "1.64.0"

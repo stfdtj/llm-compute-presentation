@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "originalPage": true,
+  "originalCanvas": "1672x941",
+  "expandedDetails": "same SVG",
+  "layerRolesChecked": 40,
+  "uniqueColoredStreamLabels": 4,
+  "orphanStreamLabels": 0,
+  "csa2BoundaryChecked": true,
+  "viewports": [
+    "1920x1080",
+    "1366x768"
+  ],
+  "calculationModes": 12,
+  "screenshots": [
+    "original_layout_1920.png",
+    "encoder_1920.png",
+    "decoder_1920.png",
+    "draft_1920.png",
+    "mhc_1920.png",
+    "original_layout_1366.png",
+    "encoder_1366.png",
+    "decoder_1366.png",
+    "draft_1366.png",
+    "mhc_1366.png"
+  ],
+  "errors": [],
+  "network": []
+}

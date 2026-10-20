@@ -82,11 +82,11 @@ const assert=require('assert/strict'),fs=require('fs'),path=require('path');
   for(const r of metrics.toolbar)assert.ok(r.x>=0&&r.right<=width&&r.bottom<=metrics.header.bottom,JSON.stringify({width,r,header:metrics.header}));
   await page.screenshot({path:path.join(__dirname,'qa',`parameters_${width}.png`)});
   await page.keyboard.press('Escape');await page.locator('#flow-toggle').click();
-  for(let i=1;i<5;i++)await page.locator('#flow-next').click();
-  assert.equal((await page.evaluate(()=>informationFlow.state)).step,5);
+  await page.locator('#shape-layer').selectOption('39');
+  assert.equal((await page.evaluate(()=>informationFlow.state)).layer,39);
   await page.locator('#flow-toggle').click();
  }
- checks.push('1920 / 1366 / 768 / 390 toolbar and inspector bounds; Data Flow five-step preservation');
+ checks.push('1920 / 1366 / 768 / 390 toolbar and inspector bounds; Shape Trace navigation');
  assert.deepEqual(errors,[]);assert.ok(requests.every(u=>u.startsWith('file:')));
  const report={passed:true,checks,coverage,errors,offline:true,statuses:await page.evaluate(()=>parameterAudit.data.summary)};
  fs.writeFileSync(path.join(__dirname,'qa','parameter_validation.json'),JSON.stringify(report,null,2));

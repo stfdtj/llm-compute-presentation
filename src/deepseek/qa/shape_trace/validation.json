@@ -1,0 +1,324 @@
+{
+  "passed": true,
+  "layers": [
+    {
+      "layer": 0,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Local only"
+    },
+    {
+      "layer": 1,
+      "nodes": 66,
+      "edges": 84,
+      "mode": "Local only"
+    },
+    {
+      "layer": 2,
+      "nodes": 78,
+      "edges": 100,
+      "mode": "Full",
+      "source": 2,
+      "indexSource": 2
+    },
+    {
+      "layer": 3,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 2,
+      "indexSource": 2
+    },
+    {
+      "layer": 4,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 2,
+      "indexSource": 2
+    },
+    {
+      "layer": 5,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 2,
+      "indexSource": 2
+    },
+    {
+      "layer": 6,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 2,
+      "indexSource": 2
+    },
+    {
+      "layer": 7,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 2,
+      "indexSource": 2
+    },
+    {
+      "layer": 8,
+      "nodes": 78,
+      "edges": 100,
+      "mode": "Full",
+      "source": 8,
+      "indexSource": 8
+    },
+    {
+      "layer": 9,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 8,
+      "indexSource": 8
+    },
+    {
+      "layer": 10,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 8,
+      "indexSource": 8
+    },
+    {
+      "layer": 11,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 8,
+      "indexSource": 8
+    },
+    {
+      "layer": 12,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 8,
+      "indexSource": 8
+    },
+    {
+      "layer": 13,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 8,
+      "indexSource": 8
+    },
+    {
+      "layer": 14,
+      "nodes": 85,
+      "edges": 109,
+      "mode": "Full",
+      "source": 14,
+      "indexSource": 14
+    },
+    {
+      "layer": 15,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 14,
+      "indexSource": 14
+    },
+    {
+      "layer": 16,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 14,
+      "indexSource": 14
+    },
+    {
+      "layer": 17,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 14,
+      "indexSource": 14
+    },
+    {
+      "layer": 18,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 14,
+      "indexSource": 14
+    },
+    {
+      "layer": 19,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 14,
+      "indexSource": 14
+    },
+    {
+      "layer": 20,
+      "nodes": 76,
+      "edges": 96,
+      "mode": "Full",
+      "source": 20,
+      "indexSource": 20
+    },
+    {
+      "layer": 21,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 20
+    },
+    {
+      "layer": 22,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 20
+    },
+    {
+      "layer": 23,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 20
+    },
+    {
+      "layer": 24,
+      "nodes": 70,
+      "edges": 88,
+      "mode": "Reindex",
+      "source": 20,
+      "indexSource": 24
+    },
+    {
+      "layer": 25,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 24
+    },
+    {
+      "layer": 26,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 24
+    },
+    {
+      "layer": 27,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 24
+    },
+    {
+      "layer": 28,
+      "nodes": 70,
+      "edges": 88,
+      "mode": "Reindex",
+      "source": 20,
+      "indexSource": 28
+    },
+    {
+      "layer": 29,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 28
+    },
+    {
+      "layer": 30,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 28
+    },
+    {
+      "layer": 31,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 28
+    },
+    {
+      "layer": 32,
+      "nodes": 70,
+      "edges": 88,
+      "mode": "Reindex",
+      "source": 20,
+      "indexSource": 32
+    },
+    {
+      "layer": 33,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 32
+    },
+    {
+      "layer": 34,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 32
+    },
+    {
+      "layer": 35,
+      "nodes": 61,
+      "edges": 77,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 32
+    },
+    {
+      "layer": 36,
+      "nodes": 70,
+      "edges": 88,
+      "mode": "Reindex",
+      "source": 20,
+      "indexSource": 36
+    },
+    {
+      "layer": 37,
+      "nodes": 62,
+      "edges": 78,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 36
+    },
+    {
+      "layer": 38,
+      "nodes": 62,
+      "edges": 78,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 36
+    },
+    {
+      "layer": 39,
+      "nodes": 65,
+      "edges": 81,
+      "mode": "Reuse",
+      "source": 20,
+      "indexSource": 36
+    }
+  ],
+  "renderedLayers": 40,
+  "representativeGeometricChecks": 13,
+  "errors": []
+}
