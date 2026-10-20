@@ -49,6 +49,8 @@ result=result.replace('</body>',(ROOT/'src/deepseek/layer_trace_ui.html').read_t
 walkthrough_ui=(ROOT/'src/deepseek/walkthrough_ui.html').read_text(encoding='utf-8').replace('__CSA_WALKTHROUGH_CONFIG__',json.dumps(indexer_config))
 walkthrough_ui=walkthrough_ui.replace('__CSA_WALKTHROUGH_MOTION__',(ROOT/'src/deepseek/walkthrough_motion.js').read_text(encoding='utf-8'))
 result=result.replace('</body>',walkthrough_ui+'\n</body>')
+pipeline_ui=(ROOT/'src/deepseek/inference_pipeline.html').read_text(encoding='utf-8').replace('__PIPELINE_SCRIPT__',(ROOT/'src/deepseek/inference_pipeline.js').read_text(encoding='utf-8'))
+result=result.replace('</body>',pipeline_ui+'\n</body>')
 (ROOT/'deepseek_v4_1_interactive.html').write_text(result,encoding='utf-8')
 (ROOT/'src/deepseek/architecture.svg').write_text(svg,encoding='utf-8')
 print(f'Built standalone HTML: {len(result.encode("utf-8")):,} bytes; {len(ids)} interactive SVG elements / {len(set(ids))} keys; {len(DATA)} calculation entries.')

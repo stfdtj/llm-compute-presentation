@@ -68,7 +68,7 @@ panel.addEventListener('click',e=>e.stopPropagation());
 document.addEventListener('click',e=>{if(panel.contains(e.target)||e.target.closest('[data-mode],.module'))return;if(!dragged)closePanel();});
 svg.addEventListener('click',e=>{if(dragged){dragged=false;return;}const g=e.target.closest('.module');if(g)openPanel(g.dataset.module,g);else closePanel();});
 svg.addEventListener('keydown',e=>{const g=e.target.closest('.module');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openPanel(g.dataset.module,g);document.getElementById('close-panel').focus();}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel(true);if(!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&e.key==='0')reset();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel(true);if(!document.body.matches('.pipeline-active,.csa-walkthrough-active')&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)&&e.key==='0')reset();});
 function paint(){svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.w} ${view.h}`);document.getElementById('zoom-value').textContent=Math.round(1672/view.w*100)+'%';}
 function point(x,y){const p=svg.createSVGPoint();p.x=x;p.y=y;return p.matrixTransform(svg.getScreenCTM().inverse());}
 function zoom(factor,anchor){const s=Math.max(.6,Math.min(6,1672/view.w*factor)),w=1672/s,h=941/s,p=anchor||{x:view.x+view.w/2,y:view.y+view.h/2};view={x:p.x-(p.x-view.x)*w/view.w,y:p.y-(p.y-view.y)*h/view.h,w,h};paint();}

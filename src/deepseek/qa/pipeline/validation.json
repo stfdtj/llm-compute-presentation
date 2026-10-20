@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "outcomes": [
+    "all",
+    "first",
+    "second",
+    "last"
+  ],
+  "lengths": [
+    1,
+    2,
+    3
+  ],
+  "viewports": [
+    [
+      1366,
+      768
+    ],
+    [
+      1920,
+      1080
+    ],
+    [
+      768,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "screenshots": [
+    "1366x768_step_3.png",
+    "1366x768_step_5.png",
+    "1366x768_step_6.png",
+    "1366x768_step_7.png",
+    "1920x1080_step_3.png",
+    "1920x1080_step_5.png",
+    "1920x1080_step_6.png",
+    "1920x1080_step_7.png",
+    "768x900_step_3.png",
+    "768x900_step_5.png",
+    "768x900_step_6.png",
+    "768x900_step_7.png",
+    "390x844_step_3.png",
+    "390x844_step_5.png",
+    "390x844_step_6.png",
+    "390x844_step_7.png"
+  ],
+  "errors": []
+}
