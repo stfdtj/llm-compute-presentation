@@ -20,6 +20,7 @@ let browser;
  const cases=[];
  for(const size of [{width:2506,height:560},{width:2048,height:720},{width:1920,height:1080},{width:1366,height:768},{width:1100,height:600},{width:900,height:480},{width:390,height:844}]){
   await page.setViewportSize(size);
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   await page.waitForFunction(()=>document.getElementById('csa-walkthrough').getBoundingClientRect().top>=document.querySelector('header').getBoundingClientRect().bottom);
   const base=await page.locator('.csa-heading').boundingBox(),nav=await page.locator('.csa-step-nav').boundingBox();
   await page.locator('.csa-scroll').evaluate(e=>e.scrollTop=0);
