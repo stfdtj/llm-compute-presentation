@@ -62,7 +62,7 @@ Shared KV 投影：每层 2,621,440 个参数，当前 token 前向 5,242,880 FL
 
 根目录 `docs/architecture/calculation_audit.md` 列出旧结果、修正内容、状态、原因与代码位置；`docs/architecture/assumptions.md` 汇总全局和模块条件。状态统计单位为 63 模块 × 3 模式的 189 主记录；当前 Verified 63 / Estimated 82 / Unverified 44 / Mismatch 0，38 项旧结果或解释边界已修正。完整变化见 `audit_results.json`，独立参数清单见 `independent_audit.json`，源码构造检查见 `qa/source_shape_validation.json`。
 
-复跑：`python src/deepseek/audit_model.py`、`python src/deepseek/build.py`、`python src/deepseek/verify_audit.py`、`python src/deepseek/verify_single_token.py`。梯度检查需 NumPy，请使用根目录 requirements.txt 安装的 NumPy；浏览器检查运行 `node src/deepseek/verify_browser.cjs`、`node src/deepseek/verify_parameters.cjs` 和 `node src/deepseek/verify_flow.cjs`。运行 HTML 本身不需要这些构建与验证工具。
+复跑：`python src/deepseek/audit_model.py`、`python src/deepseek/build.py`、`python src/deepseek/verify_audit.py`、`python src/deepseek/verify_single_token.py`。梯度检查需 NumPy，请使用根目录 requirements.txt 安装的 NumPy；浏览器检查运行 `node src/deepseek/verify_browser.cjs`、`node src/deepseek/verify_parameters.cjs` 和 `node src/deepseek/verify_shape_trace.cjs`。运行 HTML 本身不需要这些构建与验证工具。
 
 ## 信息流演示
 
@@ -80,27 +80,12 @@ KV source layers 为 `[2,8,14,20]`，Index source layers 为 `[2,8,14,20,24,28,3
 
 运行 `node src/deepseek/verify_indexer.cjs`，检查真实点击、全部 38 个适用层、三种计算模式、缓存复用、键盘与空白关闭、缩放平移、信息流切换、四种窗口及计算数据 / 原图保留。结果为 `qa/indexer_validation.json`，截图为 `qa/indexer_*.png`。
 
-### 原有五步信息流
+### Shape Trace（替代原有五步信息流 / Step 4 演示）
 
-在原页面打开“信息流 / Data Flow”，使用上一步、下一步和重新播放。蓝色表示 Hidden State 主干，橙色表示共享 KV，绿色表示 Local KV，紫色表示 Attention 汇总。箭头可悬停查看来源与用途；第 3 步可以逐行写入缓存示例，第 4 步可分别追踪 Q / Global / Local。点击 Global KV 可定位第 2 步，说明面板可返回原计算说明。关闭开关恢复进入演示前的视角。
+在原页面打开顶部 **Shape Trace**（取代旧 “信息流 / Data Flow”）。Layer 选择器覆盖 0–39；章节按钮滚动到同一张连续图的对应位置，不是分步动画。点击或键盘 Enter 选择模块，高亮其祖先和后代；“清除高亮”恢复整图。
 
-本地源码确认：
+维度来自构建时读取的 `references/deepseek/config.json / text_config`，由 `build.py` 内联；模型逻辑依据 `references/deepseek/inference/model.py` 的 Transformer、Block、Attention、Compressor、Indexer、Gate、Expert 和 MoE。当前场景为单 Token Decode，省略 batch=1，显示 TP 切分之前的完整模型维度：`[1,5120]` 的 1 表示当前 token，跨层状态为 `[1,4,5120]`；Layer 0 展开 Embedding，Layer 39 展示 Final mHC Pre、Norm、LM Head 和 `[1,129280]` Logits。
 
-- `config.json`：40 层，KV source 为 2、8、14、20；20–39 层 ratio=1；64 个 Query Head，Head 宽度 512，Local 窗口 128。
-- `model.py:978` 附近的 `Block.forward`：跨层传递四路残差；HC 合并与 Attention RMSNorm 后得到单行 Attention 输入。
-- `Compressor.forward`、`Attention._compress_kv`：层 20 对自身 Attention 输入投影、归一化、尾部 RoPE、量化并写入共享缓存，随后层复用。
-- `Attention._window_kv`：各层独立产生 Local KV 并维护环形缓存。
-- `Attention.forward` 与 `kernel.py` 的 `sparse_attn_kernel`：局部和共享 KV 在位置维拼接，选中位置共同归一化；64 个 Query Head 读取共享的 512 维向量，该向量同时用于 Key 和 Value。
+Layer 0/1 为 Local only；Global KV 源层为 2/8/14/20，Indexer 源层为 2/8/14/20/24/28/32/36，其他层读取最近源层当前 token 对应的缓存/索引。Encoder 源层 ratio=2 时每 token 写入 group buffer，成组后按通道 gate pooling（图中 ΔS=0 表示跳过，不代表实际创建零行 Tensor）；Layer 20 ratio=1，不做 pooling，ΔS=1。Gather、Attention Scores、Softmax 和 Weighted Reduce 展示 fused `sparse_attn` 中的逻辑阶段，不声称实现物化了这些中间矩阵。详细口径（Index Keys 的 RoPE 前/后取值、Candidate Mask、SWA Bounded Replay、MoE 路由权重应用顺序、Engram/DSpark 注入位置等）见 [shape_trace.md](shape_trace.md)。
 
-教学示意：原图的 Encoder / Decoder 分段及 H_enc 单行标签不是独立源码模块；真正的层 20 分支来自 HC 合并、归一化后的 Attention 输入。Cache 辅助框、无压缩三行例子、移动圆点、简化 Softmax 公式用于说明原理，不是新增层或真实运行中的张量。页面说明已明确这一区别。
-
-`verify_flow.cjs` 与 `qa/flow_validation.json` 覆盖五步导航、三次缓存写入、Q/Global/Local 筛选、计算模式保留、原 SVG 几何保留、关闭和离线运行。`qa/flow_step_1.png` 至 `qa/flow_step_5.png` 为分步截图，另有 1366 / 768 / 390 像素窗口截图。
-
-
-Step 4 的 Layer 21 矩阵教学演示（增量功能）
-
-打开原页面的信息流并进入第 4 步，即出现六段演示：三条输入、位置维 Concat、索引读取、Attention Scores、共同 Softmax 与 Weighted Sum、8 组输出投影。支持前后切换、键盘左右键 / Home / End、重看，以及改变 2 维教学 Query 后观察权重和输出。小屏矩阵区独立横向 / 纵向滚动。
-
-`flow_attention_ui.html` 只添加教学 UI，不修改模块计算数据。Global 1024 / Local 128 / Global Top-K 512 是独立的教学场景；Global 长度是 Layer 20 写入后的快照（ratio=1 时包含当前位置），不代替审计的历史长度条件。Selected KV 仅是逻辑读取视图；共享 Latent KV 同时用于分数与汇总。分组输出形状为 `[1,64,512] → [1,8,4096] → [1,8,1024] → [1,8192] → [1,5120]`。源码依据使用审计固定的官方版本，并核对 main 中对应实现。
-
-`verify_step4.cjs` 检查六段 × 五种窗口、Concat 行方向 / 固定特征宽度、联合归一化与 sink 数值例子、前后导航、离线运行、原 SVG 几何以及模块数据 / 审计数据 / 原始 SVG / 审计文档的 SHA-256 保持不变；结果见 `qa/step4_validation.json`。
+`verify_shape_trace.cjs` 检查全部 40 层的图构建/切换、13 个代表层的图形边界、端口连续性（每条连接两端形状必须相等，构建期直接抛错）、箭头避开模块、节点文字边界、高亮、1366/768/390 窄屏滚动，以及退出后原架构 DOM 保持一致；结果与截图在 `qa/shape_trace/`。旧 Data Flow（`verify_flow.cjs`）与 Step 4 矩阵演示（`flow_attention_ui.html` / `verify_step4.cjs`）已随 Shape Trace 替换整体移除。

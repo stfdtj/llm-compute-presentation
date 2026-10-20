@@ -165,7 +165,7 @@ paint();
     node('iweights','Indexer Head Weights',1,2,{in:h},{out:s(1,IH)},'index','Projection · scale');edge('normA','iweights');
     node('dot','Indexer Q · Keys',2,3,{query:s(1,IH,ID),keys:s('S',ID)},{out:s(1,IH,'S')},'index','Dot product');edge('iqrope','dot','out','query');edge('keycache','dot','out','keys');
     node('score','Indexer Score Vector',2,4,{in:s(1,IH,'S'),weights:s(1,IH)},{out:s(1,'S')},'index','ReLU · weight · head reduce');edge('dot','score');edge('iweights','score','out','weights');
-    if(L===20)node('candidate','Candidate Mask → Reindex',3,7,{in:s(1,'S')},{out:s(1,'S')},'index','8 positions/block · ≤2048 blocks');
+    if(L===20)node('candidate','Candidate Mask → Reindex',3,7,{in:s(1,'S')},{out:s(1,'S')},'index',`${C.candidate_block_size} positions/block · ≤${C.candidate_topk_blocks} blocks`);
     if(!owns)node('candidate','Candidate Mask · Layer 20',3,5,{}, {out:s(1,'S')},'index','Cross-layer mask reuse');
     node('mask','Visible Position Mask',2,6,{in:s(1,'S'),...(!owns?{candidate:s(1,'S')}: {})},{out:s(1,'S')},'index',owns?'Causal mask':'Causal + Candidate mask');edge('score','mask');if(!owns)edge('candidate','mask','out','candidate');
     if(L===20)edge('mask','candidate');

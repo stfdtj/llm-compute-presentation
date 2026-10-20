@@ -9,7 +9,7 @@
   "cacheReuse": true,
   "blankDismiss": true,
   "zoomPan": true,
-  "flowAndAttentionDemo": true,
+  "shapeTraceIntegration": true,
   "panelFlowShortcut": true,
   "expandableNotes": true,
   "viewports": [
