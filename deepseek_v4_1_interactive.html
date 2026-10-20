@@ -457,9 +457,9 @@ header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px 12px}.scenario{display
 <!-- Persistent matrix teaching scenes. Source: walkthrough_motion.js. -->
 <style>
 .csa-view-tabs{order:10;flex:0 0 100%;display:flex;align-items:center;gap:6px;border-top:1px solid var(--line);padding-top:7px}.csa-view-tabs button{padding:6px 14px;border-color:transparent;background:transparent;color:var(--muted);font-size:12px}.csa-view-tabs button[aria-selected=true]{color:var(--blue);background:#edf4ff;border-color:#c4d6f2;font-weight:650}.csa-view-tabs .csa-tab-caption{margin-left:auto;font-size:11px;color:var(--muted)}
-#csa-walkthrough[hidden]{display:none!important}#csa-walkthrough{--csa-query:#2863c5;--csa-global:#cb7916;--csa-local:#22936b;--csa-selected:#8a4ec2;position:absolute;inset:calc(var(--header-height,106px) + 10px) 10px 10px;overflow:auto;overscroll-behavior:contain;background:#f6f8fc;border-radius:8px;padding:16px max(14px,calc((100% - 1460px)/2));scrollbar-width:thin}
+#csa-walkthrough[hidden]{display:none!important}#csa-walkthrough{--csa-query:#2863c5;--csa-global:#cb7916;--csa-local:#22936b;--csa-selected:#8a4ec2;position:absolute;inset:calc(var(--header-height,106px) + 10px) 10px 10px;display:flex;flex-direction:column;overflow:hidden;overscroll-behavior:contain;background:#f6f8fc;border-radius:8px;padding:16px max(14px,calc((100% - 1460px)/2));scrollbar-width:thin}
 .csa-walkthrough-active #stage,.csa-walkthrough-active footer,.csa-walkthrough-active #flow-bar,.csa-walkthrough-active #indexer-bar,.csa-walkthrough-active #layer-trace-bar,.csa-walkthrough-active #inspector,.csa-walkthrough-active #flow-tooltip{display:none!important}.csa-walkthrough-active header>.modes,.csa-walkthrough-active header>.tools,.csa-walkthrough-active header>.scenario,.csa-walkthrough-active header>button{display:none!important}#indexer-bar{top:var(--header-height,66px)}
-.csa-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;position:sticky;top:0;z-index:3;background:#f6f8fc;padding:5px 0 8px}.csa-heading h1{font-size:26px;letter-spacing:-.5px;margin:0 0 4px}.csa-eyebrow{font-size:11px;font-weight:650;color:var(--blue);letter-spacing:.08em;margin-bottom:4px}.csa-scope{display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.csa-scope span{padding:3px 7px;background:#edf1f7;border-radius:4px}.csa-controls{display:flex;align-items:center;flex-wrap:wrap;gap:6px}.csa-controls button{padding:8px 13px;font-size:13px}.csa-controls button:disabled{opacity:.4;cursor:default}.csa-controls .csa-primary{background:var(--blue);color:white;border-color:var(--blue)}.csa-controls .csa-primary:hover{background:#194eae}.csa-controls button[aria-pressed=true]{background:#edf4ff;color:#245aca;border-color:#9cb9e6}#csa-indicator{font-size:12px;font-variant-numeric:tabular-nums;min-width:80px;text-align:center;color:var(--muted)}
+.csa-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;position:relative;flex-shrink:0;z-index:1;background:#f6f8fc;padding:5px 0 8px}.csa-heading h1{font-size:26px;letter-spacing:-.5px;margin:0 0 4px}.csa-eyebrow{font-size:11px;font-weight:650;color:var(--blue);letter-spacing:.08em;margin-bottom:4px}.csa-scope{display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.csa-scope span{padding:3px 7px;background:#edf1f7;border-radius:4px}.csa-controls{display:flex;align-items:center;flex-wrap:wrap;gap:6px}.csa-controls button{padding:8px 13px;font-size:13px}.csa-controls button:disabled{opacity:.4;cursor:default}.csa-controls .csa-primary{background:var(--blue);color:white;border-color:var(--blue)}.csa-controls .csa-primary:hover{background:#194eae}.csa-controls button[aria-pressed=true]{background:#edf4ff;color:#245aca;border-color:#9cb9e6}#csa-indicator{font-size:12px;font-variant-numeric:tabular-nums;min-width:80px;text-align:center;color:var(--muted)}
 .csa-step-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:14px 0}.csa-step-nav button{display:flex;align-items:center;gap:8px;text-align:left;border-radius:7px;font-size:12px;padding:10px 12px;color:var(--muted);background:#fff}.csa-step-nav b{display:grid;place-items:center;width:24px;height:24px;flex:none;border-radius:50%;background:#edf1f7;font-size:11px}.csa-step-nav button[aria-current=step]{border-color:#8eaddf;color:#214f9e;background:#edf4ff}.csa-step-nav button[aria-current=step] b{background:var(--blue);color:white}.csa-step-nav button.csa-completed b{color:#22936b;background:#e8f5ee}
 .csa-story{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}.csa-story-head{padding:15px 20px;border-bottom:1px solid #e8edf5;display:flex;align-items:center;gap:15px;justify-content:space-between}.csa-story-head h2{font-size:18px;margin:0 0 4px}.csa-story-head p{font-size:14px;color:#536580;margin:0;line-height:1.65}.csa-mode-switch{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0}.csa-mode-switch[hidden]{display:none!important}.csa-mode-switch button{font-size:12px;padding:6px 10px}.csa-mode-switch button[aria-pressed=true]{color:var(--blue);border-color:#99b7e6;background:#edf4ff}
 .csa-canvas{overflow-x:auto;overflow-y:hidden;background:linear-gradient(#fff,#fafcff);padding:6px 0;scrollbar-width:thin}.csa-canvas svg{display:block;width:100%;min-width:850px;max-height:calc(100dvh - 365px);min-height:370px;font-family:'Segoe UI','Microsoft YaHei',sans-serif}.csa-canvas .csa-label{font-size:17px;font-weight:650}.csa-canvas .csa-tiny{font-size:12px;fill:#66708a}.csa-canvas .csa-dim{opacity:.1}.csa-canvas .csa-cached{opacity:.55}.csa-canvas .csa-wire{fill:none;stroke:#b6c5da;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.csa-canvas .csa-hot{stroke-width:3}.csa-canvas .csa-dashed{stroke-dasharray:6 5}.csa-canvas .csa-slot{transition:fill .16s,stroke .16s}.csa-canvas .csa-score{font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}.csa-canvas .csa-white{fill:#fff}.csa-canvas .csa-state-note{font-size:13px;font-weight:600}.csa-canvas .csa-math{font-family:'Cambria Math','Microsoft YaHei',serif;font-size:17px}
@@ -471,27 +471,175 @@ header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px 12px}.scenario{display
 .csa-focus header{min-height:0;padding:5px 14px}.csa-focus header>.brand{display:none}.csa-focus .csa-view-tabs{border:0;padding:0}.csa-focus #csa-walkthrough{padding:6px 10px}.csa-focus .csa-heading{padding:0 0 4px;margin-bottom:6px}.csa-focus .csa-heading>div:first-child,.csa-focus .csa-step-nav,.csa-focus .csa-teaching-note,.csa-focus .csa-matrix-extra{display:none}.csa-focus .csa-controls{width:100%;justify-content:flex-end}.csa-focus .csa-story-head{padding:10px 16px}.csa-focus #csa-walkthrough .csa-canvas svg{max-height:calc(100dvh - 250px);height:calc(100dvh - 250px);min-height:300px}.csa-focus .csa-story-foot{padding:8px 16px}
 </style>
 <style>
-.csa-step-nav{grid-template-columns:repeat(5,minmax(0,1fr))}.csa-heading h1{font-size:24px}.csa-controls{max-width:640px;justify-content:flex-end}.csa-motion-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:8px 20px;border-bottom:1px solid #e8edf5;font-size:12px;color:#60738f}.csa-motion-toolbar label{display:flex;align-items:center;gap:10px}.csa-motion-toolbar input{width:180px;accent-color:#2863c5}.csa-motion-toolbar select{font-size:12px;padding:3px 6px}.csa-motion-toolbar #csa-motion-status{margin-right:auto}.csa-canvas svg{min-width:1000px;min-height:0;height:clamp(370px,calc(100dvh - 480px),620px);max-height:650px;width:100%;font-family:'Segoe UI','Microsoft YaHei',sans-serif}.csa-canvas [data-motion-id]{will-change:transform,opacity}.csa-canvas text{pointer-events:none}.csa-focus #csa-walkthrough .csa-canvas svg{min-height:330px;height:calc(100dvh - 285px);max-height:none}.csa-focus .csa-motion-toolbar{padding:5px 16px}.csa-focus .csa-story-head p{font-size:13px}.csa-focus .csa-story-head h2{font-size:17px}.csa-canvas [data-scene]{isolation:isolate}
+.csa-scroll{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable}.csa-step-nav{flex-shrink:0;margin:0 0 14px;grid-template-columns:repeat(7,minmax(0,1fr))}.csa-heading h1{font-size:24px}.csa-controls{max-width:640px;justify-content:flex-end}.csa-motion-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:8px 20px;border-bottom:1px solid #e8edf5;font-size:12px;color:#60738f}.csa-motion-toolbar label{display:flex;align-items:center;gap:10px}.csa-motion-toolbar input{width:180px;accent-color:#2863c5}.csa-motion-toolbar select{font-size:12px;padding:3px 6px}.csa-motion-toolbar #csa-motion-status{margin-right:auto}.csa-canvas svg{min-width:1000px;min-height:0;height:clamp(370px,calc(100dvh - 480px),620px);max-height:650px;width:100%;font-family:'Segoe UI','Microsoft YaHei',sans-serif}.csa-canvas [data-motion-id]{will-change:transform,opacity}.csa-canvas text{pointer-events:none}.csa-focus #csa-walkthrough .csa-canvas svg{min-height:330px;height:calc(100dvh - 285px);max-height:none}.csa-focus .csa-motion-toolbar{padding:5px 16px}.csa-focus .csa-story-head p{font-size:13px}.csa-focus .csa-story-head h2{font-size:17px}.csa-canvas [data-scene]{isolation:isolate}
 @media(max-width:1050px){.csa-canvas svg{height:510px;max-height:none}.csa-controls{max-width:none}.csa-motion-toolbar{flex-wrap:wrap;gap:8px}.csa-focus #csa-walkthrough .csa-canvas svg{height:500px}}
 @media(max-width:780px){.csa-step-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.csa-controls{justify-content:flex-start}.csa-motion-toolbar{padding:8px 12px}.csa-motion-toolbar input{width:130px}.csa-motion-toolbar #csa-motion-status{font-size:10px}.csa-canvas svg{height:500px;min-width:1000px}.csa-heading h1{font-size:22px}}
 </style>
 <section id="csa-walkthrough" role="tabpanel" aria-labelledby="csa-tab-walkthrough" tabindex="0" hidden>
- <div class="csa-heading"><div><div class="csa-eyebrow">STEP-BY-STEP / CSA2</div><h1>跟着矩阵，走完一次 CSA2</h1><div class="csa-scope"><span id="csa-context">Encoder 示例 · Layer 2</span><span>示意位置，不按真实数量绘制</span></div></div><div class="csa-controls" aria-label="逐步演示控制"><button id="csa-prev">← Prev</button><span id="csa-indicator" aria-live="polite">Action 1 / 23</span><button id="csa-next" class="csa-primary">Next →</button><button id="csa-play" aria-pressed="false">▶ Play</button><button id="csa-reset">↺ Reset</button><button id="csa-replay">↺ 重播本步</button><button id="csa-focus" aria-pressed="false">演示视图</button></div></div>
+ <div class="csa-heading"><div><div class="csa-eyebrow">STEP-BY-STEP / CSA2</div><h1>跟着矩阵，走完一次 CSA2</h1><div class="csa-scope"><span id="csa-context">Encoder 示例 · Layer 2</span><span>示意位置，不按真实数量绘制</span></div></div><div class="csa-controls" aria-label="逐步演示控制"><button id="csa-prev">← Prev</button><span id="csa-indicator" aria-live="polite">Action 1 / 46</span><button id="csa-next" class="csa-primary">Next →</button><button id="csa-play" aria-pressed="false">▶ Play</button><button id="csa-reset">↺ Reset</button><button id="csa-replay">↺ 重播本步</button><button id="csa-focus" aria-pressed="false">演示视图</button></div></div>
  <nav class="csa-step-nav" aria-label="选择 CSA2 步骤"></nav>
+ <div class="csa-scroll" id="csa-scroll" tabindex="0" aria-label="CSA2 content">
  <article class="csa-story"><div class="csa-story-head"><div><h2 id="csa-title"></h2><p id="csa-description" aria-live="polite"></p><span class="csa-mobile-hint">窄屏可横向滑动图示；Prev / Next 控制保持独立。</span></div><div class="csa-mode-switch" role="group" aria-label="CSA2 模式" hidden><button data-csa-mode="Full" aria-pressed="true">Full · L2</button><button data-csa-mode="Reindex" aria-pressed="false">Reindex · L24</button><button data-csa-mode="Reuse" aria-pressed="false">Reuse · L21</button></div></div>
  <div class="csa-motion-toolbar"><label>本步动画 <input id="csa-progress" type="range" min="0" max="100" value="100" aria-label="本步动画进度"></label><span id="csa-motion-status" aria-live="polite"></span><label>速度 <select id="csa-speed" aria-label="动画速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div><div class="csa-canvas" id="csa-canvas"></div>
  <div class="csa-mode-readout" id="csa-mode-readout" hidden></div>
  <div class="csa-story-foot"><div class="csa-legend"><span><i style="background:#2863c5"></i>Token / Query</span><span><i style="background:#22936b"></i>Local KV</span><span><i style="background:#cb7916"></i>Global KV / Index Key</span><span><i style="background:#8a4ec2"></i>Selected / Output</span></div><span class="csa-foot-note" id="csa-foot-note">每行是一个位置 · 每列只画少量特征，非真实比例</span></div></article>
  <p class="csa-teaching-note">位置、数值和分数用于教学，非模型运行记录。Index Keys 与 Global KV 由压缩表示分别构造，图中按位置对齐；Main Query 与 Indexer Query 独立。</p>
  <details class="csa-matrix-extra"><summary>附加演示 · Matrix Multiplication：一行 × 一列</summary><div class="csa-matrix-body"><div class="csa-matrix-toolbar"><p id="csa-matrix-message"></p><div class="csa-matrix-controls"><button id="csa-matrix-prev">← Prev</button><span id="csa-matrix-indicator" aria-live="polite"></span><button id="csa-matrix-next">Next →</button><button id="csa-matrix-reset">Reset</button></div></div><div id="csa-matrix-scene"></div></div></details>
+ </div>
 </section>
-<script type="application/json" id="csa-config">{"dim": 5120, "n_layers": 40, "n_heads": 64, "q_lora_rank": 1280, "head_dim": 512, "index_n_heads": 32, "index_head_dim": 128, "index_topk": 512, "window_size": 128, "kv_source_layers": [2, 8, 14, 20], "index_source_layers": [2, 8, 14, 20, 24, 28, 32, 36], "compress_ratios": [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0]}</script>
+<script type="application/json" id="csa-config">{"dim": 5120, "n_layers": 40, "n_heads": 64, "q_lora_rank": 1280, "head_dim": 512, "index_n_heads": 32, "index_head_dim": 128, "index_topk": 512, "window_size": 128, "kv_source_layers": [2, 8, 14, 20], "index_source_layers": [2, 8, 14, 20, 24, 28, 32, 36], "compress_ratios": [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0], "candidate_source_layer": 20, "candidate_topk_blocks": 2048, "candidate_block_size": 8}</script>
 <script>
 /* Persistent SVG scene graph. Navigation changes numeric poses, never replaces the
  * stage. One requestAnimationFrame clock owns all motion, including pause/seek. */
 (()=>{
  'use strict';
+ /* Hierarchical indexing teaching scene. Inserted into the existing persistent
+ * SVG and RAF clock; candidate positions and per-layer Top-K are separate data. */
+function createCandidateWalkthrough({scene,node,box,label,textNode,wire,el,C,config}){
+ const blockSize=config.candidate_block_size,realBlocks=config.candidate_topk_blocks;
+ const realTopK=config.index_topk,source=config.candidate_source_layer;
+ if(blockSize!==8||source!==20)throw new Error('Update the 32-position teaching layout for the changed candidate configuration.');
+ const layers=[20,24,28,32,36];
+ const sourceScores=[.24,.37,.92,.44,.31,.59,.41,.26,.62,.98,.52,.71,.33,.96,.58,.49,.35,.88,.45,.61,.29,.73,.40,.56,.66,.47,.94,.55,.79,.46,.68,.70];
+ const blockScores=Array.from({length:4},(_,b)=>Math.max(...sourceScores.slice(b*8,b*8+8)));
+ // Match select_candidate_blocks: reserve the newest visible block, then
+ // choose the remaining block by its maximum position score.
+ const rankedBlocks=[0,1,2,3].sort((a,b)=>blockScores[b]-blockScores[a]);
+ const poolBlocks=[3,...rankedBlocks.filter(b=>b!==3).slice(0,1)].sort((a,b)=>a-b);
+ const pool=Object.freeze(Array.from({length:32},(_,i)=>i).filter(i=>poolBlocks.includes(Math.floor(i/8))));
+ const score=(layer,id)=>layer===20?sourceScores[id]:(((id*(layer+7)+layer*13+(id%3)*17)%89)+10)/100;
+ const top=(ids,layer)=>ids.slice().sort((a,b)=>score(layer,b)-score(layer,a)||a-b).slice(0,4);
+ const ownTop=top(Array.from({length:32},(_,i)=>i),20);
+ const selected=Object.fromEntries(layers.slice(1).map(l=>[l,top(pool,l)]));
+ const g=scene('candidate-pool');
+ const actions=[
+  ['Decoder L20','Decoder Layer 20 · 全部可见 Global Positions','Decoder 从 ratio=1 的 Layer 20 开始；每个方块代表一个 Global KV 位置，并有对应的 Index Key。'],
+  ['Decoder L20','当前 Indexer Query 为所有可见位置评分','用 L20 自己的 Query 与 Index Keys 计算位置分数；此处逐项展示 32 个教学分数。'],
+  ['Candidate Pool','每 8 个位置组成一个 Block','32 个位置移动为四组；位置编号保持不变，每个 Block 含 8 个位置。'],
+  ['Candidate Pool','每个 Block 取内部最高分','八个位置分数汇聚成一个 Block Score：max(s₀,…,s₇)。'],
+  ['Candidate Pool','按 Block Score 选择候选 Blocks','示意选择 2 个 Block；真实上限为 2048 个，参考实现优先保留最新可见 Block。'],
+  ['Candidate Pool','展开选中的 Blocks → Candidate Pool','B1 与 B3 的全部 16 个位置移入候选池；真实上限为 2048×8 = 16,384 个位置。'],
+  ['Decoder L20','分开保留 L20 自己的 Top-K','L20 本层 Top-K 从完整可见位置独立选择；它与 Candidate Pool 是两条输出，示例 #2 只属于本层 Top-4。']
+ ];
+ for(const layer of layers.slice(1))actions.push(
+  ['Reindex','候选池传到 Decoder Layer '+layer,'复用 L20 的同一组候选位置与 KV / Index Keys；当前层产生自己的 Indexer Query。'],
+  ['Reindex','Layer '+layer+' · 对候选域重新评分','动画展示有效候选域内的分数变化；参考代码实际先对缓存评分，再施加候选掩码。'],
+  ['Reindex','Layer '+layer+' · 池内选择自己的 Top-K','候选池的 16 个位置不变；当前层用自己的新分数选择教学 Top-4，真实上限 Top-512。'],
+  ['Reindex','Layer '+layer+' · Main Attention 读取两种 KV','按本层 Top-K 读取 Global KV，与本层 Local KV 一起执行 Main Attention；候选池不重建。']
+ );
+ label(g,45,28,'教学缩略：32 positions → 4 blocks → 2 blocks / 16 positions → Reindex Top-4',19,C.q);
+ label(g,45,53,`真实配置：${blockSize} positions/block · 最多 ${realBlocks} blocks / ${(realBlocks*blockSize).toLocaleString('en-US')} positions · Top-${realTopK}`,14,C.g);
+ label(g,45,77,'方块 = 位置；Global KV 宽 512，Index Key 宽 128；所有数字为教学示例。',12,C.m);
+ for(let j=0;j<5;j++){
+  box('hp-layer-'+layers[j],g,645+j*106,85,94,33,C.q,'L'+layers[j]);
+  box('hp-query-'+layers[j],g,645+j*106,85,215,62,C.q);
+  textNode('hp-query-label-'+layers[j],g,0,0,'Q_index · L'+layers[j]+' [32,128]',C.q,16);
+ }
+ textNode('hp-source-label',g,45,120,'L20 · 全部可见位置 / Scores',C.g,18);
+ function original(id){return{x:55+(id%8)*92,y:145+Math.floor(id/8)*73};}
+ function grouped(id){return{x:55+Math.floor(id/8)%2*405+(id%4)*78,y:155+Math.floor(id/16)*174+Math.floor((id%8)/4)*60};}
+ function pooled(id){const j=pool.indexOf(id);return{x:55+(j%8)*92,y:192+Math.floor(j/8)*100};}
+ for(let i=0;i<32;i++){
+  const p=original(i);
+  node('hp-pos-'+i,g,n=>{el('rect',{width:66,height:46,rx:4,fill:'currentColor','fill-opacity':.12,stroke:'currentColor'},n);label(n,7,16,'#'+i,13);},{...p,color:C.g});
+  node('hp-score-'+i,g,n=>{el('rect',{'data-box':true,width:64,height:23,rx:2,fill:'currentColor','fill-opacity':.15},n);const t=label(n,7,17,'0.00',14);t.setAttribute('data-motion-number','');},{x:p.x+1,y:p.y+22,w:64,h:23,value:0,color:C.q,opacity:0});
+ }
+ for(let b=0;b<4;b++){
+  const x=43+(b%2)*405,y=121+Math.floor(b/2)*174;
+  box('hp-block-'+b,g,x,y,335,150,C.g);
+  textNode('hp-block-title-'+b,g,x+12,y+24,'B'+b+' · #'+b*8+'…#'+(b*8+7),C.g,15);
+  node('hp-block-score-'+b,g,n=>{el('rect',{width:95,height:25,rx:4,fill:'#fff2dd',stroke:C.g},n);label(n,8,18,'max '+blockScores[b].toFixed(2),15,C.g);},{x:x+226,y:y+7,color:C.g,opacity:0});
+  // A copy of the actual maximum position score moves into the block summary.
+  const winner=sourceScores.indexOf(blockScores[b],b*8),p=grouped(winner);
+  node('hp-max-fly-'+b,g,n=>{el('rect',{width:49,height:23,rx:4,fill:'#fff',stroke:C.s},n);label(n,6,17,blockScores[b].toFixed(2),16,C.s);},{x:p.x+8,y:p.y+23,color:C.s,opacity:0});
+ }
+ textNode('hp-latest',g,462,469,'B3：最新可见 Block 优先保留',C.g,13);
+ box('hp-pool-frame',g,42,132,757,260,C.g);
+ textNode('hp-pool-label',g,55,160,'输出 B · L20 Candidate Pool · 固定 16 个位置',C.g,19);
+ textNode('hp-pool-ids',g,55,427,'B1: #8…#15    +    B3: #24…#31',C.g,18);
+ textNode('hp-pool-upper',g,55,455,'真实上限 16,384；少于上限时只保留可见候选。',C.m,13);
+ wire('hp-score-arrow',g,'M900 165 H825','q');
+ textNode('hp-score-formula',g,900,224,'ReLU(Q_index K_indexᵀ)',C.q,16);
+ textNode('hp-score-heads',g,900,247,'→ 32 Heads 加权汇总',C.q,14);
+ box('hp-own-frame',g,890,274,280,149,C.q);
+ textNode('hp-own-title',g,905,299,'独立输出 A · L20 本层 Top-4',C.q,17);
+ textNode('hp-own-note',g,900,449,'#2 不在候选池，但属于 L20 Top-4',C.q,14);
+ textNode('hp-own-summary',g,45,565,'L20 独立 Top-4：',C.q,15);
+ for(let i=0;i<4;i++){
+  const id=ownTop[i],p=original(id);
+  node('hp-own-'+i,g,n=>{el('rect',{width:112,height:33,rx:4,fill:'#edf4ff',stroke:C.q},n);label(n,10,23,'#'+id+'  '+score(20,id).toFixed(2),16,C.q);},{...p,color:C.q,opacity:0});
+  node('hp-top-'+i,g,n=>{el('rect',{width:112,height:33,rx:4,fill:'#f2eafa',stroke:C.s},n);label(n,10,23,'',16,C.s).setAttribute('data-reindex-result',String(i));},{x:55,y:192,color:C.s,opacity:0});
+ }
+ // Candidate mask is passed, not rebuilt. The large pool matrix stays fixed.
+ node('hp-carry',g,n=>{for(let i=0;i<16;i++){el('rect',{x:(i%4)*30,y:Math.floor(i/4)*25,width:26,height:20,rx:2,fill:'#fff0d9',stroke:C.g},n);label(n,(i%4)*30+4,Math.floor(i/4)*25+14,String(pool[i]),9,C.g);}},{x:150,y:190,color:C.g,opacity:0});
+ textNode('hp-current-top',g,900,285,'当前层 · 池内 Top-4',C.s,17);
+ box('hp-main-frame',g,895,416,280,113,C.s);
+ textNode('hp-main-title',g,910,440,'本层 Main Attention',C.s,17);
+ textNode('hp-main-shapes',g,910,515,'真实：Local ≤128 + Global ≤512',C.m,12);
+ for(let i=0;i<4;i++){
+  box('hp-local-'+i,g,912+i*28,453,23,25,C.l,'');
+  node('hp-global-read-'+i,g,n=>{el('rect',{width:23,height:25,rx:3,fill:'#f2eafa',stroke:C.s},n);label(n,3,17,'',10,C.s).setAttribute('data-read-id',String(i));},{x:1035+i*28,y:453,color:C.s});
+ }
+ textNode('hp-main-kv',g,912,496,'Local KV         selected Global KV',C.m,12);
+ box('hp-output',g,970,550,154,30,C.s,'Output [1,64,512]');
+ wire('hp-main-arrow',g,'M1100 533 V544','s');
+ textNode('hp-scope',g,45,499,'候选池复用的是位置集合；每个 Reindex Layer 有自己的 Query 与分数。',C.q,15);
+ label(g,45,592,'实现口径：动画突出候选域；参考代码先计算缓存分数再加候选掩码。最新可见 Block 优先保留。',12,C.m);
+ function stage(s){const n=s-22;if(n<7)return{n,layer:20,part:-1};const j=Math.min(3,Math.floor((n-7)/4));return{n,layer:layers[j+1],part:(n-7)%4};}
+ let transition={from:22,to:22};
+ function layout(s,set){const {n,layer,part}=stage(s),group=n>=2,inPool=n>=5,isRe=n>=7;
+  const show=(id,on)=>set(id,{opacity:on?1:0});
+  for(let i=0;i<32;i++){
+   const member=pool.includes(i),p=inPool&&member?pooled(i):group?grouped(i):original(i);
+   const picked=isRe&&part>=2&&selected[layer].includes(i),dim=inPool&&!member||n===4&&!poolBlocks.includes(Math.floor(i/8));
+   set('hp-pos-'+i,{...p,opacity:dim?(inPool?0:.12):1,color:picked?C.s:C.g});
+   const scored=isRe?(part>=1?layer:layers[Math.max(0,layers.indexOf(layer)-1)]):20;
+   set('hp-score-'+i,{x:p.x+1,y:p.y+22,value:score(scored,i),w:64,opacity:n<1||inPool&&!member?0:dim?.12:1,color:picked?C.s:C.q});
+  }
+  for(let b=0;b<4;b++){
+   show('hp-block-'+b,group&&!inPool);set('hp-block-'+b,{color:n>=4&&poolBlocks.includes(b)?C.s:C.g,opacity:group&&!inPool?(n===4&&!poolBlocks.includes(b)?.12:1):0});
+   set('hp-block-title-'+b,{opacity:group&&!inPool?(n===4&&!poolBlocks.includes(b)?.15:1):0});show('hp-block-score-'+b,n>=3&&!inPool);set('hp-block-score-'+b,{opacity:n>=3&&!inPool?(n===4&&!poolBlocks.includes(b)?.15:1):0});
+   const x=43+(b%2)*405,y=121+Math.floor(b/2)*174,winner=sourceScores.indexOf(blockScores[b],b*8),p=grouped(winner);
+   set('hp-max-fly-'+b,{x:n>=3?x+263:p.x+8,y:n>=3?y+8:p.y+23,opacity:0});
+  }
+  show('hp-source-label',!group);show('hp-latest',n===4);
+  for(const id of ['hp-pool-frame','hp-pool-label','hp-pool-ids','hp-pool-upper'])show(id,inPool);
+  for(const id of ['hp-own-frame','hp-own-title','hp-own-note'])show(id,n===6);show('hp-own-summary',isRe);
+  for(let i=0;i<4;i++){const origin=inPool&&pool.includes(ownTop[i])?pooled(ownTop[i]):grouped(ownTop[i]);set('hp-own-'+i,{x:n<6?origin.x:isRe?210+i*125:905+(i%2)*132,y:n<6?origin.y:isRe?545:315+Math.floor(i/2)*50,sx:isRe?.8:1,sy:isRe?.8:1,opacity:n>=6?1:0});}
+  for(let j=0;j<5;j++){
+   const current=layers[j]===layer;
+   set('hp-layer-'+layers[j],{color:current?C.s:C.m,opacity:current?1:.4});
+   set('hp-query-'+layers[j],{x:current?905:645+j*106,y:current?133:85,opacity:current?1:0});
+   set('hp-query-label-'+layers[j],{x:current?917:645+j*106,y:current?159:105,opacity:current?1:0});
+  }
+  show('hp-score-arrow',n===1||isRe&&part===1);show('hp-score-formula',n===1||isRe&&part===1);show('hp-score-heads',n===1||isRe&&part===1);
+  set('hp-carry',{x:isRe?645+layers.indexOf(layer)*106:150,y:isRe?85:190,sx:isRe?.45:1,sy:isRe?.45:1,opacity:0});
+  for(let i=0;i<4;i++){
+   const id=isRe?selected[layer][i]:selected[24][i],p=pooled(id);
+   set('hp-top-'+i,{x:isRe&&part>=2?905+(i%2)*132:p.x,y:isRe&&part>=2?301+Math.floor(i/2)*50:p.y,opacity:isRe&&part>=2?1:0});
+   show('hp-local-'+i,isRe&&part>=3);
+   set('hp-global-read-'+i,{x:isRe&&part>=3?1035+i*28:905+(i%2)*132,y:isRe&&part>=3?453:301+Math.floor(i/2)*50,opacity:isRe&&part>=3?1:0});
+  }
+  show('hp-current-top',isRe&&part>=2);
+  for(const id of ['hp-main-frame','hp-main-title','hp-main-shapes','hp-main-kv','hp-output','hp-main-arrow'])show(id,isRe&&part>=3);
+  show('hp-scope',inPool&&!(isRe&&part===0));
+ }
+ function metadata(s){const {layer,part}=stage(s),displayLayer=layer!==20&&part<2?layers[layers.indexOf(layer)-1]:layer;for(let i=0;i<4;i++){const id=(selected[displayLayer]||ownTop)[i];g.querySelector('[data-reindex-result="'+i+'"]').textContent='#'+id+'  '+score(displayLayer,id).toFixed(2);g.querySelector('[data-read-id="'+i+'"]').textContent=String(id);}return'Decoder Layer '+layer+' · ratio = 1 · '+(layer===20?'Full / Candidate Source':'Reindex · Candidate Pool from L20');}
+ function motion(s,t,id,a,b,v){
+  if(s<22||s>44)return;
+  const active=transition.to===s;
+  if(active&&s===23&&id.startsWith('hp-score-')&&a.opacity!==b.opacity){const j=Number(id.slice(9)),u=Math.max(0,Math.min(1,t*1.8-j/40));v.opacity=u;v.value=b.value*u;v.w=64*u;}
+  if(active&&(s===25||transition.from===25&&s===24)&&id.startsWith('hp-max-fly-'))v.opacity=Math.sin(Math.PI*t);
+  if(active&&s>=29&&(s-29)%4===0&&id==='hp-carry')v.opacity=Math.sin(Math.PI*t);
+  if(active&&s>=29&&(s-29)%4===0&&id.startsWith('hp-query-')){if(a.opacity>b.opacity)v.opacity=a.opacity*Math.max(0,1-t*2.5);else if(a.opacity<b.opacity)v.opacity=Math.max(0,(t-.35)/.65);}
+  if(active&&s===29&&id.startsWith('hp-own-')&&/^hp-own-\d$/.test(id))v.y+=Math.sin(Math.PI*t)*(Number(id.slice(7))<2?-25:25);
+ }
+ function prepare(previous,s,from,to){transition={from:previous,to:s};if(s>=29&&s<=41&&(s-29)%4===0){Object.assign(from.get('hp-carry'),{x:150,y:190,sx:1,sy:1,opacity:0});}}
+ return{actions,layout,metadata,motion,prepare,get state(){return{...stage(transition.to),pool:pool.slice(),poolBlocks:poolBlocks.slice(),blockScores:blockScores.slice(),sourceTop:ownTop.slice(),topByLayer:structuredClone(selected),real:{blockSize,blocks:realBlocks,poolLimit:blockSize*realBlocks,topK:realTopK}};}};
+}
+
  const $=id=>document.getElementById(id),root=$('csa-walkthrough'),config=JSON.parse($('csa-config').textContent);
+ const scrollArea=root.querySelector('.csa-scroll');
  const NS='http://www.w3.org/2000/svg',C={q:'#2863c5',l:'#22936b',g:'#cb7916',s:'#8a4ec2',m:'#8a98ac'};
  const chapters=[['SWA',0],['KV Compression',4],['Indexer / Top-K',10],['Main Attention',17],['Full / Reindex / Reuse',22]];
  const actions=[
@@ -609,17 +757,22 @@ header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px 12px}.scenario{display
  textNode('attn-sink',attn,990,490,'示例权重总和 0.90',C.m,13);
  textNode('attn-sink2',attn,990,510,'Sink 占 0.10，不加 Value',C.m,12);
 
+ const candidate=createCandidateWalkthrough({scene,node,box,label,textNode,wire,el,C,config});
+ actions.splice(22,0,...candidate.actions);
+ chapters.splice(4,0,['L20 · Candidate Pool',22],['L24→36 · Reindex',29]);chapters[6][1]=actions.length-1;
+ const modeStep=actions.length-1;
  const modes=scene('modes');
- const modeInfo={Full:['Encoder L2 · ratio=2','生成 Global KV / Index Keys','本层评分 → Top-K'],Reindex:['Decoder L24 · ratio=1','复用 L20 KV / Index Keys','本层重新评分 → Top-K'],Reuse:['Decoder L21 · ratio=1','复用 L20 KV / Index Keys','连同 L20 位置索引复用']};
+ const modeInfo={Full:['Decoder L20 · ratio=1','生成 KV / Keys / Candidate Pool','本层 Top-K 与 Pool 独立'],Reindex:['Decoder L24 / 28 / 32 / 36','复用 L20 KV / Keys / Pool','本层 Query → 池内 Top-K'],Reuse:['Decoder L21 · ratio=1','复用 L20 KV / Index Keys','连同 L20 位置索引复用']};
  ['Full','Reindex','Reuse'].forEach((name,i)=>{
   const x=65+i*380;box('mode-card-'+name,modes,x,80,340,400,C.q);label(modes,x+28,126,name,26,C.q);
   modeInfo[name].forEach((t,j)=>label(modes,x+28,169+j*44,t,j===0?15:17));
   for(let j=0;j<4;j++)row('mode-row-'+name+'-'+j,modes,x+75,305+j*30,j<2?C.g:C.s,'',180);
   label(modes,x+28,456,'本层 Main Query → Attention',18,C.q);
  });
- label(modes,65,550,'Full 的 ratio=2 示例属于 Encoder；Decoder 的两种复用模式不重复压缩。',17);
+ label(modes,65,550,'L20 建立 Candidate Pool；Reindex 重做池内选址，Reuse 直接复用已有位置索引。',17);
 
- function chapterOf(s){return s<4?0:s<10?1:s<17?2:s<22?3:4;}
+ function chapterOf(s){return s<4?0:s<10?1:s<17?2:s<22?3:s<29?4:s<modeStep?5:6;}
+ function sceneOf(chapter){return chapter<=4?chapter:chapter===5?4:5;}
  function layout(s){
   const p=new Map([...nodes].map(([id,n])=>[id,{...n.base}]));
   const set=(id,props)=>Object.assign(p.get(id),props),show=(id,on)=>set(id,{opacity:on?1:0});
@@ -654,9 +807,10 @@ header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px 12px}.scenario{display
   show('attn-read-dim',s>=18);show('attn-q-arrow',s>=19);show('attn-dot',s>=19);show('attn-softmax',s>=20);show('attn-sink',s>=20);show('attn-sink2',s>=20);
   set('attn-output',{opacity:s>=21?1:0,sy:s>=21?1:.1});show('attn-output-dim',s>=21);
   for(const name of ['Full','Reindex','Reuse'])set('mode-card-'+name,{opacity:mode===name?1:.3,color:mode===name?C.s:C.m});
+  candidate.layout(s,set);
   return p;
  }
- function paint(p){for(const [id,v]of p){const n=nodes.get(id);n.now={...v};n.el.setAttribute('transform',`translate(${v.x} ${v.y}) scale(${v.sx} ${v.sy})`);n.el.setAttribute('opacity',String(v.opacity));n.el.style.color=v.color;const r=n.el.querySelector('[data-box]');if(r){r.setAttribute('width',v.w);r.setAttribute('height',v.h);}}
+ function paint(p){for(const [id,v]of p){const n=nodes.get(id);n.now={...v};n.el.setAttribute('transform',`translate(${v.x} ${v.y}) scale(${v.sx} ${v.sy})`);n.el.setAttribute('opacity',String(v.opacity));n.el.style.color=v.color;const r=n.el.querySelector('[data-box]');if(r){r.setAttribute('width',v.w);r.setAttribute('height',v.h);}const number=n.el.querySelector('[data-motion-number]');if(number&&Number.isFinite(v.value))number.textContent=v.value.toFixed(2);}
  }
  let from=layout(0),to=layout(0);
  function mixColor(a,b,t){const c=v=>[1,3,5].map(i=>parseInt(v.slice(i,i+2),16));const aa=c(a),bb=c(b);return '#'+aa.map((n,i)=>Math.round(n+(bb[i]-n)*t).toString(16).padStart(2,'0')).join('');}
@@ -665,25 +819,26 @@ header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px 12px}.scenario{display
    // materialises. At the endpoints only the source/result rows remain visible.
    if(motionPair!==null&&id.startsWith('comp-fly-')&&Math.floor(Number(id.slice(9))/2)===motionPair){v.opacity=Math.max(v.opacity,Math.sin(Math.PI*t));const lane=270+(Number(id.slice(9))%2)*38;v.y+=Math.sin(Math.PI*t)*(lane-(a.y+b.y)/2);}
    if(motionSort&&id.startsWith('idx-score-')){const i=Number(id.slice(10));v.x+=Math.sin(Math.PI*t)*(i%2?110:-110);v.sx*=1-.25*Math.sin(Math.PI*t);v.sy*=1-.35*Math.sin(Math.PI*t);}
+   candidate.motion(step,t,id,a,b,v);
    p.set(id,v);}paint(p);}
  function clearClock(){if(raf!==null)cancelAnimationFrame(raf);if(hold!==null)clearTimeout(hold);raf=hold=null;last=null;}
  function pause(){clearClock();running=false;auto=false;controls();}
  function controls(){const busy=running||auto;$('csa-play').textContent=busy?'Ⅱ Pause':'▶ Play';$('csa-play').setAttribute('aria-pressed',String(busy));$('csa-progress').value=String(Math.round(phase*100));$('csa-progress').setAttribute('aria-valuetext',Math.round(phase*100)+'%');$('csa-motion-status').textContent=running?'矩阵运动中':phase<1?'已暂停 · 可继续或拖动进度':'等待下一步';}
  function tick(now){if(!running)return;if(last!==null)elapsed+=(now-last)*speed;last=now;phase=Math.min(1,elapsed/duration);interpolate(phase);controls();if(phase<1)raf=requestAnimationFrame(tick);else{raf=null;last=null;running=false;if(auto&&step<actions.length-1)hold=setTimeout(()=>{hold=null;move(step+1,true);},1000/speed);else auto=false;controls();}}
  function start(){running=true;last=null;raf=requestAnimationFrame(tick);controls();}
- function metadata(){const a=actions[step],ch=chapterOf(step);$('csa-title').textContent=a[1];$('csa-description').textContent=a[2];$('csa-indicator').textContent=`Action ${step+1} / ${actions.length}`;$('csa-context').textContent=step===22?modeInfo[mode][0]:'Encoder Layer 2 · ratio = 2 · 当前位置 t4096';svgTitle.textContent=a[1];svgDesc.textContent=a[2];$('csa-prev').disabled=step===0;$('csa-next').disabled=step===actions.length-1;
+ function metadata(){const a=actions[step],ch=chapterOf(step);$('csa-title').textContent=a[1];$('csa-description').textContent=a[2];$('csa-indicator').textContent=`Action ${step+1} / ${actions.length}`;$('csa-context').textContent=step===modeStep?modeInfo[mode][0]:step>=22?candidate.metadata(step):'Encoder Layer 2 · ratio = 2 · 当前位置 t4096';svgTitle.textContent=a[1];svgDesc.textContent=a[2];$('csa-prev').disabled=step===0;$('csa-next').disabled=step===actions.length-1;
   root.querySelectorAll('[data-csa-chapter]').forEach((b,i)=>{if(i===ch)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
-  root.querySelector('.csa-mode-switch').hidden=step!==22;root.querySelectorAll('[data-csa-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.csaMode===mode)));
+  root.querySelector('.csa-mode-switch').hidden=step!==modeStep;root.querySelectorAll('[data-csa-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.csaMode===mode)));
   $('csa-mode-readout').hidden=true;
   for(let i=0;i<8;i++)nodes.get('attn-score-'+i).el.querySelector('text').textContent=step>=20?weights[i].toFixed(2):logits[i].toFixed(2);
  }
  function move(target,keepAuto=false,replay=false){
-  const previous=step;clearClock();running=false;auto=keepAuto;step=Math.max(0,Math.min(actions.length-1,target));const ch=chapterOf(step),different=chapterOf(previous)!==ch;
+  const previous=step;clearClock();running=false;auto=keepAuto;step=Math.max(0,Math.min(actions.length-1,target));const ch=chapterOf(step),different=sceneOf(chapterOf(previous))!==sceneOf(ch);
   motionPair=ch===1&&!different&&Math.max(previous,step)>=6?Math.min(3,Math.max(previous,step)-6):null;
   motionSort=previous===14&&step===15||previous===15&&step===14||replay&&step===15;
-  sceneGroups.forEach((g,i)=>{g.style.display=i===ch?'':'none';});
+  sceneGroups.forEach((g,i)=>{g.style.display=i===sceneOf(ch)?'':'none';});
   if(different||replay){const base=replay&&step>chapters[ch][1]?layout(step-1):layout(chapters[ch][1]);paint(base);}
-  from=new Map([...nodes].map(([id,n])=>[id,{...n.now}]));to=layout(step);elapsed=0;phase=0;metadata();
+  from=new Map([...nodes].map(([id,n])=>[id,{...n.now}]));to=layout(step);candidate.prepare(previous,step,from,to);elapsed=0;phase=0;metadata();
   if(different||step===0){phase=1;elapsed=duration;paint(to);if(auto&&step<actions.length-1)hold=setTimeout(()=>move(step+1,true),1000/speed);else auto=false;controls();}
   else start();
  }
@@ -692,10 +847,10 @@ header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px 12px}.scenario{display
  const nav=document.createElement('nav');nav.className='csa-view-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','页面视图');nav.innerHTML='<button id="csa-tab-architecture" role="tab" aria-selected="true" aria-controls="stage">Model Architecture</button><button id="csa-tab-walkthrough" role="tab" aria-selected="false" aria-controls="csa-walkthrough" tabindex="-1">Step-by-step · CSA2</button><span class="csa-tab-caption">矩阵逐步计算 · 可暂停 / 回退 / 重播</span>';document.querySelector('header').append(nav);$('stage').setAttribute('role','tabpanel');$('stage').setAttribute('aria-labelledby','csa-tab-architecture');
  nav.addEventListener('click',e=>{const b=e.target.closest('[role=tab]');if(b)switchView(b.id==='csa-tab-walkthrough');});nav.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();switchView(e.key==='Home'?false:e.key==='End'?true:!active);$('csa-tab-'+(active?'walkthrough':'architecture')).focus();});
  const stepNav=root.querySelector('.csa-step-nav');stepNav.innerHTML=chapters.map(([name,s],i)=>`<button data-csa-chapter="${i}"><b>${i+1}</b><span>${name}</span></button>`).join('');stepNav.addEventListener('click',e=>{const b=e.target.closest('[data-csa-chapter]');if(b)move(chapters[Number(b.dataset.csaChapter)][1]);});
- $('csa-prev').addEventListener('click',()=>move(step-1));$('csa-next').addEventListener('click',()=>move(step+1));$('csa-play').addEventListener('click',play);$('csa-reset').addEventListener('click',()=>{pause();mode='Full';move(0);root.scrollTop=0;});$('csa-replay').addEventListener('click',()=>move(step,false,true));
+ $('csa-prev').addEventListener('click',()=>move(step-1));$('csa-next').addEventListener('click',()=>move(step+1));$('csa-play').addEventListener('click',play);$('csa-reset').addEventListener('click',()=>{pause();mode='Full';move(0);scrollArea.scrollTop=0;});$('csa-replay').addEventListener('click',()=>move(step,false,true));
  $('csa-progress').addEventListener('input',e=>{const value=Number(e.target.value);pause();phase=value/100;elapsed=phase*duration;interpolate(phase);controls();});$('csa-speed').addEventListener('change',e=>{speed=Number(e.target.value);});
- $('csa-focus').addEventListener('click',()=>{presentation=!presentation;document.body.classList.toggle('csa-focus',presentation&&active);$('csa-focus').textContent=presentation?'退出演示':'演示视图';$('csa-focus').setAttribute('aria-pressed',String(presentation));root.scrollTop=0;requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));});
- root.querySelector('.csa-mode-switch').addEventListener('click',e=>{const b=e.target.closest('[data-csa-mode]');if(b){mode=b.dataset.csaMode;move(22);}});
+ $('csa-focus').addEventListener('click',()=>{presentation=!presentation;document.body.classList.toggle('csa-focus',presentation&&active);$('csa-focus').textContent=presentation?'退出演示':'演示视图';$('csa-focus').setAttribute('aria-pressed',String(presentation));scrollArea.scrollTop=0;requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));});
+ root.querySelector('.csa-mode-switch').addEventListener('click',e=>{const b=e.target.closest('[data-csa-mode]');if(b){mode=b.dataset.csaMode;move(modeStep);}});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});window.addEventListener('pagehide',pause);
  document.addEventListener('keydown',e=>{if(!active||e.target.closest('button,input,select,textarea,summary,[contenteditable=true]'))return;if(['ArrowRight','ArrowLeft',' '].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();if(e.key===' ')play();else move(step+(e.key==='ArrowRight'?1:-1));}},true);
  /* Optional scalar matrix example retains its separate controls. */
@@ -707,7 +862,7 @@ header{height:auto;min-height:66px;flex-wrap:wrap;gap:8px 12px}.scenario{display
  $('csa-matrix-prev').addEventListener('click',()=>{matrixStep=Math.max(0,matrixStep-1);matrixRender();});$('csa-matrix-next').addEventListener('click',()=>{matrixStep=Math.min(7,matrixStep+1);matrixRender();});$('csa-matrix-reset').addEventListener('click',()=>{matrixStep=0;matrixRender();});
  paint(layout(0));move(0);matrixRender();
  // Read-only diagnostics; the browser test drives the same controls as the presenter.
- window.csaWalkthrough={get state(){return{active,step:step+1,mode,playing:running||auto,running,auto,phase,presentation,matrixStep:matrixStep+1}},get config(){return structuredClone(config)},get actions(){return actions.map(a=>a.slice())}};
+ window.csaWalkthrough={get state(){return{active,step:step+1,mode,playing:running||auto,running,auto,phase,presentation,matrixStep:matrixStep+1}},get config(){return structuredClone(config)},get actions(){return actions.map(a=>a.slice())},get candidate(){return candidate.state;}};
 })();
 
 </script>

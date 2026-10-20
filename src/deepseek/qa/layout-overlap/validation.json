@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "width": 2506,
+      "height": 560
+    },
+    {
+      "width": 2048,
+      "height": 720
+    },
+    {
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "width": 1366,
+      "height": 768
+    },
+    {
+      "width": 1100,
+      "height": 600
+    },
+    {
+      "width": 900,
+      "height": 480
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "scrollPositions": [
+    0,
+    80,
+    240,
+    700
+  ],
+  "controlsRemainVisible": true,
+  "navigationRemainsVisible": true,
+  "reset": true,
+  "presentation": true,
+  "errors": []
+}

@@ -45,8 +45,10 @@ indexer_ui=(ROOT/'src/deepseek/indexer_ui.html').read_text(encoding='utf-8').rep
 result=result.replace('</body>',indexer_ui+'\n</body>')
 result=result.replace('</body>',(ROOT/'src/deepseek/attention_blocks_ui.html').read_text(encoding='utf-8')+'\n</body>')
 result=result.replace('</body>',(ROOT/'src/deepseek/layer_trace_ui.html').read_text(encoding='utf-8')+'\n</body>')
-walkthrough_ui=(ROOT/'src/deepseek/walkthrough_ui.html').read_text(encoding='utf-8').replace('__CSA_WALKTHROUGH_CONFIG__',json.dumps(indexer_config))
-walkthrough_ui=walkthrough_ui.replace('__CSA_WALKTHROUGH_MOTION__',(ROOT/'src/deepseek/walkthrough_motion.js').read_text(encoding='utf-8'))
+walkthrough_config={**indexer_config,**{key:indexer_text_config[source] for key,source in {'candidate_source_layer':'candidate_source_layer_id','candidate_topk_blocks':'candidate_topk_blocks','candidate_block_size':'candidate_block_size'}.items()}}
+walkthrough_ui=(ROOT/'src/deepseek/walkthrough_ui.html').read_text(encoding='utf-8').replace('__CSA_WALKTHROUGH_CONFIG__',json.dumps(walkthrough_config))
+walkthrough_motion=(ROOT/'src/deepseek/walkthrough_motion.js').read_text(encoding='utf-8').replace('__CSA_CANDIDATE_FACTORY__',(ROOT/'src/deepseek/walkthrough_candidate.js').read_text(encoding='utf-8'))
+walkthrough_ui=walkthrough_ui.replace('__CSA_WALKTHROUGH_MOTION__',walkthrough_motion)
 result=result.replace('</body>',walkthrough_ui+'\n</body>')
 (ROOT/'deepseek_v4_1_interactive.html').write_text(result,encoding='utf-8')
 (ROOT/'src/deepseek/architecture.svg').write_text(svg,encoding='utf-8')

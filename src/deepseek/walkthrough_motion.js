@@ -2,7 +2,9 @@
  * stage. One requestAnimationFrame clock owns all motion, including pause/seek. */
 (()=>{
  'use strict';
+ __CSA_CANDIDATE_FACTORY__
  const $=id=>document.getElementById(id),root=$('csa-walkthrough'),config=JSON.parse($('csa-config').textContent);
+ const scrollArea=root.querySelector('.csa-scroll');
  const NS='http://www.w3.org/2000/svg',C={q:'#2863c5',l:'#22936b',g:'#cb7916',s:'#8a4ec2',m:'#8a98ac'};
  const chapters=[['SWA',0],['KV Compression',4],['Indexer / Top-K',10],['Main Attention',17],['Full / Reindex / Reuse',22]];
  const actions=[
@@ -120,17 +122,22 @@
  textNode('attn-sink',attn,990,490,'示例权重总和 0.90',C.m,13);
  textNode('attn-sink2',attn,990,510,'Sink 占 0.10，不加 Value',C.m,12);
 
+ const candidate=createCandidateWalkthrough({scene,node,box,label,textNode,wire,el,C,config});
+ actions.splice(22,0,...candidate.actions);
+ chapters.splice(4,0,['L20 · Candidate Pool',22],['L24→36 · Reindex',29]);chapters[6][1]=actions.length-1;
+ const modeStep=actions.length-1;
  const modes=scene('modes');
- const modeInfo={Full:['Encoder L2 · ratio=2','生成 Global KV / Index Keys','本层评分 → Top-K'],Reindex:['Decoder L24 · ratio=1','复用 L20 KV / Index Keys','本层重新评分 → Top-K'],Reuse:['Decoder L21 · ratio=1','复用 L20 KV / Index Keys','连同 L20 位置索引复用']};
+ const modeInfo={Full:['Decoder L20 · ratio=1','生成 KV / Keys / Candidate Pool','本层 Top-K 与 Pool 独立'],Reindex:['Decoder L24 / 28 / 32 / 36','复用 L20 KV / Keys / Pool','本层 Query → 池内 Top-K'],Reuse:['Decoder L21 · ratio=1','复用 L20 KV / Index Keys','连同 L20 位置索引复用']};
  ['Full','Reindex','Reuse'].forEach((name,i)=>{
   const x=65+i*380;box('mode-card-'+name,modes,x,80,340,400,C.q);label(modes,x+28,126,name,26,C.q);
   modeInfo[name].forEach((t,j)=>label(modes,x+28,169+j*44,t,j===0?15:17));
   for(let j=0;j<4;j++)row('mode-row-'+name+'-'+j,modes,x+75,305+j*30,j<2?C.g:C.s,'',180);
   label(modes,x+28,456,'本层 Main Query → Attention',18,C.q);
  });
- label(modes,65,550,'Full 的 ratio=2 示例属于 Encoder；Decoder 的两种复用模式不重复压缩。',17);
+ label(modes,65,550,'L20 建立 Candidate Pool；Reindex 重做池内选址，Reuse 直接复用已有位置索引。',17);
 
- function chapterOf(s){return s<4?0:s<10?1:s<17?2:s<22?3:4;}
+ function chapterOf(s){return s<4?0:s<10?1:s<17?2:s<22?3:s<29?4:s<modeStep?5:6;}
+ function sceneOf(chapter){return chapter<=4?chapter:chapter===5?4:5;}
  function layout(s){
   const p=new Map([...nodes].map(([id,n])=>[id,{...n.base}]));
   const set=(id,props)=>Object.assign(p.get(id),props),show=(id,on)=>set(id,{opacity:on?1:0});
@@ -165,9 +172,10 @@
   show('attn-read-dim',s>=18);show('attn-q-arrow',s>=19);show('attn-dot',s>=19);show('attn-softmax',s>=20);show('attn-sink',s>=20);show('attn-sink2',s>=20);
   set('attn-output',{opacity:s>=21?1:0,sy:s>=21?1:.1});show('attn-output-dim',s>=21);
   for(const name of ['Full','Reindex','Reuse'])set('mode-card-'+name,{opacity:mode===name?1:.3,color:mode===name?C.s:C.m});
+  candidate.layout(s,set);
   return p;
  }
- function paint(p){for(const [id,v]of p){const n=nodes.get(id);n.now={...v};n.el.setAttribute('transform',`translate(${v.x} ${v.y}) scale(${v.sx} ${v.sy})`);n.el.setAttribute('opacity',String(v.opacity));n.el.style.color=v.color;const r=n.el.querySelector('[data-box]');if(r){r.setAttribute('width',v.w);r.setAttribute('height',v.h);}}
+ function paint(p){for(const [id,v]of p){const n=nodes.get(id);n.now={...v};n.el.setAttribute('transform',`translate(${v.x} ${v.y}) scale(${v.sx} ${v.sy})`);n.el.setAttribute('opacity',String(v.opacity));n.el.style.color=v.color;const r=n.el.querySelector('[data-box]');if(r){r.setAttribute('width',v.w);r.setAttribute('height',v.h);}const number=n.el.querySelector('[data-motion-number]');if(number&&Number.isFinite(v.value))number.textContent=v.value.toFixed(2);}
  }
  let from=layout(0),to=layout(0);
  function mixColor(a,b,t){const c=v=>[1,3,5].map(i=>parseInt(v.slice(i,i+2),16));const aa=c(a),bb=c(b);return '#'+aa.map((n,i)=>Math.round(n+(bb[i]-n)*t).toString(16).padStart(2,'0')).join('');}
@@ -176,25 +184,26 @@
    // materialises. At the endpoints only the source/result rows remain visible.
    if(motionPair!==null&&id.startsWith('comp-fly-')&&Math.floor(Number(id.slice(9))/2)===motionPair){v.opacity=Math.max(v.opacity,Math.sin(Math.PI*t));const lane=270+(Number(id.slice(9))%2)*38;v.y+=Math.sin(Math.PI*t)*(lane-(a.y+b.y)/2);}
    if(motionSort&&id.startsWith('idx-score-')){const i=Number(id.slice(10));v.x+=Math.sin(Math.PI*t)*(i%2?110:-110);v.sx*=1-.25*Math.sin(Math.PI*t);v.sy*=1-.35*Math.sin(Math.PI*t);}
+   candidate.motion(step,t,id,a,b,v);
    p.set(id,v);}paint(p);}
  function clearClock(){if(raf!==null)cancelAnimationFrame(raf);if(hold!==null)clearTimeout(hold);raf=hold=null;last=null;}
  function pause(){clearClock();running=false;auto=false;controls();}
  function controls(){const busy=running||auto;$('csa-play').textContent=busy?'Ⅱ Pause':'▶ Play';$('csa-play').setAttribute('aria-pressed',String(busy));$('csa-progress').value=String(Math.round(phase*100));$('csa-progress').setAttribute('aria-valuetext',Math.round(phase*100)+'%');$('csa-motion-status').textContent=running?'矩阵运动中':phase<1?'已暂停 · 可继续或拖动进度':'等待下一步';}
  function tick(now){if(!running)return;if(last!==null)elapsed+=(now-last)*speed;last=now;phase=Math.min(1,elapsed/duration);interpolate(phase);controls();if(phase<1)raf=requestAnimationFrame(tick);else{raf=null;last=null;running=false;if(auto&&step<actions.length-1)hold=setTimeout(()=>{hold=null;move(step+1,true);},1000/speed);else auto=false;controls();}}
  function start(){running=true;last=null;raf=requestAnimationFrame(tick);controls();}
- function metadata(){const a=actions[step],ch=chapterOf(step);$('csa-title').textContent=a[1];$('csa-description').textContent=a[2];$('csa-indicator').textContent=`Action ${step+1} / ${actions.length}`;$('csa-context').textContent=step===22?modeInfo[mode][0]:'Encoder Layer 2 · ratio = 2 · 当前位置 t4096';svgTitle.textContent=a[1];svgDesc.textContent=a[2];$('csa-prev').disabled=step===0;$('csa-next').disabled=step===actions.length-1;
+ function metadata(){const a=actions[step],ch=chapterOf(step);$('csa-title').textContent=a[1];$('csa-description').textContent=a[2];$('csa-indicator').textContent=`Action ${step+1} / ${actions.length}`;$('csa-context').textContent=step===modeStep?modeInfo[mode][0]:step>=22?candidate.metadata(step):'Encoder Layer 2 · ratio = 2 · 当前位置 t4096';svgTitle.textContent=a[1];svgDesc.textContent=a[2];$('csa-prev').disabled=step===0;$('csa-next').disabled=step===actions.length-1;
   root.querySelectorAll('[data-csa-chapter]').forEach((b,i)=>{if(i===ch)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
-  root.querySelector('.csa-mode-switch').hidden=step!==22;root.querySelectorAll('[data-csa-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.csaMode===mode)));
+  root.querySelector('.csa-mode-switch').hidden=step!==modeStep;root.querySelectorAll('[data-csa-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.csaMode===mode)));
   $('csa-mode-readout').hidden=true;
   for(let i=0;i<8;i++)nodes.get('attn-score-'+i).el.querySelector('text').textContent=step>=20?weights[i].toFixed(2):logits[i].toFixed(2);
  }
  function move(target,keepAuto=false,replay=false){
-  const previous=step;clearClock();running=false;auto=keepAuto;step=Math.max(0,Math.min(actions.length-1,target));const ch=chapterOf(step),different=chapterOf(previous)!==ch;
+  const previous=step;clearClock();running=false;auto=keepAuto;step=Math.max(0,Math.min(actions.length-1,target));const ch=chapterOf(step),different=sceneOf(chapterOf(previous))!==sceneOf(ch);
   motionPair=ch===1&&!different&&Math.max(previous,step)>=6?Math.min(3,Math.max(previous,step)-6):null;
   motionSort=previous===14&&step===15||previous===15&&step===14||replay&&step===15;
-  sceneGroups.forEach((g,i)=>{g.style.display=i===ch?'':'none';});
+  sceneGroups.forEach((g,i)=>{g.style.display=i===sceneOf(ch)?'':'none';});
   if(different||replay){const base=replay&&step>chapters[ch][1]?layout(step-1):layout(chapters[ch][1]);paint(base);}
-  from=new Map([...nodes].map(([id,n])=>[id,{...n.now}]));to=layout(step);elapsed=0;phase=0;metadata();
+  from=new Map([...nodes].map(([id,n])=>[id,{...n.now}]));to=layout(step);candidate.prepare(previous,step,from,to);elapsed=0;phase=0;metadata();
   if(different||step===0){phase=1;elapsed=duration;paint(to);if(auto&&step<actions.length-1)hold=setTimeout(()=>move(step+1,true),1000/speed);else auto=false;controls();}
   else start();
  }
@@ -203,10 +212,10 @@
  const nav=document.createElement('nav');nav.className='csa-view-tabs';nav.setAttribute('role','tablist');nav.setAttribute('aria-label','页面视图');nav.innerHTML='<button id="csa-tab-architecture" role="tab" aria-selected="true" aria-controls="stage">Model Architecture</button><button id="csa-tab-walkthrough" role="tab" aria-selected="false" aria-controls="csa-walkthrough" tabindex="-1">Step-by-step · CSA2</button><span class="csa-tab-caption">矩阵逐步计算 · 可暂停 / 回退 / 重播</span>';document.querySelector('header').append(nav);$('stage').setAttribute('role','tabpanel');$('stage').setAttribute('aria-labelledby','csa-tab-architecture');
  nav.addEventListener('click',e=>{const b=e.target.closest('[role=tab]');if(b)switchView(b.id==='csa-tab-walkthrough');});nav.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();switchView(e.key==='Home'?false:e.key==='End'?true:!active);$('csa-tab-'+(active?'walkthrough':'architecture')).focus();});
  const stepNav=root.querySelector('.csa-step-nav');stepNav.innerHTML=chapters.map(([name,s],i)=>`<button data-csa-chapter="${i}"><b>${i+1}</b><span>${name}</span></button>`).join('');stepNav.addEventListener('click',e=>{const b=e.target.closest('[data-csa-chapter]');if(b)move(chapters[Number(b.dataset.csaChapter)][1]);});
- $('csa-prev').addEventListener('click',()=>move(step-1));$('csa-next').addEventListener('click',()=>move(step+1));$('csa-play').addEventListener('click',play);$('csa-reset').addEventListener('click',()=>{pause();mode='Full';move(0);root.scrollTop=0;});$('csa-replay').addEventListener('click',()=>move(step,false,true));
+ $('csa-prev').addEventListener('click',()=>move(step-1));$('csa-next').addEventListener('click',()=>move(step+1));$('csa-play').addEventListener('click',play);$('csa-reset').addEventListener('click',()=>{pause();mode='Full';move(0);scrollArea.scrollTop=0;});$('csa-replay').addEventListener('click',()=>move(step,false,true));
  $('csa-progress').addEventListener('input',e=>{const value=Number(e.target.value);pause();phase=value/100;elapsed=phase*duration;interpolate(phase);controls();});$('csa-speed').addEventListener('change',e=>{speed=Number(e.target.value);});
- $('csa-focus').addEventListener('click',()=>{presentation=!presentation;document.body.classList.toggle('csa-focus',presentation&&active);$('csa-focus').textContent=presentation?'退出演示':'演示视图';$('csa-focus').setAttribute('aria-pressed',String(presentation));root.scrollTop=0;requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));});
- root.querySelector('.csa-mode-switch').addEventListener('click',e=>{const b=e.target.closest('[data-csa-mode]');if(b){mode=b.dataset.csaMode;move(22);}});
+ $('csa-focus').addEventListener('click',()=>{presentation=!presentation;document.body.classList.toggle('csa-focus',presentation&&active);$('csa-focus').textContent=presentation?'退出演示':'演示视图';$('csa-focus').setAttribute('aria-pressed',String(presentation));scrollArea.scrollTop=0;requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));});
+ root.querySelector('.csa-mode-switch').addEventListener('click',e=>{const b=e.target.closest('[data-csa-mode]');if(b){mode=b.dataset.csaMode;move(modeStep);}});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});window.addEventListener('pagehide',pause);
  document.addEventListener('keydown',e=>{if(!active||e.target.closest('button,input,select,textarea,summary,[contenteditable=true]'))return;if(['ArrowRight','ArrowLeft',' '].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();if(e.key===' ')play();else move(step+(e.key==='ArrowRight'?1:-1));}},true);
  /* Optional scalar matrix example retains its separate controls. */
@@ -218,5 +227,5 @@
  $('csa-matrix-prev').addEventListener('click',()=>{matrixStep=Math.max(0,matrixStep-1);matrixRender();});$('csa-matrix-next').addEventListener('click',()=>{matrixStep=Math.min(7,matrixStep+1);matrixRender();});$('csa-matrix-reset').addEventListener('click',()=>{matrixStep=0;matrixRender();});
  paint(layout(0));move(0);matrixRender();
  // Read-only diagnostics; the browser test drives the same controls as the presenter.
- window.csaWalkthrough={get state(){return{active,step:step+1,mode,playing:running||auto,running,auto,phase,presentation,matrixStep:matrixStep+1}},get config(){return structuredClone(config)},get actions(){return actions.map(a=>a.slice())}};
+ window.csaWalkthrough={get state(){return{active,step:step+1,mode,playing:running||auto,running,auto,phase,presentation,matrixStep:matrixStep+1}},get config(){return structuredClone(config)},get actions(){return actions.map(a=>a.slice())},get candidate(){return candidate.state;}};
 })();
