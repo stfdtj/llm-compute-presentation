@@ -1,51 +1,214 @@
 {
   "passed": true,
-  "outcomes": [
-    "all",
-    "first",
-    "second",
-    "last"
-  ],
-  "lengths": [
-    1,
-    2,
-    3
-  ],
-  "viewports": [
-    [
-      1366,
-      768
-    ],
-    [
-      1920,
-      1080
-    ],
-    [
-      768,
-      900
-    ],
-    [
-      390,
-      844
-    ]
+  "algorithmScenarioCombinations": 8,
+  "positions": 5,
+  "persistentGraph": true,
+  "geometry": [
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "prefill"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "slots"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "block"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "sample"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "input"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "forward"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "compare"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "commit"
+    },
+    {
+      "width": 1366,
+      "height": 768,
+      "kind": "next"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "prefill"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "slots"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "block"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "sample"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "input"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "forward"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "compare"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "commit"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "next"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "prefill"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "slots"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "block"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "sample"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "input"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "forward"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "compare"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "commit"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "next"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "prefill"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "slots"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "block"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "sample"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "input"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "forward"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "compare"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "commit"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "next"
+    }
   ],
   "screenshots": [
-    "1366x768_step_3.png",
-    "1366x768_step_5.png",
-    "1366x768_step_6.png",
-    "1366x768_step_7.png",
-    "1920x1080_step_3.png",
-    "1920x1080_step_5.png",
-    "1920x1080_step_6.png",
-    "1920x1080_step_7.png",
-    "768x900_step_3.png",
-    "768x900_step_5.png",
-    "768x900_step_6.png",
-    "768x900_step_7.png",
-    "390x844_step_3.png",
-    "390x844_step_5.png",
-    "390x844_step_6.png",
-    "390x844_step_7.png"
+    "1366x768_prefill.png",
+    "1366x768_slots.png",
+    "1366x768_block.png",
+    "1366x768_sample.png",
+    "1366x768_input.png",
+    "1366x768_forward.png",
+    "1366x768_compare.png",
+    "1366x768_commit.png",
+    "1366x768_next.png",
+    "1920x1080_prefill.png",
+    "1920x1080_slots.png",
+    "1920x1080_block.png",
+    "1920x1080_sample.png",
+    "1920x1080_input.png",
+    "1920x1080_forward.png",
+    "1920x1080_compare.png",
+    "1920x1080_commit.png",
+    "1920x1080_next.png",
+    "768x900_forward.png",
+    "768x900_compare.png",
+    "390x844_forward.png",
+    "390x844_compare.png"
   ],
-  "errors": []
+  "errors": [],
+  "networkRequests": []
 }
