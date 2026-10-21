@@ -1,47 +1,49 @@
-# CSA2 矩阵教学动画
+# 统一数据流演示（Step-by-step · Data Flow）
 
-打开仓库根目录的 `deepseek_v4_1_interactive.html`，点击顶部 **Step-by-step · CSA2**。页面完全离线运行，使用原生 HTML/CSS/JS 与可缩放 SVG，不增加运行时依赖。
+合并了原先两个重叠的教学功能：**Step-by-step · CSA2**（物理动画，23 个动作、5 章节，硬编码 Encoder Layer 2）和 **Shape Trace**（静态可点击的全层 Shape 图，可选 0–39 任意层，但不含动画）。现在只有一个入口，用同一套持久 SVG 动画引擎播放，同时在每一步旁展示结构化的 Input / Op / Weight / Output / Next 读数，数据来自同一套共享的 Shape 计算逻辑。
+
+入口有两条等价路径，打开的是同一个面板：
+
+1. 顶部 Tab 栏 **Step-by-step · Data Flow**（原 "Step-by-step · CSA2"）。
+2. 头部工具区按钮 **Data Flow**（`#flow-toggle`，原 Shape Trace 入口）——Indexer / Attention Blocks / Layer Trace / DSpark / Parameters 等面板的"追踪→"跳转链接都走这条路径。
 
 ## 现场演示
 
-- Prev / Next 推进或回退一个明确的计算动作，共 23 个动作，分为五章。顶部章节按钮用于跳转。
-- Play 连续播放；每个运动默认 1.8 秒，动作之间停留 1 秒。最后一步自动停止。
-- Pause 在当前动画进度冻结矩阵位置；再次 Play 从中途继续。手动导航会停止连续播放。
-- “重播本步”从该动作的开始姿态重播；进度条可拖到任意中间帧。支持 0.5× / 1× / 2× 速度。
-- Reset 返回第一步和 Full 模式；离开 tab 或切换到后台时停止动画。
-- “演示视图”收起辅助信息，适合笔记本和投影；再次点击退出。
-- 非按钮焦点下可用左右方向键推进，空格播放或暂停。顶部 tab 支持方向键、Home 和 End。
-- 小屏保留图中文字尺寸，计算图可以横向滑动。
-- 标题、播放控制和章节导航占用独立的布局空间，下方内容单独滚动；不使用会覆盖说明文字的 sticky 标题。Reset 与演示视图会恢复内容区滚动位置。
+- **8 个主阶段**（原 23 个细粒度动作合并而来），对应 Query/KV/Indexer/Attention/MoE 的完整单层流程：
+  1. Input + mHC Pre　2. RMSNorm + Query　3. Local KV · SWA　4. Global KV Compression　5. Indexer · Top-K　6. Main Attention　7. Output Proj + mHC　8. MoE + Final State
+  每个阶段内部再分 1–4 个 Beat，Prev / Next 按 Beat 推进；章节按钮（Stage 1–8）直接跳到某阶段的第一个 Beat。
+- **Layer 切换**：顶部 4 个按钮覆盖任务要求的代表性层——`Layer 2 · Full`（ratio=2）、`Layer 3 · Reuse`、`Layer 20 · Full (ratio 1)`、`Layer 24 · Reindex`；右侧"其它 Layer"下拉可选完整的 0–39（供其它面板的跨层跳转使用，例如 Parameters 面板的 Layer 39）。切换 Layer 会重新生成该层对应的 8 阶段内容并回到第 1 步，不替换底层 SVG 节点。
+- **Full / Reindex / Reuse 的差异直接体现在相关步骤的文字和配色里**，不单独开一个对比页：例如 Layer 24（Reindex）在第 4 步显示"Global KV 复用自 Layer 20"，第 5 步显示 Indexer Query 独立计算、Index Keys 复用、Top-K 重新选择；Layer 3（Reuse）在第 4/5 步直接显示"复用自 Layer 2"，不展示任何 Indexer 计算。复用的缓存用虚线边框区分。
+- Play 连续播放全部阶段与 Beat；Pause 冻结动画进度；Reset 回到 Layer 2 / Stage 1。进度条可拖动到本步动画的任意百分比；速度 0.5×/1×/2×。
+- "演示视图"收起阶段导航、Layer 下拉和教学说明，适合投影；再次点击退出。
+- 非按钮焦点下，左右方向键推进/回退，空格播放或暂停。
+- 窄屏下画布可横向滑动，矩阵保留真实字号。Canvas 高度由 JS 实时测量可用空间（`fitCanvas()`），不是写死的像素值，适配各种窗口尺寸与演示视图。
 
-## 动作与矩阵维度
+## 压缩阶段：本 Token 与多 Token 历史的区分
 
-| 章节 | Action | 可见的矩阵变化 | 真实维度 |
-|---|---|---|---|
-| SWA | 1–4 | 取出 Query 行、窗口滑到最近 128 个位置、复制选中行 | Q [4097,64,512] 为全序列形状示意；当前 q [1,64,512]；Local KV [128,512] |
-| KV Compression | 5–10 | 一对行进入 Compressor，随后每次 2→1，八行变四行 | X [8,5120] → Global KV [4,512]；真实历史 4096→2048；ratio=2 |
-| Indexer | 11–17 | 逐个生成 Score Vector、分数卡片移动排序、提取位置索引 | Query [32,128]；Index Keys [2048,128]；Score Vector [2048]；实际 Top-K≤512 |
-| Main Attention | 18–22 | Local / selected Global 行复制到读取区、评分、共同归一化、加权汇总 | KV_read 最多 [640,512]；每 Head scores [1,640]；O_head [1,64,512] |
-| Modes | 23 | 切换 Full / Reindex / Reuse，比较缓存与选址 | Full L2 ratio=2；Reindex L24 / Reuse L21 ratio=1 |
+第 4 步（Global KV Compression）明确拆成两种叙述，不混在一起：
 
-附加的 Matrix Multiplication 支持八步手动演示：高亮行、列、逐项乘法、求和与写入输出矩阵。
+- **这个 Token 自己的贡献**：当前 token 的 KV/Gate 投影，ratio=2 时还需要和前一个 token 配对才合并；ratio=1 时直接产出一行。
+- **Global KV Cache（多 Token 历史）**：跨步累积的缓存本身，代表许多历史 token，和"刚算完的这一行"是两个概念——缓存会在后续 Reindex/Reuse 层被复用。
 
-## 技术口径
+## 数据口径（原 Shape Trace 文档合并于此）
 
-- 参数读取现有构建配置：Local Window 128、Top-K 512；ratio=2 的压缩示例对应 Encoder Layer 2。
-- Reindex 使用 Decoder Layer 24：复用 Layer 20 的 KV / Index Keys，重新计算索引。Reuse 使用 Decoder Layer 21：连同位置索引一起复用。两者本层 ratio=1，不把 Encoder 的压缩率套到 Decoder。
-- Main Query 与 Indexer Query 分开显示。Index Keys 从压缩表示分支产生；不是从存储后的 Global KV 重新投影。
-- 当前位置 t4096（从 0 开始），此前 4096 个 Token 压缩为 2048 个 Global Slots；窗口 t3969…t4096 包含当前 Token。一次增量推理只计算当前 Query，全序列 Q 矩阵用于说明行与 Token 的关系。
-- Compression 图示 8→4。压缩为可学习投影、按通道 Softmax 门控和加权汇总，不表示对原始 Token 简单求平均。未满一组的尾部不输出新 Slot。
-- Indexer 只画四个候选、示意选两个；实际候选域为 C=2048，Top-K 上限 512。分数排序是教学展示，不要求实现中完整排序。Index Keys 是 128 维，Global KV 是 512 维，两者不能混用。
-- Main Attention 图示 6 行 Local + 2 行 Global；真实最多 128+512 行。行复制表示逻辑 Gather，不要求额外分配完整拼接矩阵。共享 Latent KV 同时用作 Key 和 Value。
-- 分数、位置与单元格数值都是教学示意，不是模型运行或 Profiling 结果。Softmax 数字保持自洽：示例 Sink logit=0，八个 logits 为 ln(weight/0.10)，Value 权重和为 0.90，Sink 贡献分母中剩余 0.10 而不加 Value。
-- 矩阵例子 A[2,3] × B[3,2] 的结果为 [[22,28],[49,64]]；精确标量计数为 12 次乘法 + 8 次加法 = 20 FLOPs，2MKN 近似为 24 FLOPs。
-- 原有架构 SVG 和模块计算数据保持不变。
+- 维度来自构建时读取的 `references/deepseek/config.json / text_config`，由 `build.py` 内联；模型逻辑依据 `references/deepseek/inference/model.py` 的 Transformer、Block、Attention、Compressor、Indexer、Gate、Expert 和 MoE。
+- 当前场景为单 Token Decode，省略 batch=1，显示 TP 切分之前的完整模型维度。`[1,5120]` 的 1 表示当前 token，跨层状态为 `[1,4,5120]`。
+- mHC 的 Attention Pre 使用前一层 FFN 的 pre_mix，FFN Pre 使用本层 Attention Mix 的 pre；本层 FFN pre 传给下一层。Post 同时接收 sublayer output、四路 residual、post 和 comb。
+- Layer 0/1 为 Local only。Global KV 源为 2/8/14/20，Indexer 源为 2/8/14/20/24/28/32/36。其它层读取最近源层的当前 token 对应缓存/索引，不是跨 token 重用旧 Top-K。
+- Encoder 源层 ratio=2：每 Token 写入 group buffer，成组后按通道 gate pooling；组未完成时返回 None。Layer 20 ratio=1，不做 gate pooling，ΔS=1。
+- Index Keys 取自源层 **RoPE 前**的 compressed latent，Global KV 另行 RoPE / FP4。Reindex 使用当前层自己的 Query / head weights 和共享 Index Keys。
+- Layer 20 的 Candidate Mask 是与本层 Top-K 分开的辅助输出，只标注 8 positions/block、最多 2048 blocks。
+- Gather、Attention Scores、Softmax 和 Weighted Reduce 展示 fused `sparse_attn` 中的逻辑阶段；不声称实现物化了这些中间矩阵，也不复制 64 份 KV。
+- MoE 的 6 个 Routed Experts 使用同构分支展开"每个选中的 expert"；Gate/Up/Down 为 5120→2304→5120；路由权重在 Down 投影前应用；六路 routed output 与一个 shared output 求和。
+- 位置、数值和分数（Indexer 分数卡片、Attention 权重条）用于教学示意，不是模型运行或 Profiling 结果。
 
-## 生成和检查
+## 实现和验收
 
-在仓库根目录运行：
+`walkthrough_motion.js` 的持久 SVG 场景（节点/行/箭头）只创建一次；`buildStages(L)` 为任意 Layer 生成 8 阶段的结构化数据（复用原 Shape Trace 的维度常量与 `ratio/owns/scores/mode` 判定逻辑，不重复定义），驱动动画姿态与右侧 Input/Op/Weight/Output/Next 读数两者。`walkthrough_ui.html` 提供外观、Layer 切换与阶段导航。两者由 `build.py` 在生成架构 SVG 之后、Indexer/Attention Blocks 面板之前内联注入——顺序很重要：本面板的 `drawPanel` 包装必须先于 `indexer_ui.html` 的包装注册，才能让后者正确找到本面板注入的 `.flow-entry` 跳转按钮。
+
+构建：
 
 ```powershell
 $env:PYTHONUTF8='1'
@@ -50,12 +52,8 @@ npm run test:browser:walkthrough
 npm run test:browser:layout
 ```
 
-`walkthrough_ui.html` 提供外观和控制区，`walkthrough_motion.js` 创建持久 SVG 元素，由 `build.py` 内联到最终 HTML。计算画布只创建一次 SVG；后续插值改变矩阵行的坐标、尺寸、透明度和颜色，不重新渲染整张 SVG。附加矩阵乘法有独立的简单演示区。
+验收入口：`node src/deepseek/verify_walkthrough_motion.cjs`（推进真实 requestAnimationFrame 时钟，捕获开始/约 50%/结束的真实中间帧；检查 8 阶段结构、4 个代表层的 Beat 数量差异、Reindex/Reuse 的行内文案、Play/Pause/Reset/拖动进度/键盘导航、跨面板契约 `#flow-toggle` / `informationFlow` / `#shape-layer` 0–39 范围、原有 Parameter/Forward/Backward 计算面板、1920/1366/768/390 四种窗口无横向溢出，以及演示视图在 1366×768 下完整可见不溢出）与 `node src/deepseek/verify_walkthrough_layout.cjs`（7 种窗口尺寸 × 4 个滚动位置，检查标题/导航/内容区互不遮挡）。截图与报告在 `src/deepseek/qa/walkthrough/`。
 
-`verify_walkthrough.cjs` 调用 `verify_walkthrough_motion.cjs`。浏览器测试推进真实 requestAnimationFrame 时钟，捕获开始、约 50% 和结束的不同几何姿态，同时检查 DOM 身份保留、暂停时坐标冻结、反向移动、重播、进度拖动、全部 23 步播放、三种模式、原有三种计算面板以及四种窗口尺寸。中间帧不通过测试专用接口伪造。
+跨面板兼容：`#flow-toggle` 按钮、`#flow-bar` 容器 id、`window.informationFlow.state`（`enabled`/`layer`）、`#shape-layer` 的完整 0–39 选项、`drawPanel` 包装注入的 `.flow-entry` 按钮（模块 key `global`/`hidden`/`multi`/`localstates`，与 `[data-node]`/`.chosen` 高亮）均按原 Shape Trace 的约定保留，供 `indexer_ui.html`、`attention_blocks_ui.html`、`layer_trace_ui.html`、`dspark_ui.html`、`audit_ui.html`、`page_template.html` 继续使用；`#csa-tab-architecture` / `#csa-tab-walkthrough` / `#csa-tab-pipeline` 三个 Tab 与 `csa-walkthrough-active` body class 按原 CSA2 walkthrough 的约定保留。`npm run test:browser:deepseek`（含 `verify_indexer.cjs`、`verify_attention_blocks.cjs`）与单独的 `verify_dspark_overview.cjs`、`verify_inference_pipeline.cjs` 均已重新跑过确认未受影响。
 
-本轮实际执行结果为 `passed: true`，浏览器错误为 0。已查看关键场景的真实截图，修正运动中卡片碰撞、压缩行遮挡公式、数值条压缩文字和输出维度重叠问题。保留 8 组开始／中间／结束截图。原计算面板另用真实时间的浏览器页面验证；原 Architecture / 计算数据 / 其他 UI 的 HTML 前缀与修改前保持一致（仅规范化换行比较）。
-
-验收入口为 [关键帧对照页](qa/walkthrough/review.html)，结果为 `qa/walkthrough/validation.json`（含各场景起止坐标、中间帧进度和矩阵尺寸）。本轮截图采用 `swa-*-start/middle/end.png`、`compression-*.png`、`indexer-*.png`、`attention-*.png`。目录内原有 `step-1` 至 `step-6` 是上一版静态流程图的历史截图，不作为新版验收依据。
-
-数据依据：`references/deepseek/config.json`、`inference/model.py` 的 `Compressor.forward` / `Indexer.forward` / `Attention.forward`，以及 `inference/kernel.py` 的 Attention Sink 归一化。视觉参考为用户提供的 Downloads/imgs 中四张截图；没有复制截图素材到演示页面。
+旧的 `verify_shape_trace.cjs`（纯 Shape Trace 验收）已随功能合并一并移除，其覆盖范围被 `verify_walkthrough_motion.cjs` 吸收。

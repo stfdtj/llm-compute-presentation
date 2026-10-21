@@ -31,7 +31,7 @@ Shared KV 投影：每层 2,621,440 个参数，当前 token 前向 5,242,880 FL
 - `build_diagram.py`：SVG 几何与标签。
 - `indexer_diagram.py`、`indexer_ui.html`：Indexer 流程、跨层复用与计算面板入口；配置来自 `references/deepseek/config.json`，计算复用原 `module-data`。
 - `page_template.html`：页面布局、面板样式与交互。
-- `flow_ui.html`：独立信息流开关、五步演示、SVG 路径叠加、缓存写入示例及说明；构建时内嵌到原 HTML。
+- `walkthrough_ui.html`、`walkthrough_motion.js`：统一的 Step-by-step · Data Flow 演示（合并原 Step-by-step CSA2 与 Shape Trace）；持久 SVG 动画 + 结构化 Shape 读数，覆盖单层完整计算的 8 个阶段，可切换 Layer 2/3/20/24 查看 Full/Reindex/Reuse 差异；构建时内嵌到原 HTML，详见 [WALKTHROUGH.md](WALKTHROUGH.md)。
 - `audit_model.py`：直接按固定官方配置和源码构造建立参数总账与独立操作计数；不读取旧 HTML 或旧 FLOPs 报告。
 - `audited_data.py`：将统一参数注册表、权重归属、Assumptions 和复核记录绑定到教学条目，生成根目录两份审计文档。
 - `audit_ui.html`：可学习参数表、当前权重 / 公式 / 矩阵同步、MoE Total / Activated、全局假设和数值结果审计。
@@ -62,7 +62,7 @@ Shared KV 投影：每层 2,621,440 个参数，当前 token 前向 5,242,880 FL
 
 根目录 `docs/architecture/calculation_audit.md` 列出旧结果、修正内容、状态、原因与代码位置；`docs/architecture/assumptions.md` 汇总全局和模块条件。状态统计单位为 63 模块 × 3 模式的 189 主记录；当前 Verified 63 / Estimated 82 / Unverified 44 / Mismatch 0，38 项旧结果或解释边界已修正。完整变化见 `audit_results.json`，独立参数清单见 `independent_audit.json`，源码构造检查见 `qa/source_shape_validation.json`。
 
-复跑：`python src/deepseek/audit_model.py`、`python src/deepseek/build.py`、`python src/deepseek/verify_audit.py`、`python src/deepseek/verify_single_token.py`。梯度检查需 NumPy，请使用根目录 requirements.txt 安装的 NumPy；浏览器检查运行 `node src/deepseek/verify_browser.cjs`、`node src/deepseek/verify_parameters.cjs` 和 `node src/deepseek/verify_shape_trace.cjs`。运行 HTML 本身不需要这些构建与验证工具。
+复跑：`python src/deepseek/audit_model.py`、`python src/deepseek/build.py`、`python src/deepseek/verify_audit.py`、`python src/deepseek/verify_single_token.py`。梯度检查需 NumPy，请使用根目录 requirements.txt 安装的 NumPy；浏览器检查运行 `node src/deepseek/verify_browser.cjs`、`node src/deepseek/verify_parameters.cjs` 和 `node src/deepseek/verify_walkthrough_motion.cjs`。运行 HTML 本身不需要这些构建与验证工具。
 
 ## 信息流演示
 
@@ -80,12 +80,10 @@ KV source layers 为 `[2,8,14,20]`，Index source layers 为 `[2,8,14,20,24,28,3
 
 运行 `node src/deepseek/verify_indexer.cjs`，检查真实点击、全部 38 个适用层、三种计算模式、缓存复用、键盘与空白关闭、缩放平移、信息流切换、四种窗口及计算数据 / 原图保留。结果为 `qa/indexer_validation.json`，截图为 `qa/indexer_*.png`。
 
-### Shape Trace（替代原有五步信息流 / Step 4 演示）
+### Step-by-step · Data Flow（合并原 Step-by-step CSA2 与 Shape Trace）
 
-在原页面打开顶部 **Shape Trace**（取代旧 “信息流 / Data Flow”）。Layer 选择器覆盖 0–39；章节按钮滚动到同一张连续图的对应位置，不是分步动画。点击或键盘 Enter 选择模块，高亮其祖先和后代；“清除高亮”恢复整图。
+两个曾经重叠的教学功能——CSA2 矩阵动画（23 个动作、固定 Encoder Layer 2）与 Shape Trace（静态 0–39 层 Shape 图，无动画）——已合并成一个入口：顶部 Tab **Step-by-step · Data Flow**，或头部按钮 **Data Flow**（`#flow-toggle`，原 Shape Trace 入口，其它面板的"追踪→"跳转仍走这条路径）。单层完整计算被组织成 8 个阶段（Input+mHC Pre → RMSNorm+Query → Local KV → Global KV Compression → Indexer → Main Attention → Output Proj+mHC → MoE+Final State），每阶段内 Prev/Next 推进若干 Beat，Play/Pause/Reset/拖动进度齐全；顶部可切换 4 个代表性 Layer（`2·Full`、`3·Reuse`、`20·Full ratio1`、`24·Reindex`）查看 Full/Reindex/Reuse 在 Global KV Compression 与 Indexer 两步上的具体差异，另有"其它 Layer"下拉覆盖完整 0–39（供跨面板跳转使用）。每一步在动画旁展示结构化的 Input / Op / Weight / Output / Next 读数，维度来自同一套共享计算逻辑，不单独维护。
 
-维度来自构建时读取的 `references/deepseek/config.json / text_config`，由 `build.py` 内联；模型逻辑依据 `references/deepseek/inference/model.py` 的 Transformer、Block、Attention、Compressor、Indexer、Gate、Expert 和 MoE。当前场景为单 Token Decode，省略 batch=1，显示 TP 切分之前的完整模型维度：`[1,5120]` 的 1 表示当前 token，跨层状态为 `[1,4,5120]`；Layer 0 展开 Embedding，Layer 39 展示 Final mHC Pre、Norm、LM Head 和 `[1,129280]` Logits。
+维度来自构建时读取的 `references/deepseek/config.json / text_config`，由 `build.py` 内联；模型逻辑依据 `references/deepseek/inference/model.py` 的 Transformer、Block、Attention、Compressor、Indexer、Gate、Expert 和 MoE。当前场景为单 Token Decode，省略 batch=1，显示 TP 切分之前的完整模型维度：`[1,5120]` 的 1 表示当前 token，跨层状态为 `[1,4,5120]`。详细口径（Index Keys 的 RoPE 前/后取值、Candidate Mask、SWA Bounded Replay、MoE 路由权重应用顺序、Engram/DSpark 注入位置、本/历史 Token 的区分等）见 [WALKTHROUGH.md](WALKTHROUGH.md)。
 
-Layer 0/1 为 Local only；Global KV 源层为 2/8/14/20，Indexer 源层为 2/8/14/20/24/28/32/36，其他层读取最近源层当前 token 对应的缓存/索引。Encoder 源层 ratio=2 时每 token 写入 group buffer，成组后按通道 gate pooling（图中 ΔS=0 表示跳过，不代表实际创建零行 Tensor）；Layer 20 ratio=1，不做 pooling，ΔS=1。Gather、Attention Scores、Softmax 和 Weighted Reduce 展示 fused `sparse_attn` 中的逻辑阶段，不声称实现物化了这些中间矩阵。详细口径（Index Keys 的 RoPE 前/后取值、Candidate Mask、SWA Bounded Replay、MoE 路由权重应用顺序、Engram/DSpark 注入位置等）见 [shape_trace.md](shape_trace.md)。
-
-`verify_shape_trace.cjs` 检查全部 40 层的图构建/切换、13 个代表层的图形边界、端口连续性（每条连接两端形状必须相等，构建期直接抛错）、箭头避开模块、节点文字边界、高亮、1366/768/390 窄屏滚动，以及退出后原架构 DOM 保持一致；结果与截图在 `qa/shape_trace/`。旧 Data Flow（`verify_flow.cjs`）与 Step 4 矩阵演示（`flow_attention_ui.html` / `verify_step4.cjs`）已随 Shape Trace 替换整体移除。
+`verify_walkthrough_motion.cjs` 推进真实动画时钟，检查 8 阶段结构、4 个代表层的 Beat 数量与行内 Reindex/Reuse 文案、Play/Pause/Reset/拖动进度/键盘导航、跨面板契约（`#flow-toggle`、`informationFlow`、`#shape-layer` 完整 0–39 范围）、原有计算面板与 1920/1366/768/390 四种窗口；`verify_walkthrough_layout.cjs` 另行检查 7 种窗口尺寸下标题/导航/内容区互不遮挡。结果与截图在 `qa/walkthrough/`。旧 `verify_shape_trace.cjs` 已随合并移除，覆盖范围由前者吸收。

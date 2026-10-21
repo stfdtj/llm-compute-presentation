@@ -35,8 +35,11 @@ template=(ROOT/'src/deepseek/page_template.html').read_text(encoding='utf-8')
 result=template.replace('__SVG__',svg).replace('__DATA__',json.dumps(DATA,ensure_ascii=False).replace('</','<\\/'))
 audit_ui=(ROOT/'src/deepseek/audit_ui.html').read_text(encoding='utf-8').replace('__AUDIT__',json.dumps(AUDIT,ensure_ascii=False).replace('</','<\\/'))
 shape_config=json.loads((ROOT/'references/deepseek/config.json').read_text(encoding='utf-8'))['text_config']
-shape_ui=(ROOT/'src/deepseek/flow_ui.html').read_text(encoding='utf-8').replace('__SHAPE_CONFIG__',json.dumps(shape_config)).replace('__SHAPE_SCRIPT__',(ROOT/'src/deepseek/shape_trace.js').read_text(encoding='utf-8'))
-result=result.replace('</body>',shape_ui+'\n'+audit_ui+'\n</body>')
+# Unified Data Flow + Shape walkthrough (formerly separate Step-by-step CSA2 / Shape Trace).
+# Injected here, before indexer_ui/attention_blocks_ui/layer_trace_ui: its drawPanel wrap
+# must create the .flow-entry button before indexer_ui.html's own drawPanel wrap looks for it.
+walkthrough_ui=(ROOT/'src/deepseek/walkthrough_ui.html').read_text(encoding='utf-8').replace('__SHAPE_CONFIG__',json.dumps(shape_config)).replace('__SHAPE_SCRIPT__',(ROOT/'src/deepseek/walkthrough_motion.js').read_text(encoding='utf-8'))
+result=result.replace('</body>',walkthrough_ui+'\n'+audit_ui+'\n</body>')
 indexer_text_config=json.loads((ROOT/'references/deepseek/config.json').read_text(encoding='utf-8'))['text_config']
 # Hugging Face config names -> inference/model.py ModelArgs names.
 indexer_aliases={'dim':'hidden_size','n_layers':'num_hidden_layers','n_heads':'num_attention_heads','window_size':'sliding_window','kv_source_layers':'kv_source_layer_ids','index_source_layers':'index_source_layer_ids'}
@@ -46,9 +49,6 @@ indexer_ui=(ROOT/'src/deepseek/indexer_ui.html').read_text(encoding='utf-8').rep
 result=result.replace('</body>',indexer_ui+'\n</body>')
 result=result.replace('</body>',(ROOT/'src/deepseek/attention_blocks_ui.html').read_text(encoding='utf-8')+'\n</body>')
 result=result.replace('</body>',(ROOT/'src/deepseek/layer_trace_ui.html').read_text(encoding='utf-8')+'\n</body>')
-walkthrough_ui=(ROOT/'src/deepseek/walkthrough_ui.html').read_text(encoding='utf-8').replace('__CSA_WALKTHROUGH_CONFIG__',json.dumps(indexer_config))
-walkthrough_ui=walkthrough_ui.replace('__CSA_WALKTHROUGH_MOTION__',(ROOT/'src/deepseek/walkthrough_motion.js').read_text(encoding='utf-8'))
-result=result.replace('</body>',walkthrough_ui+'\n</body>')
 pipeline_ui=(ROOT/'src/deepseek/inference_pipeline.html').read_text(encoding='utf-8').replace('__PIPELINE_SCRIPT__',(ROOT/'src/deepseek/inference_pipeline_data.js').read_text(encoding='utf-8')+'\n'+(ROOT/'src/deepseek/inference_pipeline.js').read_text(encoding='utf-8'))
 result=result.replace('</body>',pipeline_ui+'\n</body>')
 result=result.replace('</body>',(ROOT/'src/deepseek/dspark_ui.html').read_text(encoding='utf-8')+'\n</body>')

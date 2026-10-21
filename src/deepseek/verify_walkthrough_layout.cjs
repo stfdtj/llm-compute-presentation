@@ -12,7 +12,7 @@ let browser;
  await page.locator('#csa-tab-walkthrough').click();await page.locator('#csa-next').click();
  await page.waitForFunction(()=>!csaWalkthrough.state.running);
  if(process.argv.includes('--before')){
-  await page.evaluate(()=>document.getElementById('csa-walkthrough').scrollTop=130);
+  await page.evaluate(()=>document.getElementById('flow-bar').scrollTop=130);
   await page.screenshot({path:path.join(out,'before-scroll.png')});
   const h=await page.locator('.csa-heading').boundingBox(),n=await page.locator('.csa-step-nav').boundingBox();
   console.log({reproduced:n.y<h.y+h.height,heading:h,nav:n});await browser.close();return;
@@ -21,7 +21,7 @@ let browser;
  for(const size of [{width:2506,height:560},{width:2048,height:720},{width:1920,height:1080},{width:1366,height:768},{width:1100,height:600},{width:900,height:480},{width:390,height:844}]){
   await page.setViewportSize(size);
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-  await page.waitForFunction(()=>document.getElementById('csa-walkthrough').getBoundingClientRect().top>=document.querySelector('header').getBoundingClientRect().bottom);
+  await page.waitForFunction(()=>document.getElementById('flow-bar').getBoundingClientRect().top>=document.querySelector('header').getBoundingClientRect().bottom);
   const base=await page.locator('.csa-heading').boundingBox(),nav=await page.locator('.csa-step-nav').boundingBox();
   await page.locator('.csa-scroll').evaluate(e=>e.scrollTop=0);
   await page.screenshot({path:path.join(out,`initial-${size.width}x${size.height}.png`)});
@@ -39,7 +39,7 @@ let browser;
  }
  await page.setViewportSize({width:1366,height:768});await page.locator('#csa-reset').click();
  assert.equal(await page.locator('.csa-scroll').evaluate(e=>e.scrollTop),0,'Reset restores the new scrolling region');
- await page.locator('[data-csa-chapter="4"]').click();await page.locator('#csa-focus').click();
+ await page.locator('[data-csa-stage="4"]').click();await page.locator('#csa-focus').click();
  assert.equal(await page.locator('.csa-step-nav').isVisible(),false);
  await page.screenshot({path:path.join(out,'presentation-1366.png')});
  assert.equal(await page.locator('.csa-scroll').evaluate(e=>e.scrollTop),0,'Presentation view starts at top');

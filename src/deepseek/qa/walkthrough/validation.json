@@ -1,242 +1,86 @@
 {
   "passed": true,
-  "actions": 23,
+  "stages": 8,
+  "representativeLayers": [
+    2,
+    3,
+    20,
+    24
+  ],
+  "beatsPerLayer": {
+    "2": 25,
+    "3": 20,
+    "20": 24,
+    "24": 23
+  },
   "persistentSvg": true,
   "elementReplacements": 0,
   "realAnimationEvidence": {
-    "swa-window": {
+    "mhc-pre-reduce": {
       "begin": {
-        "x": 480,
-        "y": 133,
+        "x": 800,
+        "y": 255,
         "sx": 1,
         "sy": 1,
-        "opacity": 0,
-        "height": 288
+        "opacity": 0
       },
       "middle": {
-        "x": 480,
-        "y": 163.93350219726562,
+        "x": 800,
+        "y": 255,
         "sx": 1,
         "sy": 1,
-        "opacity": 0.48333607681755825,
-        "height": 257.0664910836763
+        "opacity": 0.4900005925925926
       },
       "end": {
-        "x": 480,
-        "y": 197,
+        "x": 800,
+        "y": 255,
         "sx": 1,
         "sy": 1,
-        "opacity": 1,
-        "height": 224
+        "opacity": 1
       },
-      "phaseAtMiddle": 0.4888888888888889
+      "phaseAtMiddle": 0.49333333333333335
     },
-    "swa-gather": {
+    "query-wqa": {
       "begin": {
-        "x": 490,
-        "y": 205,
+        "x": 430,
+        "y": 315,
         "sx": 1,
         "sy": 1,
-        "opacity": 0,
-        "height": 0
+        "opacity": 0
       },
       "middle": {
-        "x": 697.8345336914062,
-        "y": 183.2498779296875,
+        "x": 430,
+        "y": 315,
         "sx": 1,
         "sy": 1,
-        "opacity": 0.48333607681755825,
-        "height": 0
+        "opacity": 0.470016
       },
       "end": {
-        "x": 920,
-        "y": 160,
+        "x": 430,
+        "y": 315,
         "sx": 1,
         "sy": 1,
-        "opacity": 1,
-        "height": 0
+        "opacity": 1
       },
-      "phaseAtMiddle": 0.4888888888888889
-    },
-    "swa-backward": {
-      "begin": {
-        "x": 920,
-        "y": 160,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 1,
-        "height": 0
-      },
-      "middle": {
-        "x": 706.433349609375,
-        "y": 182.35000610351562,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 0.5033333113854597,
-        "height": 0
-      },
-      "end": {
-        "x": 490,
-        "y": 205,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 0,
-        "height": 0
-      },
-      "phaseAtMiddle": 0.49777777777777776
-    },
-    "compression": {
-      "begin": {
-        "x": 470,
-        "y": 270,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 1,
-        "height": 0
-      },
-      "middle": {
-        "x": 661.2166748046875,
-        "y": 270.3420715332031,
-        "sx": 1,
-        "sy": 0.677166759967804,
-        "opacity": 0.9999756307053947,
-        "height": 0
-      },
-      "end": {
-        "x": 855,
-        "y": 167,
-        "sx": 1,
-        "sy": 0.3500000238418579,
-        "opacity": 0,
-        "height": 0
-      },
-      "phaseAtMiddle": 0.49777777777777776
-    },
-    "indexer-sort": {
-      "begin": {
-        "x": 850,
-        "y": 200,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 1,
-        "height": 0
-      },
-      "middle": {
-        "x": 959.9329833984375,
-        "y": 169.54981994628906,
-        "sx": 0.7501523494720459,
-        "sy": 0.6502131819725037,
-        "opacity": 1,
-        "height": 0
-      },
-      "end": {
-        "x": 850,
-        "y": 137,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 1,
-        "height": 0
-      },
-      "phaseAtMiddle": 0.4888888888888889
-    },
-    "indexer-topk": {
-      "begin": {
-        "x": 865,
-        "y": 137,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 0,
-        "height": 0
-      },
-      "middle": {
-        "x": 857.7499389648438,
-        "y": 295.53424072265625,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 0.48333607681755825,
-        "height": 0
-      },
-      "end": {
-        "x": 850,
-        "y": 465,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 1,
-        "height": 0
-      },
-      "phaseAtMiddle": 0.4888888888888889
-    },
-    "attention-gather": {
-      "begin": {
-        "x": 75,
-        "y": 205,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 0,
-        "height": 0
-      },
-      "middle": {
-        "x": 395.3500061035156,
-        "y": 274.03668212890625,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 0.4966666886145404,
-        "height": 0
-      },
-      "end": {
-        "x": 720,
-        "y": 344,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 1,
-        "height": 0
-      },
-      "phaseAtMiddle": 0.49777777777777776
-    },
-    "attention-output": {
-      "begin": {
-        "x": 720,
-        "y": 140,
-        "sx": 1,
-        "sy": 1,
-        "opacity": 0.7,
-        "height": 0
-      },
-      "middle": {
-        "x": 768.3336181640625,
-        "y": 319.801025390625,
-        "sx": 1,
-        "sy": 0.5939977169036865,
-        "opacity": 0.3616647462277092,
-        "height": 0
-      },
-      "end": {
-        "x": 820,
-        "y": 512,
-        "sx": 1,
-        "sy": 0.1599999964237213,
-        "opacity": 0,
-        "height": 0
-      },
-      "phaseAtMiddle": 0.4888888888888889
+      "phaseAtMiddle": 0.48
     }
   },
   "pauseFreezesGeometry": true,
-  "reverse": true,
-  "replay": true,
+  "resume": true,
   "scrub": true,
   "playToEnd": true,
+  "reset": true,
+  "crossFeatureContract": {
+    "flowToggle": true,
+    "informationFlow": true,
+    "shapeLayerFullRange": true
+  },
   "originalCalculationModes": [
     "parameter",
     "forward",
     "backward"
   ],
   "architectureDataAndGeometryPreserved": true,
-  "modes": [
-    "Full",
-    "Reindex",
-    "Reuse"
-  ],
   "responsiveWidths": [
     1920,
     1366,

@@ -135,7 +135,7 @@ def build():
 
     # C3: the original four-stream mHC and MoE/routing detail.
     frame('moe',885,585,493,333,'purple','3.  mHC + MoE (Detail)',21)
-    text(1131,635,'Same FL and MoE structure used in both encoder and decoder blocks.',14)
+    text(1131,635,'Same mHC and MoE structure used in both encoder and decoder blocks.',14)
     start('hc','mHC · Manifold-Constrained Hyper-Connections');rect(893,648,226,264,'orange',opacity=.15);text(1006,668,'Single-Pass mHC',17,True);text(1006,689,'Four parallel residual streams',14);end()
     for y,t,c in [(728,'h⁽¹⁾','blue'),(766,'h⁽²⁾','green'),(805,'h⁽³⁾','orange'),(843,'h⁽⁴⁾','purple')]:
         box('streams',902,y,34,26,t,c,14)
@@ -150,7 +150,7 @@ def build():
     for key,y,h,ls in [('router',720,24,'Router (top experts)'),('selection',752,24,'Top-6 Expert Selection'),('expert',784,24,'Expert FFN (SwiGLU)'),('shared',816,24,'Shared Expert'),('combine',848,23,'Combine Expert Outputs')]:box(key,1136,y,121,h,ls,'purple',12)
     for y,z in [(710,720),(744,752),(776,784),(808,816),(840,848)]:arrow(f'M1197 {y} V{z}')
     text(1197,897,'1 × 5120',15,italic=True)
-    rect(1264,689,103,194,'blue',True,opacity=.12);text(1315,705,'Fetch Token:',14)
+    rect(1264,689,103,194,'blue',True,opacity=.12);text(1315,705,'Expert Routing Process:',9)
     for key,y,h,ls,c in [('router',710,24,'Router Logits','pink'),('selection',742,24,'Top-k indices','blue'),('weights',774,24,'Top-k weights','blue'),('weights',806,24,'Normalize Weights','blue'),('combine',838,36,['Weighted Sum','(to routed+shared)'],'blue')]:box(key,1273,y,86,h,ls,c,11.5)
     for y,z in [(734,742),(766,774),(798,806),(830,838)]:arrow(f'M1316 {y} V{z}')
 
