@@ -12,7 +12,7 @@ const out=path.join(__dirname,'qa/pipeline');
  const index=async(kind,i)=>page.evaluate(({kind,i})=>inferencePipeline.actions.findIndex(a=>a.kind===kind&&(i===undefined||a.i===i)),{kind,i});
  const stage=async(kind,i)=>go(await index(kind,i));
  await page.evaluate(()=>{window.pipelineNodes=[...document.querySelectorAll('[data-flow-node]')];});
- assert.deepEqual((await state()).cache,['我','喜欢']);assert.equal(await page.locator('[data-flow-edge]').count(),17);
+ assert.deepEqual((await state()).cache,['我']);assert.equal(await page.locator('[data-flow-edge]').count(),17);
  await stage('slots');assert.deepEqual((await state()).confirmed,['我','喜欢','先']);assert.deepEqual((await state()).cache,['我','喜欢']);assert.deepEqual((await state()).pending,['先']);
  for(let i=0;i<3;i++){await stage('block',i);assert.equal(await page.locator('[data-slot]').count(),15);assert.equal(await page.locator('.ip-layer-active').count(),5);assert.equal((await state()).candidateCount,0);}
  await stage('head');assert.equal((await state()).candidateCount,0);
@@ -51,7 +51,7 @@ const out=path.join(__dirname,'qa/pipeline');
  const screenshots=[],geometry=[];
  for(const [width,height] of [[1366,768],[1920,1080],[768,900],[390,844]]){
   await page.setViewportSize({width,height});
-  for(const kind of ['prefill','slots','block','sample','input','forward','compare','commit','next']){
+  for(const kind of ['prefill','decode','slots','block','sample','input','forward','compare','commit','next']){
    const i=kind==='block'?1:kind==='sample'?4:kind==='compare'?2:undefined;await stage(kind,i);
    await page.locator('#inference-pipeline').evaluate(n=>n.scrollTop=0);await page.locator('#ip-detail').evaluate(n=>n.scrollTop=0);
    const g=await page.evaluate(()=>{
@@ -78,6 +78,6 @@ const out=path.join(__dirname,'qa/pipeline');
  await page.locator('#csa-tab-architecture').focus();await page.keyboard.press('End');assert.equal(await page.locator('#csa-tab-pipeline').getAttribute('aria-selected'),'true');
  await page.clock.install();await page.locator('#ip-play').click();await page.clock.fastForward(3700);assert.equal((await state()).step,1);await page.locator('#ip-play').click();assert.equal((await state()).playing,false);
  assert.deepEqual(errors,[]);assert.ok(requests.every(url=>url.startsWith('file:')));fs.writeFileSync(path.join(out,'validation.json'),JSON.stringify({passed:true,algorithmScenarioCombinations:8,positions:5,persistentGraph:true,geometry,screenshots,errors,networkRequests:requests.filter(url=>!url.startsWith('file:'))},null,2));
- console.log('Pipeline browser: 8 algorithm/data combinations, 5-position provenance, 3x5 slots, shifted causal mask, residual correction, state transitions, persistent graph, 36 responsive scenes, offline and existing tab isolation passed.');
+ console.log('Pipeline browser: 8 algorithm/data combinations, 5-position provenance, 3x5 slots, shifted causal mask, residual correction, state transitions, persistent graph, 40 responsive scenes, offline and existing tab isolation passed.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

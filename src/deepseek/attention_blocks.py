@@ -145,7 +145,7 @@ def draft():
           'Mean over four mHC streams → concatenate [B,L,15360]',
           'main_proj[15360,5120] → RMSNorm → main_x[B,L,5120]',
           'Each draft stage reprojects main_x into its own window KV.'],'blue',22,leading=29)
-    d.box('ids',775,125,690,145,['Five draft slots: [current token, noise, noise, noise, noise]',
+    d.box('ids',775,125,690,145,['Five draft slots: [Anchor, Noise, Noise, Noise, Noise]',
           'Noise ID 128799; main embedding table is shared.',
           '[B,5,5120] → expand to [B,5,4,5120].',
           'Initialize mHC pre_mix; pass the draft states through all three stages.'],'purple',22,leading=29)
@@ -164,12 +164,12 @@ def draft():
           'All five current draft slots are visible to each draft Query.'],'blue',21,leading=27)
     d.box('head',775,600,690,165,['Final mHC collapse → Norm → shared vocabulary Head',
           'Logits[B,5,129280] + Markov bias (rank 256)',
-          'Sample 5 IDs sequentially; return seed + 5 candidates.',
+          'Markov: previous token bias; sample 5 IDs sequentially.',
           'Confidence: [hidden5120, Markov256] × [5376,1] → [B,5]',
           'Return candidate IDs, logits and confidence to caller.'],'purple',21,leading=27)
     d.arrow('M1120 525 V560 H380 V600',width=2)
     d.arrow('M725 685 H775',width=2)
     d.text(35,835,'Prefill: start_pos=0 only seeds the three private draft caches; forward_spec returns None.',22,anchor='start')
-    d.text(35,875,'Decode: the caller must invoke main-model verification / acceptance. That scheduler is not implemented in model.py.',21,anchor='start')
+    d.text(35,875,'generate.py runs normal autoregressive decode; draft / verify / accept-reject serving is not implemented there.',21,anchor='start')
     d.text(35,920,'Draft-specific FLOPs are not substituted with backbone totals. Existing calculation links retain their original scope.',20,anchor='start')
     d.raw('</g>')

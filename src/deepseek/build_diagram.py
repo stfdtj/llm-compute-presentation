@@ -90,17 +90,14 @@ def build():
     start('prediction','Next Token Prediction');rect(1566,134,94,165);text(1613,151,['Next Token','Prediction'],14,True);text(1613,183,'(Illustrative only)',12)
     for y,word,prob in [(194,'“在”','0.42'),(221,'“it”','0.18'),(248,'“is”','0.06')]:
         rect(1572,y,41,24,'white');rect(1618,y,35,24,'white');text(1592.5,y+17,word,13);text(1635.5,y+17,prob,13)
-    text(1613,285,'…',16);end()
+    end()
     for x1,x2 in [(1323,1333),(1397,1407),(1479,1488),(1556,1566)]:arrow(f'M{x1} 233 H{x2-1}')
 
     arrow('M859 247 H963')
     arrow('M1063 253 H1071')
 
-    raw('<g class="attention-focus" data-attention-focus="draft" role="button" tabindex="0" aria-label="DSpark three draft stages">')
-    rect(1380,314,280,42,'purple')
-    text(1520,330,'DSpark: mtp[0] → mtp[1] → mtp[2]',13,True)
-    text(1520,347,'Main features before 37 / 38 / 39 → 5 candidates',12)
-    raw('</g>')
+    from dspark_overview import draw as draw_dspark
+    draw_dspark()
 
     # B: the exact two per-layer chains.
     rect(13,365,1647,207,'purple',True,opacity=.11)

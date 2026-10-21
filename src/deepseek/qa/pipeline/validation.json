@@ -12,6 +12,11 @@
     {
       "width": 1366,
       "height": 768,
+      "kind": "decode"
+    },
+    {
+      "width": 1366,
+      "height": 768,
       "kind": "slots"
     },
     {
@@ -53,6 +58,11 @@
       "width": 1920,
       "height": 1080,
       "kind": "prefill"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "kind": "decode"
     },
     {
       "width": 1920,
@@ -98,6 +108,11 @@
       "width": 768,
       "height": 900,
       "kind": "prefill"
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "kind": "decode"
     },
     {
       "width": 768,
@@ -143,6 +158,11 @@
       "width": 390,
       "height": 844,
       "kind": "prefill"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "kind": "decode"
     },
     {
       "width": 390,
@@ -187,6 +207,7 @@
   ],
   "screenshots": [
     "1366x768_prefill.png",
+    "1366x768_decode.png",
     "1366x768_slots.png",
     "1366x768_block.png",
     "1366x768_sample.png",
@@ -196,6 +217,7 @@
     "1366x768_commit.png",
     "1366x768_next.png",
     "1920x1080_prefill.png",
+    "1920x1080_decode.png",
     "1920x1080_slots.png",
     "1920x1080_block.png",
     "1920x1080_sample.png",
