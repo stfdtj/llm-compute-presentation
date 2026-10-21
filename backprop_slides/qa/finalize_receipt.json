@@ -1,0 +1,123 @@
+{
+  "contact_sheet": "D:\\working\\llm-compute-presentation\\backprop_slides\\qa\\visual_review\\contact_sheet.jpg",
+  "failed_stage": "qa",
+  "failure_category": "render_environment",
+  "generated_at": "2026-10-19T01:58:52.676762+00:00",
+  "next_action": "Preserve the built deck and static QA report. Do not probe alternate Office apps, Python installations, or preview tools; rerun the same finalizer outside the sandbox to complete rendered visual review.",
+  "outline": "D:\\working\\llm-compute-presentation\\backprop_slides\\outline.json",
+  "outline_sha256": "e9181898c0bd8e1d2dbca2e03780d72f23cc02821e92f5aea208056e0439ddfa",
+  "output": "D:\\working\\llm-compute-presentation\\backprop_five_steps.pptx",
+  "output_exists": true,
+  "output_sha256": "b68e50540470d65f506ff9c86ac79f8d5ddfdd222697967ea617af744a4a3182",
+  "passed": false,
+  "qa_counts": {
+    "accessibility_error_count": 0,
+    "accessibility_warning_count": 0,
+    "design_error_count": 0,
+    "design_warning_count": 0,
+    "geometry_error_count": 0,
+    "geometry_warning_count": 0,
+    "overflow_count": 0,
+    "overlap_count": 0,
+    "source_fidelity_error_count": 0,
+    "source_fidelity_warning_count": 0,
+    "visual_review_warning_count": 1,
+    "visual_warning_count": 0,
+    "whitespace_warning_count": 0
+  },
+  "qa_dir": "D:\\working\\llm-compute-presentation\\backprop_slides\\qa",
+  "qa_report": "D:\\working\\llm-compute-presentation\\backprop_slides\\qa\\qa_report.json",
+  "readability": {
+    "min_body_pt": 16.0,
+    "min_metadata_pt": 9.0,
+    "min_support_pt": 13.0
+  },
+  "render_cache": {
+    "status": "not_completed"
+  },
+  "render_status": "deferred_environment",
+  "repair_packet": "D:\\working\\llm-compute-presentation\\backprop_slides\\qa\\repair_packet.json",
+  "schema_version": "quick-deck-finalization/v1",
+  "stages": [
+    {
+      "accepted": true,
+      "accepted_returncodes": [
+        0,
+        1
+      ],
+      "command": [
+        "C:\\Users\\15344\\.codex\\skills\\presentation-skill\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\15344\\.codex\\skills\\presentation-skill\\scripts\\preflight.py",
+        "--outline",
+        "D:\\working\\llm-compute-presentation\\backprop_slides\\outline.json"
+      ],
+      "duration_seconds": 0.145,
+      "returncode": 1,
+      "stage": "preflight"
+    },
+    {
+      "accepted": true,
+      "accepted_returncodes": [
+        0
+      ],
+      "command": [
+        "C:\\Program Files\\nodejs\\node.EXE",
+        "C:\\Users\\15344\\.codex\\skills\\presentation-skill\\scripts\\build_deck_pptxgenjs.js",
+        "--outline",
+        "D:\\working\\llm-compute-presentation\\backprop_slides\\outline.json",
+        "--output",
+        "D:\\working\\llm-compute-presentation\\backprop_five_steps.pptx",
+        "--style-preset",
+        "lab-report"
+      ],
+      "duration_seconds": 0.177,
+      "output_sha256_after_restore": "b68e50540470d65f506ff9c86ac79f8d5ddfdd222697967ea617af744a4a3182",
+      "previous_output_bytes_restored": false,
+      "returncode": 0,
+      "stage": "build"
+    },
+    {
+      "accepted": false,
+      "accepted_returncodes": [
+        0
+      ],
+      "command": [
+        "C:\\Users\\15344\\.codex\\skills\\presentation-skill\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\15344\\.codex\\skills\\presentation-skill\\scripts\\qa_gate.py",
+        "--input",
+        "D:\\working\\llm-compute-presentation\\backprop_five_steps.pptx",
+        "--outline",
+        "D:\\working\\llm-compute-presentation\\backprop_slides\\outline.json",
+        "--outdir",
+        "D:\\working\\llm-compute-presentation\\backprop_slides\\qa",
+        "--style-preset",
+        "lab-report",
+        "--strict-geometry",
+        "--fail-on-geometry-warnings",
+        "--fail-on-whitespace-warnings",
+        "--run-visual-review",
+        "--fail-on-visual-review-warnings",
+        "--fail-on-design-warnings",
+        "--accessibility",
+        "--strict-accessibility",
+        "--accessibility-min-body-pt",
+        "16.0",
+        "--accessibility-min-support-pt",
+        "13.0",
+        "--accessibility-min-metadata-pt",
+        "9.0",
+        "--skip-manual-review",
+        "--render-cache-dir",
+        "D:\\working\\llm-compute-presentation\\backprop_slides\\qa\\.render-cache"
+      ],
+      "duration_seconds": 2.865,
+      "returncode": 1,
+      "stage": "qa"
+    }
+  ],
+  "style_preset": "lab-report",
+  "style_resolution_basis": "outline_design_choice",
+  "timing_scope": "Pipeline only; excludes model authoring and visual judgment.",
+  "total_duration_seconds": 3.187,
+  "visual_inspection_status": "not_recorded"
+}

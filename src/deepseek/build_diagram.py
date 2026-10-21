@@ -87,7 +87,7 @@ def build():
     box('finalnorm',1333,184,64,95,['Final','RMSNorm'],'blue',14,True)
     box('head',1407,184,72,95,['LM Head','5120 × 129280'],'blue',14)
     box('logits',1488,168,68,124,['Logits','','1 × 129280'],'purple',16)
-    start('prediction','Next Token Prediction');rect(1566,134,94,165);text(1613,151,['Next Token','Prediction'],14,True);text(1613,183,'(Illustrative only)',12)
+    start('prediction','Next Token Prediction');rect(1566,134,94,165);text(1613,151,['Next Token','Prediction'],14,True);text(1613,183,'Logits → Sample',12)
     for y,word,prob in [(194,'“在”','0.42'),(221,'“it”','0.18'),(248,'“is”','0.06')]:
         rect(1572,y,41,24,'white');rect(1618,y,35,24,'white');text(1592.5,y+17,word,13);text(1635.5,y+17,prob,13)
     end()

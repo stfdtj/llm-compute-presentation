@@ -1,0 +1,1012 @@
+{
+  "error_count": 0,
+  "finding_count": 62,
+  "findings": [
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "Image Vision + Aligner"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 15,
+      "shape_name": "s01-architecture:1:14:text",
+      "slide_number": 1,
+      "xml_order": "14"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "DSpark \u00b7 3 Draft Blocks \u2192 5 \u5019\u9009 Tokens"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 28,
+      "shape_name": "s01-architecture:3:27:text",
+      "slide_number": 1,
+      "xml_order": "27"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e00.2 Causal Encoder \u4e0e Decoder"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s02-ced:0:1:text",
+      "slide_number": 2,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.5,
+        "role": "body",
+        "text_sample": "\u6784\u5efa Global KV"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 20,
+      "shape_name": "s02-ced:2:19:text",
+      "slide_number": 2,
+      "xml_order": "19"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "\u4e24\u90e8\u5206\u90fd\u9075\u5b88 Causal Mask\uff1b\u4e0d\u662f\u4f20\u7edf\u7684\u53cc\u5411 Encoder\u2013Decoder\u3002"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 26,
+      "shape_name": "s02-ced:3:25:text",
+      "slide_number": 2,
+      "xml_order": "25"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e00.3 Encoder Attention"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s03-local:0:1:text",
+      "slide_number": 3,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e00.3 Global KV \u4e0e Indexer"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s04-indexer:0:1:text",
+      "slide_number": 4,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "Softmax Attention Output"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 41,
+      "shape_name": "s04-indexer:4:40:text",
+      "slide_number": 4,
+      "xml_order": "40"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e00.5 mHC"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s06-mhc:0:1:text",
+      "slide_number": 6,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e00.6 MoE \u4e0e Dense"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s07-moe:0:1:text",
+      "slide_number": 7,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "Token"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 13,
+      "shape_name": "s07-moe:0:12:text",
+      "slide_number": 7,
+      "xml_order": "12"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.5,
+        "role": "body",
+        "text_sample": "384 Routed Experts \u00b7 \u8bc4\u5206\u793a\u610f"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 409,
+      "shape_name": "s07-moe:2:408:text",
+      "slide_number": 7,
+      "xml_order": "408"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.0,
+        "role": "body",
+        "text_sample": "Scores 0.12 \u00b7 0.91 \u00b7 \u2026"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 410,
+      "shape_name": "s07-moe:2:409:text",
+      "slide_number": 7,
+      "xml_order": "409"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e00.6 Expert \u5185\u90e8\u8ba1\u7b97"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s08-swiglu:0:1:text",
+      "slide_number": 8,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e00.7 Engram"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s09-engram:0:1:text",
+      "slide_number": 9,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e8c.1 \u4e00\u4e2a Expert"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s10-expert_params:0:1:text",
+      "slide_number": 10,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 14.0,
+        "role": "body",
+        "text_sample": "\u4e09\u4e2a Linear \u5747\u65e0\u52a0\u6027 Bias"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 27,
+      "shape_name": "s10-expert_params:3:26:text",
+      "slide_number": 10,
+      "xml_order": "26"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e8c.2\u20133 Total vs Active"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s11-active:0:1:text",
+      "slide_number": 11,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "+ Shared"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 398,
+      "shape_name": "s11-active:1:397:text",
+      "slide_number": 11,
+      "xml_order": "397"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "+ Shared"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 786,
+      "shape_name": "s11-active:2:785:text",
+      "slide_number": 11,
+      "xml_order": "785"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e09.\u524d\u5411 1 \u4ece\u53c2\u6570\u5230 FLOPs"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s12-matmul:0:1:text",
+      "slide_number": 12,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e09.\u524d\u5411 2 Query \u6295\u5f71"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s14-lowrank:0:1:text",
+      "slide_number": 14,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "[1,1280]"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 17,
+      "shape_name": "s14-lowrank:1:16:text",
+      "slide_number": 14,
+      "xml_order": "16"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "\u6b63\u5e38\u4e3b\u5e72 Decode\uff1b\u53ea\u542b Query \u7684\u4e24\u4e2a Linear\uff0c\u5176\u4f59\u6a21\u5757\u4ecd\u9700\u53e6\u8ba1\u3002"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 55,
+      "shape_name": "s15-layers:3:54:text",
+      "slide_number": 15,
+      "xml_order": "54"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e09.Backward 1\u20132 \u4e94\u6b65\u4e0e\u987a\u5e8f"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s16-backward:0:1:text",
+      "slide_number": 16,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.5,
+        "role": "body",
+        "text_sample": "\u540e\u7eed\u6a21\u5757 Loss"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 28,
+      "shape_name": "s16-backward:2:27:text",
+      "slide_number": 16,
+      "xml_order": "27"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e09.Backward 3\u20135 Weight / Input Gradient"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s17-gradients:0:1:text",
+      "slide_number": 17,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "H\u2032 [1,1280]"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 11,
+      "shape_name": "s17-gradients:0:10:text",
+      "slide_number": 17,
+      "xml_order": "10"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "X [1,5120]"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 12,
+      "shape_name": "s17-gradients:0:11:text",
+      "slide_number": 17,
+      "xml_order": "11"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.5,
+        "role": "body",
+        "text_sample": "[1280,1] \u00d7 [1,32768] \u2192 [1280,32768]"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 23,
+      "shape_name": "s17-gradients:2:22:text",
+      "slide_number": 17,
+      "xml_order": "22"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.0,
+        "role": "body",
+        "text_sample": "[1,32768] \u00d7 [32768,1280] \u2192 [1,1280]"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 26,
+      "shape_name": "s17-gradients:3:25:text",
+      "slide_number": 17,
+      "xml_order": "25"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.5,
+        "role": "body",
+        "text_sample": "[5120,1] \u00d7 [1,1280] \u2192 [5120,1280]"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 31,
+      "shape_name": "s17-gradients:5:30:text",
+      "slide_number": 17,
+      "xml_order": "30"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.0,
+        "role": "body",
+        "text_sample": "[1,1280] \u00d7 [1280,5120] \u2192 [1,5120]"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 33,
+      "shape_name": "s17-gradients:5:32:text",
+      "slide_number": 17,
+      "xml_order": "32"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u4e09.Backward 6 \u53cd\u5411 FLOPs \u6c47\u603b"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s18-backward_flops:0:1:text",
+      "slide_number": 18,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "\u524d\u5411 + \u53cd\u5411 \u2248 290.98 MFLOPs\uff1b\u4e0d\u542b RMSNorm\u3001\u4f18\u5316\u5668\u6216\u989d\u5916\u91cd\u8ba1\u7b97\u3002"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 21,
+      "shape_name": "s18-backward_flops:3:20:text",
+      "slide_number": 18,
+      "xml_order": "20"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "Performance \u00b7 TFLOP/s"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 13,
+      "shape_name": "s19-roofline:1:12:text",
+      "slide_number": 19,
+      "xml_order": "12"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "1"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 15,
+      "shape_name": "s19-roofline:1:14:text",
+      "slide_number": 19,
+      "xml_order": "14"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "10"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 16,
+      "shape_name": "s19-roofline:1:15:text",
+      "slide_number": 19,
+      "xml_order": "15"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "100"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 17,
+      "shape_name": "s19-roofline:1:16:text",
+      "slide_number": 19,
+      "xml_order": "16"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "1000"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 18,
+      "shape_name": "s19-roofline:1:17:text",
+      "slide_number": 19,
+      "xml_order": "17"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "1"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 19,
+      "shape_name": "s19-roofline:1:18:text",
+      "slide_number": 19,
+      "xml_order": "18"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "10"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 20,
+      "shape_name": "s19-roofline:1:19:text",
+      "slide_number": 19,
+      "xml_order": "19"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "100"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 21,
+      "shape_name": "s19-roofline:1:20:text",
+      "slide_number": 19,
+      "xml_order": "20"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "1000"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 22,
+      "shape_name": "s19-roofline:1:21:text",
+      "slide_number": 19,
+      "xml_order": "21"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "AI = FLOPs / Bytes"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 23,
+      "shape_name": "s19-roofline:1:22:text",
+      "slide_number": 19,
+      "xml_order": "22"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 14.0,
+        "role": "body",
+        "text_sample": "P_peak / BW"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 31,
+      "shape_name": "s19-roofline:4:30:text",
+      "slide_number": 19,
+      "xml_order": "30"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 14.5,
+        "role": "body",
+        "text_sample": "Compute-bound"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 33,
+      "shape_name": "s19-roofline:5:32:text",
+      "slide_number": 19,
+      "xml_order": "32"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.5,
+        "role": "body",
+        "text_sample": "\u56db.3\u20135 Query \u6d41\u91cf\u4e0e Batch"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 2,
+      "shape_name": "s20-roofline_batch:0:1:text",
+      "slide_number": 20,
+      "xml_order": "1"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "Performance \u00b7 TFLOP/s"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 13,
+      "shape_name": "s20-roofline_batch:0:12:text",
+      "slide_number": 20,
+      "xml_order": "12"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "1"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 15,
+      "shape_name": "s20-roofline_batch:0:14:text",
+      "slide_number": 20,
+      "xml_order": "14"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "10"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 16,
+      "shape_name": "s20-roofline_batch:0:15:text",
+      "slide_number": 20,
+      "xml_order": "15"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "100"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 17,
+      "shape_name": "s20-roofline_batch:0:16:text",
+      "slide_number": 20,
+      "xml_order": "16"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "1000"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 18,
+      "shape_name": "s20-roofline_batch:0:17:text",
+      "slide_number": 20,
+      "xml_order": "17"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "1"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 19,
+      "shape_name": "s20-roofline_batch:0:18:text",
+      "slide_number": 20,
+      "xml_order": "18"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "10"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 20,
+      "shape_name": "s20-roofline_batch:0:19:text",
+      "slide_number": 20,
+      "xml_order": "19"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "100"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 21,
+      "shape_name": "s20-roofline_batch:0:20:text",
+      "slide_number": 20,
+      "xml_order": "20"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 10.0,
+        "role": "body",
+        "text_sample": "1000"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 22,
+      "shape_name": "s20-roofline_batch:0:21:text",
+      "slide_number": 20,
+      "xml_order": "21"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 14.5,
+        "role": "body",
+        "text_sample": "Compute-bound"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 27,
+      "shape_name": "s20-roofline_batch:0:26:text",
+      "slide_number": 20,
+      "xml_order": "26"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 15.0,
+        "role": "body",
+        "text_sample": "BF16 \u00b7 2 Bytes"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 28,
+      "shape_name": "s20-roofline_batch:1:27:text",
+      "slide_number": 20,
+      "xml_order": "27"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 13.5,
+        "role": "body",
+        "text_sample": "\u6743\u91cd\u6309\u6279\u6b21\u8bfb\u4e00\u6b21 H \u5199\u51fa\u4e00\u6b21\u3001\u8bfb\u56de\u4e00\u6b21"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 29,
+      "shape_name": "s20-roofline_batch:1:28:text",
+      "slide_number": 20,
+      "xml_order": "28"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 14.5,
+        "role": "body",
+        "text_sample": "M=1 96.99 MFLOPs 97.07 MB \u00b7 AI\u22481"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 31,
+      "shape_name": "s20-roofline_batch:2:30:text",
+      "slide_number": 20,
+      "xml_order": "30"
+    },
+    {
+      "base_severity": "warning",
+      "code": "text_below_minimum",
+      "details": {
+        "minimum_pt": 16.0,
+        "observed_min_pt": 14.5,
+        "role": "body",
+        "text_sample": "M=1024 99.32 GFLOPs 179.83 MB AI\u2248552.3"
+      },
+      "message": "Body text is below the configured minimum size.",
+      "severity": "warning",
+      "shape_id": 33,
+      "shape_name": "s20-roofline_batch:3:32:text",
+      "slide_number": 20,
+      "xml_order": "32"
+    }
+  ],
+  "input": "D:\\working\\llm-compute-presentation\\visual_deck\\DeepSeek_V41_Flash_\u8ba1\u7b97\u6210\u672c\u53ef\u89c6\u5316.pptx",
+  "passed": true,
+  "schema": "pptx_accessibility_qa",
+  "schema_version": "pptx_accessibility_qa_v1",
+  "slide_count": 22,
+  "strict": false,
+  "thresholds": {
+    "large_visual_area_ratio": 0.2,
+    "min_body_pt": 16.0,
+    "min_metadata_pt": 9.0,
+    "min_support_pt": 13.0
+  },
+  "version": 1,
+  "warning_count": 62
+}

@@ -1,0 +1,829 @@
+{
+  "input": "D:\\working\\llm-compute-presentation\\visual_deck\\DeepSeek_V41_Flash_\u8ba1\u7b97\u6210\u672c\u53ef\u89c6\u5316.pptx",
+  "style_preset": "lab-report",
+  "renderer_detected": "pptxgenjs",
+  "summary": {
+    "slide_count": 22,
+    "violation_count": 53,
+    "error_count": 20,
+    "warning_count": 33,
+    "density_score_by_slide": [
+      {
+        "slide_index": 0,
+        "density_score": 0.6401
+      },
+      {
+        "slide_index": 1,
+        "density_score": 0.5355
+      },
+      {
+        "slide_index": 2,
+        "density_score": 0.4601
+      },
+      {
+        "slide_index": 3,
+        "density_score": 0.5291
+      },
+      {
+        "slide_index": 4,
+        "density_score": 0.5327
+      },
+      {
+        "slide_index": 5,
+        "density_score": 0.5019
+      },
+      {
+        "slide_index": 6,
+        "density_score": 0.4215
+      },
+      {
+        "slide_index": 7,
+        "density_score": 0.5041
+      },
+      {
+        "slide_index": 8,
+        "density_score": 0.368
+      },
+      {
+        "slide_index": 9,
+        "density_score": 0.5223
+      },
+      {
+        "slide_index": 10,
+        "density_score": 0.4048
+      },
+      {
+        "slide_index": 11,
+        "density_score": 0.5841
+      },
+      {
+        "slide_index": 12,
+        "density_score": 0.6124
+      },
+      {
+        "slide_index": 13,
+        "density_score": 0.5448
+      },
+      {
+        "slide_index": 14,
+        "density_score": 0.4041
+      },
+      {
+        "slide_index": 15,
+        "density_score": 0.4328
+      },
+      {
+        "slide_index": 16,
+        "density_score": 0.5315
+      },
+      {
+        "slide_index": 17,
+        "density_score": 0.4881
+      },
+      {
+        "slide_index": 18,
+        "density_score": 0.559
+      },
+      {
+        "slide_index": 19,
+        "density_score": 0.6476
+      },
+      {
+        "slide_index": 20,
+        "density_score": 0.5395
+      },
+      {
+        "slide_index": 21,
+        "density_score": 0.5506
+      }
+    ]
+  },
+  "slides": [
+    {
+      "slide_index": 0,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "top_misalignment",
+          "shape_ids": [
+            "shape-10",
+            "shape-16",
+            "shape-19",
+            "shape-22",
+            "shape-11",
+            "shape-17",
+            "shape-20",
+            "shape-23"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.05,
+          "suggested_fix": "Align top edges for cards in the same visual row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-10",
+            "shape-11"
+          ],
+          "severity": "error",
+          "delta_inches": 1.81,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-16",
+            "shape-17"
+          ],
+          "severity": "error",
+          "delta_inches": 2.16,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-19",
+            "shape-20"
+          ],
+          "severity": "error",
+          "delta_inches": 2.16,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-22",
+            "shape-23"
+          ],
+          "severity": "error",
+          "delta_inches": 1.81,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_inconsistent",
+          "shape_ids": [
+            "shape-10",
+            "shape-11",
+            "shape-16",
+            "shape-17",
+            "shape-19",
+            "shape-20",
+            "shape-22",
+            "shape-23"
+          ],
+          "severity": "warning",
+          "delta_inches": 2.65,
+          "suggested_fix": "Distribute cards evenly for consistent rhythm."
+        },
+        {
+          "type": "top_misalignment",
+          "shape_ids": [
+            "shape-12",
+            "shape-13"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.05,
+          "suggested_fix": "Align top edges for cards in the same visual row."
+        },
+        {
+          "type": "height_inconsistent",
+          "shape_ids": [
+            "shape-12",
+            "shape-13"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.1,
+          "suggested_fix": "Normalize card heights in the same row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-12",
+            "shape-13"
+          ],
+          "severity": "error",
+          "delta_inches": 1.81,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-10",
+            "shape-11",
+            "shape-12",
+            "shape-13"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-16",
+            "shape-17"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-19",
+            "shape-20"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-22",
+            "shape-23"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        }
+      ],
+      "density_score": 0.6401,
+      "empty_ratio": 0.3599
+    },
+    {
+      "slide_index": 1,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "height_inconsistent",
+          "shape_ids": [
+            "shape-15",
+            "shape-19",
+            "shape-16",
+            "shape-20"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.1,
+          "suggested_fix": "Normalize card heights in the same row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-15",
+            "shape-16"
+          ],
+          "severity": "error",
+          "delta_inches": 2.56,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-19",
+            "shape-20"
+          ],
+          "severity": "error",
+          "delta_inches": 2.76,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_inconsistent",
+          "shape_ids": [
+            "shape-15",
+            "shape-16",
+            "shape-19",
+            "shape-20"
+          ],
+          "severity": "warning",
+          "delta_inches": 4.2,
+          "suggested_fix": "Distribute cards evenly for consistent rhythm."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-9",
+            "shape-15",
+            "shape-16"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-11",
+            "shape-19",
+            "shape-20"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        }
+      ],
+      "density_score": 0.5355,
+      "empty_ratio": 0.4645
+    },
+    {
+      "slide_index": 2,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.4601,
+      "empty_ratio": 0.5399
+    },
+    {
+      "slide_index": 3,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "top_misalignment",
+          "shape_ids": [
+            "shape-38",
+            "shape-39"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.05,
+          "suggested_fix": "Align top edges for cards in the same visual row."
+        },
+        {
+          "type": "height_inconsistent",
+          "shape_ids": [
+            "shape-38",
+            "shape-39"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.1,
+          "suggested_fix": "Normalize card heights in the same row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-38",
+            "shape-39"
+          ],
+          "severity": "error",
+          "delta_inches": 1.81,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-38",
+            "shape-39"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        }
+      ],
+      "density_score": 0.5291,
+      "empty_ratio": 0.4709
+    },
+    {
+      "slide_index": 4,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.5327,
+      "empty_ratio": 0.4673
+    },
+    {
+      "slide_index": 5,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "top_misalignment",
+          "shape_ids": [
+            "shape-25",
+            "shape-26",
+            "shape-22",
+            "shape-28",
+            "shape-29"
+          ],
+          "severity": "error",
+          "delta_inches": 0.15,
+          "suggested_fix": "Align top edges for cards in the same visual row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-25",
+            "shape-26"
+          ],
+          "severity": "error",
+          "delta_inches": 2.36,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-28",
+            "shape-29"
+          ],
+          "severity": "error",
+          "delta_inches": 1.96,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_inconsistent",
+          "shape_ids": [
+            "shape-22",
+            "shape-25",
+            "shape-26",
+            "shape-28",
+            "shape-29"
+          ],
+          "severity": "warning",
+          "delta_inches": 2.75,
+          "suggested_fix": "Distribute cards evenly for consistent rhythm."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-25",
+            "shape-26"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-28",
+            "shape-29"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        }
+      ],
+      "density_score": 0.5019,
+      "empty_ratio": 0.4981
+    },
+    {
+      "slide_index": 6,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "empty_ratio_too_high",
+          "shape_ids": [],
+          "severity": "warning",
+          "delta_inches": 0.0285,
+          "suggested_fix": "Increase purposeful visual structure to reduce dead zones.",
+          "slide_type": "content",
+          "effective_max_empty_ratio": 0.55
+        }
+      ],
+      "density_score": 0.4215,
+      "empty_ratio": 0.5785
+    },
+    {
+      "slide_index": 7,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "top_misalignment",
+          "shape_ids": [
+            "shape-13",
+            "shape-14"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.05,
+          "suggested_fix": "Align top edges for cards in the same visual row."
+        },
+        {
+          "type": "height_inconsistent",
+          "shape_ids": [
+            "shape-13",
+            "shape-14"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.1,
+          "suggested_fix": "Normalize card heights in the same row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-13",
+            "shape-14"
+          ],
+          "severity": "error",
+          "delta_inches": 2.16,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "height_inconsistent",
+          "shape_ids": [
+            "shape-15",
+            "shape-16"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.1,
+          "suggested_fix": "Normalize card heights in the same row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-15",
+            "shape-16"
+          ],
+          "severity": "error",
+          "delta_inches": 2.16,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-13",
+            "shape-14",
+            "shape-15",
+            "shape-16"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        }
+      ],
+      "density_score": 0.5041,
+      "empty_ratio": 0.4959
+    },
+    {
+      "slide_index": 8,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-9",
+            "shape-10"
+          ],
+          "severity": "error",
+          "delta_inches": 1.76,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-97",
+            "shape-98"
+          ],
+          "severity": "error",
+          "delta_inches": 2.16,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_inconsistent",
+          "shape_ids": [
+            "shape-9",
+            "shape-10",
+            "shape-97",
+            "shape-98"
+          ],
+          "severity": "warning",
+          "delta_inches": 7.3,
+          "suggested_fix": "Distribute cards evenly for consistent rhythm."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-9",
+            "shape-10"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-97",
+            "shape-98"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        },
+        {
+          "type": "empty_ratio_too_high",
+          "shape_ids": [],
+          "severity": "warning",
+          "delta_inches": 0.082,
+          "suggested_fix": "Increase purposeful visual structure to reduce dead zones.",
+          "slide_type": "content",
+          "effective_max_empty_ratio": 0.55
+        }
+      ],
+      "density_score": 0.368,
+      "empty_ratio": 0.632
+    },
+    {
+      "slide_index": 9,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.5223,
+      "empty_ratio": 0.4777
+    },
+    {
+      "slide_index": 10,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "empty_ratio_too_high",
+          "shape_ids": [],
+          "severity": "warning",
+          "delta_inches": 0.0452,
+          "suggested_fix": "Increase purposeful visual structure to reduce dead zones.",
+          "slide_type": "content",
+          "effective_max_empty_ratio": 0.55
+        }
+      ],
+      "density_score": 0.4048,
+      "empty_ratio": 0.5952
+    },
+    {
+      "slide_index": 11,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.5841,
+      "empty_ratio": 0.4159
+    },
+    {
+      "slide_index": 12,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.6124,
+      "empty_ratio": 0.3876
+    },
+    {
+      "slide_index": 13,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "top_misalignment",
+          "shape_ids": [
+            "shape-12",
+            "shape-21",
+            "shape-22",
+            "shape-10"
+          ],
+          "severity": "error",
+          "delta_inches": 0.17,
+          "suggested_fix": "Align top edges for cards in the same visual row."
+        },
+        {
+          "type": "height_inconsistent",
+          "shape_ids": [
+            "shape-12",
+            "shape-21",
+            "shape-22",
+            "shape-10"
+          ],
+          "severity": "error",
+          "delta_inches": 0.25,
+          "suggested_fix": "Normalize card heights in the same row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-21",
+            "shape-22"
+          ],
+          "severity": "error",
+          "delta_inches": 1.81,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "gutter_inconsistent",
+          "shape_ids": [
+            "shape-10",
+            "shape-12",
+            "shape-21",
+            "shape-22"
+          ],
+          "severity": "warning",
+          "delta_inches": 2.89,
+          "suggested_fix": "Distribute cards evenly for consistent rhythm."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-21",
+            "shape-22"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        }
+      ],
+      "density_score": 0.5448,
+      "empty_ratio": 0.4552
+    },
+    {
+      "slide_index": 14,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "height_inconsistent",
+          "shape_ids": [
+            "shape-9",
+            "shape-10"
+          ],
+          "severity": "error",
+          "delta_inches": 0.1,
+          "suggested_fix": "Normalize card heights in the same row."
+        },
+        {
+          "type": "gutter_too_small",
+          "shape_ids": [
+            "shape-9",
+            "shape-10"
+          ],
+          "severity": "error",
+          "delta_inches": 2.46,
+          "suggested_fix": "Increase horizontal spacing to meet gutter token."
+        },
+        {
+          "type": "column_misalignment",
+          "shape_ids": [
+            "shape-9",
+            "shape-10"
+          ],
+          "severity": "warning",
+          "delta_inches": 0.08,
+          "suggested_fix": "Align left edges across repeated card columns."
+        },
+        {
+          "type": "empty_ratio_too_high",
+          "shape_ids": [],
+          "severity": "warning",
+          "delta_inches": 0.0459,
+          "suggested_fix": "Increase purposeful visual structure to reduce dead zones.",
+          "slide_type": "content",
+          "effective_max_empty_ratio": 0.55
+        }
+      ],
+      "density_score": 0.4041,
+      "empty_ratio": 0.5959
+    },
+    {
+      "slide_index": 15,
+      "slide_type": "content",
+      "violations": [
+        {
+          "type": "empty_ratio_too_high",
+          "shape_ids": [],
+          "severity": "warning",
+          "delta_inches": 0.0172,
+          "suggested_fix": "Increase purposeful visual structure to reduce dead zones.",
+          "slide_type": "content",
+          "effective_max_empty_ratio": 0.55
+        }
+      ],
+      "density_score": 0.4328,
+      "empty_ratio": 0.5672
+    },
+    {
+      "slide_index": 16,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.5315,
+      "empty_ratio": 0.4685
+    },
+    {
+      "slide_index": 17,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.4881,
+      "empty_ratio": 0.5119
+    },
+    {
+      "slide_index": 18,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.559,
+      "empty_ratio": 0.441
+    },
+    {
+      "slide_index": 19,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.6476,
+      "empty_ratio": 0.3524
+    },
+    {
+      "slide_index": 20,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.5395,
+      "empty_ratio": 0.4605
+    },
+    {
+      "slide_index": 21,
+      "slide_type": "content",
+      "violations": [],
+      "density_score": 0.5506,
+      "empty_ratio": 0.4494
+    }
+  ]
+}

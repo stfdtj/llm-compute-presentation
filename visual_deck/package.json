@@ -1,0 +1,11 @@
+{
+  "name": "deepseek-mathematical-visualization-deck",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "python plan.py && node build.js",
+    "check": "python check.py",
+    "render": "python render.py"
+  },
+  "dependencies": {"pptxgenjs": "4.0.1", "jszip": "3.10.1"}
+}

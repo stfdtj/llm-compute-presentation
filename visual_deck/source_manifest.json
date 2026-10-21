@@ -1,0 +1,27 @@
+[
+  {
+    "path": "C:\\Users\\15344\\Downloads\\pre_v2_反向传播简化版_Roofline_MFU.docx",
+    "sha256": "659645a40449adbddcc025274760d997ccb9ef142b88d3129e3c0bdc7bbaacfc",
+    "bytes": 40684
+  },
+  {
+    "path": "backprop_five_steps.pptx",
+    "sha256": "b68e50540470d65f506ff9c86ac79f8d5ddfdd222697967ea617af744a4a3182",
+    "bytes": 20851
+  },
+  {
+    "path": "visual_deck\\evidence\\config.json",
+    "sha256": "2e84f45cf1dac8c7fcbb200e96667d4b913275690668ed496f24c7747207a809",
+    "bytes": 1982
+  },
+  {
+    "path": "visual_deck\\evidence\\local_teaching_app.js",
+    "sha256": "a8236be2362423d0d8e7379fe1f40fb439e12e360b14229abe686b9a7546e5fa",
+    "bytes": 19369
+  },
+  {
+    "path": "visual_deck\\evidence\\query_calculations.js",
+    "sha256": "6e36ae4493a4c18f022c287689818b3b2e1ac706139128b990823dd4a2c94266",
+    "bytes": 9515
+  }
+]

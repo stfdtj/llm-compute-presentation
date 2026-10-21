@@ -1,0 +1,338 @@
+今天的主题是《以deepseekv4.1 falsh为例,进行大语言模型的计算成本分析》。
+我们会先从模型架构入手，以 Dense 和 MoE 模型为例，介绍它们的整体结构，以及 Attention、MoE 等重要模块的计算过程。
+在理解架构之后，我们会选择几个典型模块，实际计算它们的参数量，并从这些例子中总结出一套通用的参数量计算方法。
+接下来，我们会进一步分析 FLOPs，也就是模型需要执行多少次浮点运算。这里会分别介绍前向传播和反向传播的计算过程，最后总结不同模块的 FLOPs 应该如何计算，以及 Dense 和 MoE 在计算成本上有什么区别。
+最后，我们会从理论计算量转向实际硬件效率，介绍 Roofline 模型和 MFU。Roofline 帮助我们判断计算性能可能受到算力还是内存带宽的限制，而 MFU 则用来衡量模型训练对硬件理论算力的利用程度。
+所以，整场分享会沿着模型架构 → 参数量 → FLOPs → 硬件计算效率这条主线展开，从模型具体做了什么，逐步分析做到这些计算需要付出多大的成本。
+
+一.架构介绍+细节
+1. 整体架构
+接下来我们先从模型架构开始。这里我选择了 DeepSeek V4.1 Flash 作为 MoE 模型的例子，之后会再和 Dense 模型进行对比。
+首先看网页最上面的整体架构图。
+模型可以同时处理文本和图片。文本首先经过 Token Embedding，转换成向量；图片则经过 Vision Encoder 和投影模块，转换到语言模型可以处理的特征空间。之后，这些信息都会进入 Transformer 主干。
+这里比较特别的是，它没有采用常见的、从头到尾结构基本一致的 Decoder-only 架构，而是把 40 层划分成了两部分：前 20 层是 Causal Encoder，后 20 层是 Causal Decoder。
+模型最后通过 LM Head，把计算得到的 Hidden States 映射到词表上，生成下一个 Token 的预测结果。
+在主干旁边，我们还能看到 DSpark，最后我们简单看一下 DSpark，它是模型中独立于 40 层主干的辅助模块，主要用于 Speculative Decoding，也就是推测解码。
+从图中可以看到，DSpark 包含三个 Draft Blocks，每个 Block 的结构和普通 Transformer Block 比较相似，同样包含 Attention、MoE 和 mHC 等模块。
+它会利用主模型提供的 Hidden States，经过三个 Draft Blocks，提前生成五个候选 Tokens，再交给主模型进行验证。
+如果多个候选 Token 被接受，就可以减少主模型逐个生成 Token 的次数，从而提高推理速度。
+2. Causal Encoder 与 Decoder 的区别
+接下来我们往下看，对比一下 Causal Encoder 和 Decoder。
+传统 Transformer 的 Encoder 通常可以双向读取输入，Decoder 则通过 Cross-Attention 使用 Encoder 的输出，并逐步生成 Token。而 DeepSeek 这里的 Encoder 和 Decoder 都遵循 Causal Mask，主要区别在于计算职责和 Global KV 的使用方式，并不是传统的编码和解码结构。
+从 Block 内部来看，Encoder 和 Decoder 其实非常相似，都包含 Attention、MoE 和 mHC 等模块。
+它们最主要的区别，在于计算职责，以及 Global KV 的来源。
+传统 Decoder-only 模型在处理输入时，通常需要让每个 Token 经过全部 Transformer Layers。
+而 DeepSeek V4.1 Flash 使用了一种不对称设计。对于输入阶段，也就是 Prefill，大部分输入 Token 主要经过前 20 层 Encoder；Decoder 则可以直接利用 Encoder 产生的表示来构建全局 KV，不需要让全部输入 Token 再完整执行后 20 层的所有计算。
+所以，CED 的主要目标减少输入阶段实际需要执行的计算。
+3. Encoder Attention：Global KV 和 Indexer
+接下来我们具体看 Encoder Attention 的内部结构。
+首先，Attention 的基本目的，是让当前 Token 从之前的 Token 中找到与自己相关的信息。
+对于 Dense 模型中的普通 Full Attention，理论上当前 Token 可以和所有允许访问的历史 Token 计算相关性。随着序列越来越长，Attention 的计算量和 KV Cache 开销也会随之增加。
+所以deepseek v4.1组合了Local Sliding Window Attention，加上 Compressed Sparse Attention，也就是 CSA2。
+我们先看 Local Attention。
+这里设置的 Window Size 是 128，也就是说，当前 Token 只需要在最近最多 128 个 Token 的窗口里进行局部 Attention。
+这样虽然减少了计算量，但也限制了模型能够直接关注的范围。如果重要信息出现在更早之前，超Local Attention 就无法直接获取这些信息。
+所以模型还需要通过 Global Attention，找到并读取更早的历史信息。
+
+可以看一下，一个layer主要包含 mHC、RMSNorm、Attention 和 MoE。输入先经过 mHC Pre 和 RMSNorm，再进入 Attention，之后通过 mHC 和 MoE 完成这一层的计算。
+这里我们主要关注中间的 Attention 部分。左边是 Global KV 的生成或复用，右边是 Indexer 的 Top-K 选择或复用，中间的 Main Attention 则负责结合 Local KV 和 Global KV，计算最终的 Attention Output。
+
+在 Encoder 中，第 0 层和第 1 层只使用 Sliding Window Attention。从第 2 层开始，模型会额外引入压缩后的 Global KV。
+
+
+我们可以看到，这里 Encoder 的 Compression Ratio 是 2，也就是把两个 Token 对应的信息压缩成一个 Global KV 位置。
+有了这些压缩后的 Global KV，还需要决定当前应该读取哪几个历史位置。这就是 Indexer 的作用。
+Indexer 本身也会计算 Query 和 Key，用它们来计算当前 Token 与历史位置的相关性，然后从global kv里选出分数较高的 Top-512 个位置。
+
+选出位置之后，Main Attention 才会使用自己的 Query，读取这些选中的 Global KV，并结合最近 128 个 Token 的 Local KV，完成 Attention 计算。
+
+4. CSA 和 CSA2 的区别，以及层间复用
+接下来再看图里的不同 Layer。
+这里使用的 CSA2，全称是 Compressed Sparse Attention 2，可以理解为 CSA 的改进版本。
+CSA2 一个非常重要的改进，就是跨层复用 Global KV 和 Indexer 的选择结果，减少重复计算和缓存存储。
+第 2、8、14 层属于 Full Mode。这些层会负责生成自己的 Compressed Global KV 和 Index Keys，并执行 Indexer，产生 Top-K 选择结果。
+例如，第 2 层生成的 Global KV 和 Top-K 结果，可以提供给第 3 到第 7 层使用。
+等到了第 8 层，它又会根据自己的输入生成一组新的 Global KV，并重新计算 Indexer。之后第 9 到第 13 层就复用第 8 层的结果。
+第 14 层也是类似的，后面的第 15 到第 19 层会复用第 14 层的数据。
+它们复用的是全局历史信息，以及已经选好的 Top-K 位置.
+
+Decoder 的第 20 层会根据 Encoder 最终的 Hidden States，生成 Decoder 使用的 Global KV。这里 Compression Ratio 是 1，也就是每个历史位置对应一个 Global KV 位置，不再进行 2 比 1 的位置压缩。
+后续 Decoder Layers 会共享第 20 层生成的 Global KV。
+但是，并不是所有层都完全照搬第 20 层的 Top-K 结果。
+在第 24、28、32、36 层，模型使用 Reindex Mode，也就是保留原来的 Global KV 和 Index Keys，但是使用当前层的 Indexer Query 重新评分，选择新的 Top-K 位置。
+其余的 Reuse Layers 则继续使用最近一次计算得到的选择结果。
+另外，Decoder 还使用了 Candidate Blocks，也就是候选池机制。它会限制后续 Reindex 的搜索范围，避免每次都重新搜索全部历史位置，从而减少计算开销。
+(Candidate blocks: 8 positions/block, ≤2048 blocks, newest pinned. Source scores first, masks later.) 
+因此，CSA2 可以总结成三种模式：
+Full：生成新的 Global KV，并重新选择 Top-K。
+Reindex：复用 Global KV，但重新选择 Top-K。
+Reuse：同时复用 Global KV 和最近一次的 Top-K 结果。
+与前代 CSA 相比，CSA2进一步减少了不同Layers 之间重复保存和重复查找历史信息的开销。
+这对于长上下文推理尤其重要。
+5. mHC：残差连接的改进
+介绍完 Attention，我们继续看 Block 中的 mHC。
+普通 Transformer 一般使用 Residual Connection，也就是残差连接。它的形式比较简单：把模块的输入和计算结果相加。
+这样做的目的是保留原始信息，同时让新计算得到的信息加入进来。
+DeepSeek V4.1 Flash 使用的是 Single-Pass mHC，也就是一种多路残差混合机制。
+在这个模型中，mHC 同时维护 4 路 Hidden States，每一路的维度都是 5120。
+这里主要有三个操作：Pre、Post 和 Comb。
+Pre 的作用是把 4 路 Hidden States 按照学习得到的权重，合并成一路 5120 维的输入，交给 Attention 或者 MoE 模块计算。
+计算结束以后，Post 会把模块产生的结果重新分配到 4 路。
+而 Comb 则负责对原来的 4 路残差信息进行重新组合，然后和 Post 分配的结果合并。
+所以相比普通残差连接直接把输入和计算结果相加，mHC 允许模型学习不同信息通路之间应该如何组合。
+这些混合权重也需要通过计算得到，而且其中有可以学习的参数。
+6. MoE 与 Dense 模型的对比
+接下来我们再看 MoE，也就是 Mixture of Experts，混合专家模型。
+这也是 DeepSeek V4.1 Flash 和 Dense 模型之间比较重要的区别。
+首先，无论 Dense 还是 MoE，Transformer Block 中通常都会有 Attention 和 FFN 两个主要部分。
+它们的一个核心区别，就是 FFN 如何组织和执行。
+对于普通 Dense 模型，每个 Token 经过 FFN 时，使用的是同一组权重。无论输入什么 Token，这组 FFN 参数都会参与计算。
+而 MoE 则把 FFN 拆分成了多个 Expert。
+在 DeepSeek V4.1 Flash 中，每层有 384 个 Routed Experts，以及 1 个 Shared Expert。
+当一个 Token 进入 MoE 时，首先由 Router 计算它与不同专家的匹配分数，然后从 384 个 Routed Experts 中选择 6 个参与计算。
+此外，还有一个 Shared Expert 参与计算。
+这些专家内部依然使用类似 FFN 的结构，包括 Gate Projection、Up Projection 和 Down Projection，并使用 SwiGLU 激活函数。
+我们可以简单理解为，Gate 和 Up 负责产生中间特征，并通过 SwiGLU 对这些信息进行筛选和组合，而 Down 则负责把中间特征投影回原来的 Hidden Size。
+最后，MoE 会把选中专家的输出按照 Router 给出的权重进行组合，再加上共享专家的输出，得到最终结果。
+右边fetch token展示的是 Router 的具体过程。它会先给不同 Expert 打分，选择 Top-6，再根据归一化后的权重合并 Expert 的输出，最后结合 Shared Expert 的结果。
+7. Engram：条件记忆模块
+最后再简单介绍一下 Engram。
+Engram 可以理解成一种额外的条件记忆机制。
+Attention 主要根据当前 Query 和历史 Key 的相关性来检索信息，而 Engram 则通过 Token 组合，也就是 N-gram，进行哈希查表，从一个大型 Embedding Table 中读取相关信息。
+在 DeepSeek V4.1 Flash 中，Engram 被放在 Encoder 的第 1 层和第 14 层。
+它的作用是让模型能够通过相对直接的查表操作，获取一些与局部 Token 组合相关的记忆信息，减少部分信息完全依赖 Transformer 内部计算的需求。
+Engram 本身也有大量参数，但一次计算通常只访问其中很小的一部分。
+二.参数量计算
+前面我们已经介绍了模型的整体架构。接下来，我们开始分析第一个计算指标：参数量（Parameter Count）。
+参数量指的是模型中可学习的参数数量，例如线性层中的权重矩阵。对于一个普通矩阵，如果有 M 行、N 列，那么它就包含 M × N 个参数。
+这里我们选择 DeepSeek V4.1 Flash 中的 MoE 作为例子来计算参数量.
+1. 一个 Expert 的参数量
+我们先看网页中的 MoE Detail。
+每个 Expert 本质上都是一个使用 SwiGLU 激活函数的 FFN，内部包含三个线性投影：Gate、Up 和 Down。
+在 DeepSeek V4.1 Flash 中，Hidden Size 是 5120，Expert 的 Intermediate Size 是 2304。
+我们假设现在只有一个 Token 进入 Expert，那么它的输入矩阵维度就是 [1, 5120]。
+首先是 Gate Projection，它会把输入从 5120 维投影到 2304 维。
+因此，Gate 的权重矩阵是 [5120, 2304]，参数量就是：
+5120 × 2304 = 11,796,480
+接下来是 Up Projection，它的输入输出维度和 Gate 完全相同，所以也有 11,796,480 个参数。
+Gate 和 Up 分别得到两个 2304 维的向量。模型会对 Gate 的结果使用 SiLU 激活函数，再和 Up 的结果进行逐元素相乘，这就是 SwiGLU 的主要计算过程。
+这里的 SiLU 和逐元素乘法没有额外的可学习参数。
+最后是 Down Projection，它负责把 2304 维的中间结果投影回原来的 5120 维。
+所以 Down 的权重矩阵是 [2304, 5120]，同样包含 11,796,480 个参数。
+这样，我们就得到了一个完整 Expert 的参数量：
+P(Expert) = 3 × 5120 × 2304 = 35,389,440
+也就是大约 3540 万参数。
+这里三个线性层都没有额外的 Bias，所以我们只需要计算三个权重矩阵。
+2. 从一个 Expert 扩展到整个 MoE
+我们计算完了一个expert的参数量.
+这些 Expert 的内部结构相同，所以我们只需要把单个 Expert 的参数量乘以专家数量。
+384 个 Routed Experts 的参数量是：
+384 × 35,389,440 = 13,589,544,960
+再加上一个 Shared Expert：
+385 × 35,389,440 = 13,624,934,400
+也就是大约 136.25 亿参数。
+不过，MoE 里面还有 Router，它负责判断当前 Token 应该交给哪些专家。
+Router 的主要权重矩阵维度是 [5120, 384]，包含 1,966,080 个参数。另外还有少量用于选择专家的可学习 Bias。
+把 Router 也加进去以后，一个完整 MoE 层大约有 136.27 亿个核心可学习参数
+3. 总参数量与激活参数量
+虽然一个 MoE 层有超过 136 亿参数，但并不是所有 Expert 都会参与每个 Token 的计算。
+所以，我们可以单独计算这些 Expert 的激活参数量：
+P(Active Experts) = 7 × 35,389,440 = 247,726,080
+也就是大约 2.48 亿参数。
+如果再加上 Router，当前 MoE 层实际参与计算的核心权重大约是 2.50 亿，远小于整个 MoE 层的 136 亿参数。
+这也是 MoE 和 Dense 模型的一个重要区别。
+Dense 模型中的 FFN 通常会使用全部 FFN 权重，而 MoE 虽然拥有大量 Expert，但每个 Token 只会激活其中一部分。
+因此，在计算 MoE 的参数量时，我们需要区分 Total Parameters 和 Active Parameters。前者表示模型总共存储了多少参数，后者表示当前计算实际使用了多少参数。
+三. FLOPs前向
+1. 从参数量过渡到 FLOPs
+前面我们通过 MoE 的例子，介绍了如何计算一个模块的参数量。
+不过，参数量只能告诉我们模型有多少可学习的权重，并不能直接反映完成一次计算需要多少运算。
+所以接下来，我们引入第二个指标：FLOPs，也就是 Floating Point Operations，浮点运算次数。
+这里我们主要以矩阵乘法为例，因为它是大语言模型中主要的计算来源之一。
+在矩阵乘法中，输出矩阵的每一个元素，都是通过输入矩阵的一行和权重矩阵的一列，逐个相乘再相加得到的。
+比如说，如果一行有 3 个元素，我们就需要进行 3 次乘法和 2 次加法，总共是 5 次浮点运算。
+所以，对于一个输出元素，如果需要进行 K 次乘法，就还需要 K 减 1 次加法，也就是大约 2K 次浮点运算。
+最后，再乘以输出矩阵的元素数量，就能得到整个矩阵乘法的 FLOPs。
+接下来我们用 DeepSeek 的 Query Low-Rank Projection 作为例子，代入具体的矩阵维度进行计算。
+2. Query Low-Rank Projection 的前向 FLOPs
+接下来，我们用 DeepSeek Attention 中的 Query Low-Rank Projection 作为例子，介绍前向 FLOPs 的具体计算过程。
+【打开 Encoder Attention，点击 Low-rank Query，再打开计算详情】
+从图中可以看到，这个模块主要包含三个步骤：W_QA、RMSNorm 和 W_QB。
+它的作用是把当前 Token 的 Hidden States 转换成 Attention 需要的 Query。
+这里我们只考虑一个 Token，所以输入 X 的维度是 [1, 5120]。
+第一步，W_QA，也就是 Down Projection。
+【点击 ① W_QA】
+我们先看第一个矩阵乘法。
+输入 X 的维度是 [1, 5120]，权重矩阵 W_QA 的维度是 [5120, 1280]。
+两个矩阵相乘后，得到一个 [1, 1280] 的输出，相当于把当前 Token 从 5120 维压缩到了 1280 维。
+前面介绍过，矩阵乘法的 FLOPs 可以近似通过三个维度相乘，再乘以 2 来计算。
+所以这里就是 2 乘以 1，再乘以 5120 和 1280。
+得到 13,107,200 FLOPs，也就是大约 13.11 MFLOPs。
+第二步，RMSNorm。
+【点击 ② RMSNorm γ】
+经过 W_QA 后，模型会对得到的 1280 维向量进行 RMSNorm。
+RMSNorm 主要用于调整数值的大小，输出仍然是 1280 维。
+它本身也有计算开销，不过这里我们主要统计两个 Linear Projection 的矩阵乘法，所以先不把 RMSNorm 的 FLOPs 加进去。
+第三步，W_QB，也就是 Up Projection。
+【点击 ③ W_QB】
+接下来，模型使用第二个权重矩阵 W_QB，把刚才的 1280 维向量展开。
+W_QB 的维度是 [1280, 32768]，所以两个矩阵相乘后，输出维度就是 [1, 32768]。
+这里的 32768 来自 64 个 Query Heads，每个 Head 有 512 个维度。
+我们继续使用相同的 FLOPs 计算方法。
+2 乘以 1，再乘以 1280 和 32768。
+得到 83,886,080 FLOPs，也就是大约 83.89 MFLOPs。
+最后，这 32768 个数字会被重新分组成 64 个 Query Heads，每个 Head 包含 512 个数字。这个 Reshape 操作本身不需要额外的浮点乘加运算。
+【切换到 FLOPs（前向），查看 Query Projection 的计算结果】
+现在把 W_QA 和 W_QB 两次矩阵乘法的 FLOPs 加起来：
+13.11 加上 83.89，得到大约 97 MFLOPs。
+也就是说，对于当前一个 Token，完成一层 Query Low-Rank Projection，大约需要 9700 万次浮点运算。
+这里暂时没有包含 RMSNorm 和 RoPE 等额外操作。
+3. 从单个模块扩展到多层
+前面我们计算的是单层 Query Projection 的 FLOPs。
+在正常 Decode 阶段，一个 Token 会经过全部 40 层 Transformer，每层都会执行自己的 Query Projection。
+所以，把刚才的 97 MFLOPs 乘以 40，就能得到这部分在整个主干中的计算量，大约是 3.88 GFLOPs。
+不过，这还不是整个模型的 Forward FLOPs。完整的计算量还需要加上 Attention、MoE、mHC 等其他模块。
+这里也能看出，Low-Rank Projection 不仅减少了参数量，也降低了矩阵乘法的计算成本。
+
+三. Backward（反向传播）
+1. 反向传播其实就是重复五个步骤
+现在我们来看训练时怎样从 Loss 一路往回计算梯度。这里先不讲复杂的求导过程，只需要记住一个线性层的反向计算规则。
+第一步，先根据模型的预测结果计算 Loss，然后求出 Loss 对最后输出的梯度。我们暂时把这个梯度叫作 dZ。
+第二步，从最后一个线性层开始，找到它前向时使用的输入 X，以及权重矩阵 W。
+第三步，计算权重梯度 dW，用于之后更新这一层的权重。
+dW = Xᵀ × dY
+第四步，计算输入梯度 dX，把梯度继续传回前一层。
+dX = dY × Wᵀ
+第五步，来到上一层，把刚才得到的 dX 当成它接收到的输出梯度 dY，再重复第三步和第四步，一层一层向前传。
+这里我们统一使用前向公式 Y = XW。X 是这一层的输入，W 是权重，Y 是输出；dY 是从后面传回来的梯度。上标 T 表示转置，也就是交换矩阵的行和列。
+需要注意，只有最开始从 Loss 出发时，我们才需要得到最末端的梯度。到了中间的层，不用每次重新对 Loss 求导，只要使用后一层传过来的梯度就可以。
+2. Query Low-Rank Projection 的反向计算
+接下来，我们继续使用刚才的 Query Low-Rank Projection，介绍 Backward FLOPs 的计算。
+【打开 FLOPs（反向），点击 Query Projection】
+前面介绍过，Forward 的顺序是先经过 W_QA，再经过 RMSNorm，最后经过 W_QB。
+Backward 的顺序正好相反。我们从最后的 W_QB 开始，经过 RMSNorm，再回到 W_QA。
+这里假设后续 Attention 的反向计算已经把梯度 dQ 传了回来。
+对于每个 Linear Layer，我们都需要计算两个 Gradient：一个是 Weight Gradient，用于后续更新当前层的权重；另一个是 Input Gradient，用于把梯度继续传给前面的模块。
+3. W_QB 的反向计算
+【点击 ① W_QB】
+我们先看最后一个矩阵 W_QB。
+这里需要计算两个梯度。
+第一个是 Weight Gradient，dW_QB。它等于前向输入 H′ 的转置乘以 dQ。
+第二个是 Input Gradient，dH′。它等于 dQ 乘以 W_QB 的转置。
+从网页上可以看到，这两个计算都是矩阵乘法，所以我们可以继续根据矩阵维度来统计 FLOPs。
+完成这一步之后，我们就得到了 W_QB 的权重梯度，以及需要继续往前传的 dH′。
+4. RMSNorm 的反向计算
+【点击 ② RMSNorm】
+接下来是 RMSNorm。
+因为 Forward 时经过了 RMSNorm，所以 Backward 也需要经过对应的反向计算。
+这里我们暂时不展开 RMSNorm 的具体公式，只需要知道，它会把刚才得到的 dH′ 转换成 dH，再继续传给 W_QA。
+5. W_QA 的反向计算
+【点击 ③ W_QA】
+最后回到第一个矩阵 W_QA。
+这里的计算方法和 W_QB 完全一样。
+我们先用原始输入 X 的转置乘以 dH，得到 Weight Gradient，也就是 dW_QA。
+再用 dH 乘以 W_QA 的转置，得到 Input Gradient，也就是 dX。
+这样，两个 Linear Projection 的反向计算就完成了。得到的 dX 还可以继续传给更前面的模块。
+6. 反向 FLOPs 汇总
+【查看网页下方的反向计算量】
+最后，我们把两个矩阵的反向计算量加起来。
+网页这里使用的是统一的矩阵乘法近似公式，把每个矩阵的反向 FLOPs 估算为前向的两倍。
+所以，这两个矩阵的反向计算量大约是 194 MFLOPs。
+这里暂时没有包含 RMSNorm Backward 等其他操作。
+通过这个例子可以看到，Backward 和 Forward 一样，主要计算仍然是矩阵乘法。区别在于，Backward 需要分别计算 Weight Gradient 和 Input Gradient，并将梯度逐层向前传递。
+
+四. Roofline
+1. 为什么 FLOPs 更少，却不一定更快？
+前面我们计算了模型的 FLOPs，但计算量少不一定代表运行速度快，所以接下来用 Roofline 来分析性能主要受硬件算力还是显存带宽的限制。
+2. 先分清算力、带宽和计算密度
+接下来我们先看 Roofline 的几个基本概念。
+首先是 Peak Compute，也就是硬件的理论峰值算力，表示设备每秒最多能完成多少次浮点运算，单位通常是 TFLOP/s。
+第二个是 Peak Memory Bandwidth，也就是峰值内存带宽，表示硬件每秒最多能搬运多少数据，单位通常是 GB/s 或 TB/s。
+第三个是 Arithmetic Intensity，简称 AI，也就是计算密度。
+我们看左边的公式，AI 等于 FLOPs 除以 Bytes Moved，也就是总计算量除以数据搬运量。
+它表示每搬运一个 Byte 的数据，可以完成多少次浮点运算。AI 越高，说明数据的计算利用率越高。
+中间是 Roofline 的核心公式。它会根据计算密度、峰值算力和峰值带宽，取两种性能上限中较小的一个，作为当前任务的理论性能上限。
+右边的 Ridge Point，则是峰值算力除以峰值带宽，表示计算瓶颈从 Memory-bound 转向 Compute-bound 的分界点。
+接下来我们结合 Roofline 图，具体看一下这两种性能瓶颈的区别。
+3. Roofline 的两条线是怎么算出来的？
+接下来我们看下面这张 Roofline 图。
+横轴是 Arithmetic Intensity，也就是计算密度；纵轴是 Performance，也就是计算性能。
+图中有两条线。左边倾斜的线代表 Memory Bandwidth 的限制。随着计算密度增加，能够达到的性能上限也会提高。
+右边水平的线代表 Peak Compute，也就是硬件的理论算力上限。到了这里，即使继续提高计算密度，性能上限也不会再增加。
+两条线的交点就是刚才提到的 Ridge Point。
+交点左边属于 Memory-bound，主要受到数据搬运速度的限制；右边属于 Compute-bound，主要受到硬件算力的限制。
+图中还给出了 Decode 和 Batch 两种情况。
+Decode 每次通常只处理一个 Token，计算密度比较低，所以更容易受到 Memory Bandwidth 的限制。
+而 Batch 可以同时处理多个 Token，复用同一份模型权重，提高计算密度，因此更有可能进入 Compute-bound 区域。
+我们还可以调整上方的 Token 数量，观察计算密度和性能瓶颈是怎么变化的。
+接下来我们继续用 DeepSeek 的 Query Low-Rank Projection，演示 Roofline 的计算方法。
+【打开第一张图：Show Calculation】
+这边主要是在计算两个指标：FLOPs 和 Memory Traffic。
+首先，根据 W_QA 和 W_QB 的矩阵维度，计算总 FLOPs。
+然后，根据权重、输入、中间结果和输出的数据大小，估算总共需要搬运多少 Bytes。
+这里使用 BF16 作为示例，每个数字占 2 Bytes。
+最后，把这些数据搬运量加起来，就得到了计算 Arithmetic Intensity 所需要的两个数值。
+【切换到第二张图：Arithmetic Intensity】
+然后这边就是把刚才的计算结果代入公式。
+首先，用 FLOPs 除以 Memory Traffic，得到计算密度。
+这里分别计算了单 Token Decode 和 1024 Tokens Batch 两种情况，可以看到，Batch 的计算密度明显更高。
+最后，再用硬件的 Peak Compute 除以 Peak Bandwidth，得到 Ridge Point。
+通过比较 Arithmetic Intensity 和 Ridge Point，就可以判断当前计算更接近 Memory-bound 还是 Compute-bound。
+所以整个 Roofline 的计算方法就是：先算 FLOPs 和数据搬运量，再算 Arithmetic Intensity，最后与 Ridge Point 比较，判断性能瓶颈。
+5. 怎样用 Roofline 理解模型优化？
+通过 Roofline，我们不仅可以判断性能瓶颈，还可以决定优化方向。
+如果是 Memory-bound，就需要重点考虑减少数据搬运量，或者提高数据复用率；如果是 Compute-bound，就需要重点考虑减少计算量，或者提高计算效率。
+所以，Roofline 的主要作用就是帮助我们判断，当前应该优先优化计算还是数据搬运。
+不过，Roofline 给出的只是理论性能上限，实际瓶颈还需要结合 Profiling 来确认。
+五. MFU
+接下来我们介绍 MFU，全称是 Model FLOPs Utilization，主要用来衡量模型的训练效率。
+简单来说，MFU 就是模型训练所需的有效计算量，占硬件理论最大计算能力的百分比。
+我们看网页上的公式。
+首先，F_step 表示一个 Training Step 所需要的 FLOPs。
+t_step 是完成这个 Step 实际花费的时间。
+N_GPU 是参与训练的 GPU 数量，P_peak 则是每张 GPU 的理论峰值算力。
+计算时，我们先用 F_step 除以 t_step，得到每秒的有效模型计算量。
+然后，再除以所有 GPU 的总峰值算力，最后乘以 100%，就得到了 MFU。
+比如 MFU 是 50%，就表示按照模型的理论计算量来衡量，当前训练速度相当于使用了硬件总峰值算力的 50%。
+接下来我们用 DeepSeek 的一个示例，实际计算一下 MFU。
+2. 跟着网页计算一个 50% 的例子
+接下来我们通过网页上的一个例子，实际计算一下 MFU。
+这里使用 DeepSeek 的 Training Batch Size，其他数据则采用假设值，主要是为了演示计算方法。
+【Step 1：Useful Model FLOPs】
+第一步，先计算一个 Training Step 需要多少 FLOPs。
+这里我们用一个 Step 处理的 Token 数量，乘以每个 Token 的 Training FLOPs。
+根据网页上的数据，最后得到大约 6.04 EFLOPs。
+【Step 2：Hardware Peak Throughput】
+第二步，计算所有 GPU 的理论峰值算力。
+这里假设使用 2048 张 GPU，每张 GPU 的峰值算力是 989.5 TFLOP/s。
+把设备数量和单卡峰值相乘，就能得到整个集群的理论总算力。
+【Step 3：MFU】
+最后，用第一步得到的总 FLOPs，除以 Training Step Time，再除以所有 GPU 的总峰值算力。
+根据网页上的计算结果，得到的 MFU 大约是 49.6%，也就是接近 50%。
+这表示在当前假设下，模型训练的有效计算吞吐量相当于硬件理论峰值算力的 50%。
+所以 MFU 的计算可以总结为三个步骤：先算一个 Step 的 FLOPs，再算硬件总峰值，最后结合 Step Time，计算利用率。
+这里的 50% 只是教学示例，并不是 DeepSeek 实际测出来的 MFU。
+最后，这里还有几点需要注意。
+首先，网页中的 Training FLOPs/token 使用的是假设值，并不是 DeepSeek 实际的训练计算量。
+如果要计算真实的 Training FLOPs，我们需要按照前面介绍的方法，把模型各个模块的 Forward 和 Backward FLOPs 加起来。
+对于 MoE 模型，还需要考虑实际激活的 Expert 数量，而不能直接使用模型的总参数量来估算。
+另外，MFU 也不一定越高越好。因为模型优化后，每个 Token 的计算量可能减少，即使训练速度提高，MFU 也不一定增加。
+最后，实际训练中还有数据搬运、设备间通信和等待等开销，所以硬件通常无法持续达到理论峰值算力。
+因此，MFU 可以帮助我们分析训练效率，但也需要结合 Training Throughput 等其他指标一起判断。
+6. Roofline 和 MFU 应该怎样一起看？
+最后把这两个指标放在一起。Roofline 更偏向回答“为什么算不快”：我们根据计算量、显存搬运量和硬件峰值，分析任务可能先遇到哪一项限制。MFU 则回答“整个训练实际发挥了多少理论算力”：需要结合模型计算量和真实训练吞吐量来计算。
+如果一个任务从 Roofline 上看，本来就明显受到带宽限制，那么 MFU 不高，并不一定代表 Kernel 写得差。反过来，如果任务的计算密度已经很高，理论上应该是算力受限，但 MFU 仍然很低，就应该继续排查算子效率、设备间通信、Pipeline Bubble 等因素。
+因此，Roofline 和 MFU 不是两个互相替代的指标。一个帮助判断潜在瓶颈，一个帮助衡量实际训练效率，它们应该结合起来使用。
+7. 全场总结
+回顾今天的主线，我们先从 DeepSeek V4.1 Flash 的架构出发，认识了 Attention、MoE 等模块；然后通过矩阵维度计算参数量，再通过前向和反向传播计算 FLOPs。
+在此基础上，Roofline 又把 FLOPs 和 HBM 数据搬运联系起来，解释为什么计算量减少并不一定等于等比例提速。最后，MFU 把模型理论工作量和真实训练吞吐量联系起来，衡量训练系统相对硬件峰值的效率。
+所以，从模型架构，到参数量，再到 FLOPs、Roofline 和 MFU，其实是在逐步回答同一个问题：一个模型需要做哪些计算，这些计算有多大成本，最后放到真实硬件上又能以多高的效率完成。
+附：数据口径与参考资料（备查，无需口述）
+1. DeepSeek Query Low-Rank Projection 的形状、参数量、前向及单 Token 反向 FLOPs，沿用本讲稿前文；此处仅增加了 BF16 权重搬运的简化假设。
+2. Roofline 的 989 TFLOP/s（BF16 Dense）和 3.35 TB/s 为仓库当前 H100 SXM 80GB 模板使用的规格。官网带稀疏性加速的峰值不能直接当作 Dense 峰值。
+3. 网页的 Roofline Attention 计算范围是通用算法比较，并非直接集成 DeepSeek V4.1 Flash 全模型 Profiling；页面中的 Bytes Moved 为模型估计。本文的 Query Projection 演算是独立的简化教学示例。
+4. MFU 采用网页的 1 TFLOP/token、2000 Tokens/s、4 张设备、每张 1000 TFLOP/s 的假设；不是任何具体 DeepSeek 训练实验的测量结果。
+仓库对应网页：https://raw.githubusercontent.com/stfdtj/llm-compute-presentation/fix/deepseek-original-attention-details/index.html
+H100 官方规格：https://www.nvidia.com/en-us/data-center/h100/
+H100 BF16 Dense 口径：https://github.com/NVIDIA/recsys-examples/blob/main/examples/hstu/training/benchmark/E2E_BENCHMARK.md
+MFU 定义原始论文：PaLM (2022), https://arxiv.org/abs/2204.02311

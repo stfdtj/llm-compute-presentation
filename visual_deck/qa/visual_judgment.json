@@ -1,0 +1,15 @@
+{
+  "schema_version": "visual_judgment_v1",
+  "reviewer": {"type": "model", "name": "Codex"},
+  "verdict": "pass",
+  "scope": "Actual 22-page PPTX render, all 47 source-generated click checkpoints, and detailed inspection of mathematical notation and gradient arrows.",
+  "reviewed_slide_pages": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22],
+  "reviewed_checkpoint_pages": 47,
+  "findings": [
+    {"severity":"warning","slide":20,"message":"Initial Roofline labels overlapped the axes and ridge panel; moved the traffic and AI examples to a separate readout column, separated the axis label and ticks, and inspected new renders.","resolved":true},
+    {"severity":"warning","slide":17,"message":"Initial weight-gradient arrows crossed the superscript formulas; moved the computational nodes down and terminated arrows below formula labels, then inspected the final native slide and checkpoints.","resolved":true},
+    {"severity":"warning","slide":11,"message":"Initial Router annotations approached the footer and overlapped source text frames; raised them and separated the columns, then inspected the final page.","resolved":true},
+    {"severity":"info","message":"Matrix highlight layers intentionally cover and repeat the same cell text; formula superscripts are separate font-fallback glyph spans. These are not unintended collisions.","resolved":true},
+    {"severity":"info","message":"Live Microsoft PowerPoint slideshow playback was unavailable. Native OOXML timeline references and an independent LibreOffice import were checked; 83 click groups are retained.","resolved":true}
+  ]
+}

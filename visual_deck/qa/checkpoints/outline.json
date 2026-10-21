@@ -1,0 +1,1157 @@
+{
+  "title": "DeepSeek V4.1 Flash 计算成本可视化",
+  "deck_style": {
+    "style_preset": "lab-report",
+    "composition_grammar": "scientific-evidence-plate",
+    "style_seed": "deepseek-math-lesson",
+    "header_variant": "plain",
+    "font_pair": "system_clean_v1",
+    "footer_page_numbers": true,
+    "readability_contract": {
+      "min_title_pt": 28,
+      "min_body_pt": 16,
+      "min_support_pt": 13,
+      "min_caption_pt": 9,
+      "min_footer_pt": 9,
+      "min_metadata_pt": 9,
+      "max_title_lines": 2
+    }
+  },
+  "slides": [
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "moe",
+      "title": "Dense 使用同一组 FFN；MoE 选择执行路径",
+      "section": "一.6 MoE 与 Dense | Visual QA · Click 0/6",
+      "script_paragraphs": [
+        83,
+        96
+      ],
+      "clicks": [
+        "Token 进入 Router",
+        "显示 384 个 Routed Experts 的评分示意",
+        "高亮其中 6 个选中专家",
+        "显示始终执行的 1 个 Shared Expert",
+        "选中专家执行 FFN",
+        "路由加权求和，再加共享专家输出"
+      ],
+      "spoken": "专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。",
+      "slide_id": "s07-moe-checkpoint-0",
+      "notes": "对应 Word：一.6 MoE 与 Dense。\n段落索引（从 0 起）：[83, 96]。\n讲述：专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。\n点击顺序：\n1. Token 进入 Router\n2. 显示 384 个 Routed Experts 的评分示意\n3. 高亮其中 6 个选中专家\n4. 显示始终执行的 1 个 Shared Expert\n5. 选中专家执行 FFN\n6. 路由加权求和，再加共享专家输出\n本页完成后再次点击切换下一页。",
+      "stage_cap": 0,
+      "page_no": 7
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "moe",
+      "title": "Dense 使用同一组 FFN；MoE 选择执行路径",
+      "section": "一.6 MoE 与 Dense | Visual QA · Click 1/6",
+      "script_paragraphs": [
+        83,
+        96
+      ],
+      "clicks": [
+        "Token 进入 Router",
+        "显示 384 个 Routed Experts 的评分示意",
+        "高亮其中 6 个选中专家",
+        "显示始终执行的 1 个 Shared Expert",
+        "选中专家执行 FFN",
+        "路由加权求和，再加共享专家输出"
+      ],
+      "spoken": "专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。",
+      "slide_id": "s07-moe-checkpoint-1",
+      "notes": "对应 Word：一.6 MoE 与 Dense。\n段落索引（从 0 起）：[83, 96]。\n讲述：专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。\n点击顺序：\n1. Token 进入 Router\n2. 显示 384 个 Routed Experts 的评分示意\n3. 高亮其中 6 个选中专家\n4. 显示始终执行的 1 个 Shared Expert\n5. 选中专家执行 FFN\n6. 路由加权求和，再加共享专家输出\n本页完成后再次点击切换下一页。",
+      "stage_cap": 1,
+      "page_no": 7
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "moe",
+      "title": "Dense 使用同一组 FFN；MoE 选择执行路径",
+      "section": "一.6 MoE 与 Dense | Visual QA · Click 2/6",
+      "script_paragraphs": [
+        83,
+        96
+      ],
+      "clicks": [
+        "Token 进入 Router",
+        "显示 384 个 Routed Experts 的评分示意",
+        "高亮其中 6 个选中专家",
+        "显示始终执行的 1 个 Shared Expert",
+        "选中专家执行 FFN",
+        "路由加权求和，再加共享专家输出"
+      ],
+      "spoken": "专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。",
+      "slide_id": "s07-moe-checkpoint-2",
+      "notes": "对应 Word：一.6 MoE 与 Dense。\n段落索引（从 0 起）：[83, 96]。\n讲述：专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。\n点击顺序：\n1. Token 进入 Router\n2. 显示 384 个 Routed Experts 的评分示意\n3. 高亮其中 6 个选中专家\n4. 显示始终执行的 1 个 Shared Expert\n5. 选中专家执行 FFN\n6. 路由加权求和，再加共享专家输出\n本页完成后再次点击切换下一页。",
+      "stage_cap": 2,
+      "page_no": 7
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "moe",
+      "title": "Dense 使用同一组 FFN；MoE 选择执行路径",
+      "section": "一.6 MoE 与 Dense | Visual QA · Click 3/6",
+      "script_paragraphs": [
+        83,
+        96
+      ],
+      "clicks": [
+        "Token 进入 Router",
+        "显示 384 个 Routed Experts 的评分示意",
+        "高亮其中 6 个选中专家",
+        "显示始终执行的 1 个 Shared Expert",
+        "选中专家执行 FFN",
+        "路由加权求和，再加共享专家输出"
+      ],
+      "spoken": "专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。",
+      "slide_id": "s07-moe-checkpoint-3",
+      "notes": "对应 Word：一.6 MoE 与 Dense。\n段落索引（从 0 起）：[83, 96]。\n讲述：专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。\n点击顺序：\n1. Token 进入 Router\n2. 显示 384 个 Routed Experts 的评分示意\n3. 高亮其中 6 个选中专家\n4. 显示始终执行的 1 个 Shared Expert\n5. 选中专家执行 FFN\n6. 路由加权求和，再加共享专家输出\n本页完成后再次点击切换下一页。",
+      "stage_cap": 3,
+      "page_no": 7
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "moe",
+      "title": "Dense 使用同一组 FFN；MoE 选择执行路径",
+      "section": "一.6 MoE 与 Dense | Visual QA · Click 4/6",
+      "script_paragraphs": [
+        83,
+        96
+      ],
+      "clicks": [
+        "Token 进入 Router",
+        "显示 384 个 Routed Experts 的评分示意",
+        "高亮其中 6 个选中专家",
+        "显示始终执行的 1 个 Shared Expert",
+        "选中专家执行 FFN",
+        "路由加权求和，再加共享专家输出"
+      ],
+      "spoken": "专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。",
+      "slide_id": "s07-moe-checkpoint-4",
+      "notes": "对应 Word：一.6 MoE 与 Dense。\n段落索引（从 0 起）：[83, 96]。\n讲述：专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。\n点击顺序：\n1. Token 进入 Router\n2. 显示 384 个 Routed Experts 的评分示意\n3. 高亮其中 6 个选中专家\n4. 显示始终执行的 1 个 Shared Expert\n5. 选中专家执行 FFN\n6. 路由加权求和，再加共享专家输出\n本页完成后再次点击切换下一页。",
+      "stage_cap": 4,
+      "page_no": 7
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "moe",
+      "title": "Dense 使用同一组 FFN；MoE 选择执行路径",
+      "section": "一.6 MoE 与 Dense | Visual QA · Click 5/6",
+      "script_paragraphs": [
+        83,
+        96
+      ],
+      "clicks": [
+        "Token 进入 Router",
+        "显示 384 个 Routed Experts 的评分示意",
+        "高亮其中 6 个选中专家",
+        "显示始终执行的 1 个 Shared Expert",
+        "选中专家执行 FFN",
+        "路由加权求和，再加共享专家输出"
+      ],
+      "spoken": "专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。",
+      "slide_id": "s07-moe-checkpoint-5",
+      "notes": "对应 Word：一.6 MoE 与 Dense。\n段落索引（从 0 起）：[83, 96]。\n讲述：专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。\n点击顺序：\n1. Token 进入 Router\n2. 显示 384 个 Routed Experts 的评分示意\n3. 高亮其中 6 个选中专家\n4. 显示始终执行的 1 个 Shared Expert\n5. 选中专家执行 FFN\n6. 路由加权求和，再加共享专家输出\n本页完成后再次点击切换下一页。",
+      "stage_cap": 5,
+      "page_no": 7
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "moe",
+      "title": "Dense 使用同一组 FFN；MoE 选择执行路径",
+      "section": "一.6 MoE 与 Dense | Visual QA · Click 6/6",
+      "script_paragraphs": [
+        83,
+        96
+      ],
+      "clicks": [
+        "Token 进入 Router",
+        "显示 384 个 Routed Experts 的评分示意",
+        "高亮其中 6 个选中专家",
+        "显示始终执行的 1 个 Shared Expert",
+        "选中专家执行 FFN",
+        "路由加权求和，再加共享专家输出"
+      ],
+      "spoken": "专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。",
+      "slide_id": "s07-moe-checkpoint-6",
+      "notes": "对应 Word：一.6 MoE 与 Dense。\n段落索引（从 0 起）：[83, 96]。\n讲述：专家墙真实包含 384 格。分数与选中的具体专家编号只作教学示意，不是运行轨迹；共享专家不参与这次 Top-6 竞争。\n点击顺序：\n1. Token 进入 Router\n2. 显示 384 个 Routed Experts 的评分示意\n3. 高亮其中 6 个选中专家\n4. 显示始终执行的 1 个 Shared Expert\n5. 选中专家执行 FFN\n6. 路由加权求和，再加共享专家输出\n本页完成后再次点击切换下一页。",
+      "stage_cap": 6,
+      "page_no": 7
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul",
+      "title": "Matrix Multiplication：一行 × 一列，生成一个数",
+      "section": "三.前向 1 从参数到 FLOPs | Visual QA · Click 0/7",
+      "script_paragraphs": [
+        145,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行 [1,2,3]",
+        "高亮 B 第一列 [1,3,5]",
+        "显示 1×1 = 1",
+        "显示 2×3 = 6",
+        "显示 3×5 = 15",
+        "将乘积相加：1+6+15 = 22",
+        "将 22 写入 C 第一行第一列"
+      ],
+      "spoken": "小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。",
+      "slide_id": "s12-matmul-checkpoint-0",
+      "notes": "对应 Word：三.前向 1 从参数到 FLOPs。\n段落索引（从 0 起）：[145, 155]。\n讲述：小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。\n点击顺序：\n1. 高亮 A 第一行 [1,2,3]\n2. 高亮 B 第一列 [1,3,5]\n3. 显示 1×1 = 1\n4. 显示 2×3 = 6\n5. 显示 3×5 = 15\n6. 将乘积相加：1+6+15 = 22\n7. 将 22 写入 C 第一行第一列\n本页完成后再次点击切换下一页。",
+      "stage_cap": 0,
+      "page_no": 12
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul",
+      "title": "Matrix Multiplication：一行 × 一列，生成一个数",
+      "section": "三.前向 1 从参数到 FLOPs | Visual QA · Click 1/7",
+      "script_paragraphs": [
+        145,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行 [1,2,3]",
+        "高亮 B 第一列 [1,3,5]",
+        "显示 1×1 = 1",
+        "显示 2×3 = 6",
+        "显示 3×5 = 15",
+        "将乘积相加：1+6+15 = 22",
+        "将 22 写入 C 第一行第一列"
+      ],
+      "spoken": "小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。",
+      "slide_id": "s12-matmul-checkpoint-1",
+      "notes": "对应 Word：三.前向 1 从参数到 FLOPs。\n段落索引（从 0 起）：[145, 155]。\n讲述：小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。\n点击顺序：\n1. 高亮 A 第一行 [1,2,3]\n2. 高亮 B 第一列 [1,3,5]\n3. 显示 1×1 = 1\n4. 显示 2×3 = 6\n5. 显示 3×5 = 15\n6. 将乘积相加：1+6+15 = 22\n7. 将 22 写入 C 第一行第一列\n本页完成后再次点击切换下一页。",
+      "stage_cap": 1,
+      "page_no": 12
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul",
+      "title": "Matrix Multiplication：一行 × 一列，生成一个数",
+      "section": "三.前向 1 从参数到 FLOPs | Visual QA · Click 2/7",
+      "script_paragraphs": [
+        145,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行 [1,2,3]",
+        "高亮 B 第一列 [1,3,5]",
+        "显示 1×1 = 1",
+        "显示 2×3 = 6",
+        "显示 3×5 = 15",
+        "将乘积相加：1+6+15 = 22",
+        "将 22 写入 C 第一行第一列"
+      ],
+      "spoken": "小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。",
+      "slide_id": "s12-matmul-checkpoint-2",
+      "notes": "对应 Word：三.前向 1 从参数到 FLOPs。\n段落索引（从 0 起）：[145, 155]。\n讲述：小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。\n点击顺序：\n1. 高亮 A 第一行 [1,2,3]\n2. 高亮 B 第一列 [1,3,5]\n3. 显示 1×1 = 1\n4. 显示 2×3 = 6\n5. 显示 3×5 = 15\n6. 将乘积相加：1+6+15 = 22\n7. 将 22 写入 C 第一行第一列\n本页完成后再次点击切换下一页。",
+      "stage_cap": 2,
+      "page_no": 12
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul",
+      "title": "Matrix Multiplication：一行 × 一列，生成一个数",
+      "section": "三.前向 1 从参数到 FLOPs | Visual QA · Click 3/7",
+      "script_paragraphs": [
+        145,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行 [1,2,3]",
+        "高亮 B 第一列 [1,3,5]",
+        "显示 1×1 = 1",
+        "显示 2×3 = 6",
+        "显示 3×5 = 15",
+        "将乘积相加：1+6+15 = 22",
+        "将 22 写入 C 第一行第一列"
+      ],
+      "spoken": "小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。",
+      "slide_id": "s12-matmul-checkpoint-3",
+      "notes": "对应 Word：三.前向 1 从参数到 FLOPs。\n段落索引（从 0 起）：[145, 155]。\n讲述：小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。\n点击顺序：\n1. 高亮 A 第一行 [1,2,3]\n2. 高亮 B 第一列 [1,3,5]\n3. 显示 1×1 = 1\n4. 显示 2×3 = 6\n5. 显示 3×5 = 15\n6. 将乘积相加：1+6+15 = 22\n7. 将 22 写入 C 第一行第一列\n本页完成后再次点击切换下一页。",
+      "stage_cap": 3,
+      "page_no": 12
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul",
+      "title": "Matrix Multiplication：一行 × 一列，生成一个数",
+      "section": "三.前向 1 从参数到 FLOPs | Visual QA · Click 4/7",
+      "script_paragraphs": [
+        145,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行 [1,2,3]",
+        "高亮 B 第一列 [1,3,5]",
+        "显示 1×1 = 1",
+        "显示 2×3 = 6",
+        "显示 3×5 = 15",
+        "将乘积相加：1+6+15 = 22",
+        "将 22 写入 C 第一行第一列"
+      ],
+      "spoken": "小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。",
+      "slide_id": "s12-matmul-checkpoint-4",
+      "notes": "对应 Word：三.前向 1 从参数到 FLOPs。\n段落索引（从 0 起）：[145, 155]。\n讲述：小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。\n点击顺序：\n1. 高亮 A 第一行 [1,2,3]\n2. 高亮 B 第一列 [1,3,5]\n3. 显示 1×1 = 1\n4. 显示 2×3 = 6\n5. 显示 3×5 = 15\n6. 将乘积相加：1+6+15 = 22\n7. 将 22 写入 C 第一行第一列\n本页完成后再次点击切换下一页。",
+      "stage_cap": 4,
+      "page_no": 12
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul",
+      "title": "Matrix Multiplication：一行 × 一列，生成一个数",
+      "section": "三.前向 1 从参数到 FLOPs | Visual QA · Click 5/7",
+      "script_paragraphs": [
+        145,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行 [1,2,3]",
+        "高亮 B 第一列 [1,3,5]",
+        "显示 1×1 = 1",
+        "显示 2×3 = 6",
+        "显示 3×5 = 15",
+        "将乘积相加：1+6+15 = 22",
+        "将 22 写入 C 第一行第一列"
+      ],
+      "spoken": "小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。",
+      "slide_id": "s12-matmul-checkpoint-5",
+      "notes": "对应 Word：三.前向 1 从参数到 FLOPs。\n段落索引（从 0 起）：[145, 155]。\n讲述：小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。\n点击顺序：\n1. 高亮 A 第一行 [1,2,3]\n2. 高亮 B 第一列 [1,3,5]\n3. 显示 1×1 = 1\n4. 显示 2×3 = 6\n5. 显示 3×5 = 15\n6. 将乘积相加：1+6+15 = 22\n7. 将 22 写入 C 第一行第一列\n本页完成后再次点击切换下一页。",
+      "stage_cap": 5,
+      "page_no": 12
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul",
+      "title": "Matrix Multiplication：一行 × 一列，生成一个数",
+      "section": "三.前向 1 从参数到 FLOPs | Visual QA · Click 6/7",
+      "script_paragraphs": [
+        145,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行 [1,2,3]",
+        "高亮 B 第一列 [1,3,5]",
+        "显示 1×1 = 1",
+        "显示 2×3 = 6",
+        "显示 3×5 = 15",
+        "将乘积相加：1+6+15 = 22",
+        "将 22 写入 C 第一行第一列"
+      ],
+      "spoken": "小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。",
+      "slide_id": "s12-matmul-checkpoint-6",
+      "notes": "对应 Word：三.前向 1 从参数到 FLOPs。\n段落索引（从 0 起）：[145, 155]。\n讲述：小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。\n点击顺序：\n1. 高亮 A 第一行 [1,2,3]\n2. 高亮 B 第一列 [1,3,5]\n3. 显示 1×1 = 1\n4. 显示 2×3 = 6\n5. 显示 3×5 = 15\n6. 将乘积相加：1+6+15 = 22\n7. 将 22 写入 C 第一行第一列\n本页完成后再次点击切换下一页。",
+      "stage_cap": 6,
+      "page_no": 12
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul",
+      "title": "Matrix Multiplication：一行 × 一列，生成一个数",
+      "section": "三.前向 1 从参数到 FLOPs | Visual QA · Click 7/7",
+      "script_paragraphs": [
+        145,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行 [1,2,3]",
+        "高亮 B 第一列 [1,3,5]",
+        "显示 1×1 = 1",
+        "显示 2×3 = 6",
+        "显示 3×5 = 15",
+        "将乘积相加：1+6+15 = 22",
+        "将 22 写入 C 第一行第一列"
+      ],
+      "spoken": "小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。",
+      "slide_id": "s12-matmul-checkpoint-7",
+      "notes": "对应 Word：三.前向 1 从参数到 FLOPs。\n段落索引（从 0 起）：[145, 155]。\n讲述：小矩阵为教学例。A=[[1,2,3],[4,5,6]]，B=[[1,2],[3,4],[5,6]]。每次点击只推进一个乘法或求和动作，等待听众看清再继续。\n点击顺序：\n1. 高亮 A 第一行 [1,2,3]\n2. 高亮 B 第一列 [1,3,5]\n3. 显示 1×1 = 1\n4. 显示 2×3 = 6\n5. 显示 3×5 = 15\n6. 将乘积相加：1+6+15 = 22\n7. 将 22 写入 C 第一行第一列\n本页完成后再次点击切换下一页。",
+      "stage_cap": 7,
+      "page_no": 12
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul_next",
+      "title": "换一列，得到下一个输出；重复同样的规则",
+      "section": "三.前向 1 矩阵乘法与计数 | Visual QA · Click 0/4",
+      "script_paragraphs": [
+        151,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行与 B 第二列",
+        "显示 1×2 + 2×4 + 3×6 = 28",
+        "将 28 写入 C，并补齐第二行",
+        "显示 3 次乘法 + 2 次加法，以及 2MKN 近似"
+      ],
+      "spoken": "C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。",
+      "slide_id": "s13-matmul_next-checkpoint-0",
+      "notes": "对应 Word：三.前向 1 矩阵乘法与计数。\n段落索引（从 0 起）：[151, 155]。\n讲述：C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。\n点击顺序：\n1. 高亮 A 第一行与 B 第二列\n2. 显示 1×2 + 2×4 + 3×6 = 28\n3. 将 28 写入 C，并补齐第二行\n4. 显示 3 次乘法 + 2 次加法，以及 2MKN 近似\n本页完成后再次点击切换下一页。",
+      "stage_cap": 0,
+      "page_no": 13
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul_next",
+      "title": "换一列，得到下一个输出；重复同样的规则",
+      "section": "三.前向 1 矩阵乘法与计数 | Visual QA · Click 1/4",
+      "script_paragraphs": [
+        151,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行与 B 第二列",
+        "显示 1×2 + 2×4 + 3×6 = 28",
+        "将 28 写入 C，并补齐第二行",
+        "显示 3 次乘法 + 2 次加法，以及 2MKN 近似"
+      ],
+      "spoken": "C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。",
+      "slide_id": "s13-matmul_next-checkpoint-1",
+      "notes": "对应 Word：三.前向 1 矩阵乘法与计数。\n段落索引（从 0 起）：[151, 155]。\n讲述：C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。\n点击顺序：\n1. 高亮 A 第一行与 B 第二列\n2. 显示 1×2 + 2×4 + 3×6 = 28\n3. 将 28 写入 C，并补齐第二行\n4. 显示 3 次乘法 + 2 次加法，以及 2MKN 近似\n本页完成后再次点击切换下一页。",
+      "stage_cap": 1,
+      "page_no": 13
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul_next",
+      "title": "换一列，得到下一个输出；重复同样的规则",
+      "section": "三.前向 1 矩阵乘法与计数 | Visual QA · Click 2/4",
+      "script_paragraphs": [
+        151,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行与 B 第二列",
+        "显示 1×2 + 2×4 + 3×6 = 28",
+        "将 28 写入 C，并补齐第二行",
+        "显示 3 次乘法 + 2 次加法，以及 2MKN 近似"
+      ],
+      "spoken": "C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。",
+      "slide_id": "s13-matmul_next-checkpoint-2",
+      "notes": "对应 Word：三.前向 1 矩阵乘法与计数。\n段落索引（从 0 起）：[151, 155]。\n讲述：C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。\n点击顺序：\n1. 高亮 A 第一行与 B 第二列\n2. 显示 1×2 + 2×4 + 3×6 = 28\n3. 将 28 写入 C，并补齐第二行\n4. 显示 3 次乘法 + 2 次加法，以及 2MKN 近似\n本页完成后再次点击切换下一页。",
+      "stage_cap": 2,
+      "page_no": 13
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul_next",
+      "title": "换一列，得到下一个输出；重复同样的规则",
+      "section": "三.前向 1 矩阵乘法与计数 | Visual QA · Click 3/4",
+      "script_paragraphs": [
+        151,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行与 B 第二列",
+        "显示 1×2 + 2×4 + 3×6 = 28",
+        "将 28 写入 C，并补齐第二行",
+        "显示 3 次乘法 + 2 次加法，以及 2MKN 近似"
+      ],
+      "spoken": "C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。",
+      "slide_id": "s13-matmul_next-checkpoint-3",
+      "notes": "对应 Word：三.前向 1 矩阵乘法与计数。\n段落索引（从 0 起）：[151, 155]。\n讲述：C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。\n点击顺序：\n1. 高亮 A 第一行与 B 第二列\n2. 显示 1×2 + 2×4 + 3×6 = 28\n3. 将 28 写入 C，并补齐第二行\n4. 显示 3 次乘法 + 2 次加法，以及 2MKN 近似\n本页完成后再次点击切换下一页。",
+      "stage_cap": 3,
+      "page_no": 13
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "matmul_next",
+      "title": "换一列，得到下一个输出；重复同样的规则",
+      "section": "三.前向 1 矩阵乘法与计数 | Visual QA · Click 4/4",
+      "script_paragraphs": [
+        151,
+        155
+      ],
+      "clicks": [
+        "高亮 A 第一行与 B 第二列",
+        "显示 1×2 + 2×4 + 3×6 = 28",
+        "将 28 写入 C，并补齐第二行",
+        "显示 3 次乘法 + 2 次加法，以及 2MKN 近似"
+      ],
+      "spoken": "C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。",
+      "slide_id": "s13-matmul_next-checkpoint-4",
+      "notes": "对应 Word：三.前向 1 矩阵乘法与计数。\n段落索引（从 0 起）：[151, 155]。\n讲述：C=[[22,28],[49,64]]。每个输出精确 5 次乘加，全矩阵 20 FLOPs；2×2×3×2=24 为常用近似。不是精确 24。\n点击顺序：\n1. 高亮 A 第一行与 B 第二列\n2. 显示 1×2 + 2×4 + 3×6 = 28\n3. 将 28 写入 C，并补齐第二行\n4. 显示 3 次乘法 + 2 次加法，以及 2MKN 近似\n本页完成后再次点击切换下一页。",
+      "stage_cap": 4,
+      "page_no": 13
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "lowrank",
+      "title": "Query Low-Rank Projection：先压缩，再展开",
+      "section": "三.前向 2 Query 投影 | Visual QA · Click 0/4",
+      "script_paragraphs": [
+        156,
+        188
+      ],
+      "clicks": [
+        "W_QA：5120 → 1280，13.11 MFLOPs",
+        "RMSNorm：维度仍为 1280",
+        "W_QB：1280 → 32768，83.89 MFLOPs",
+        "重排为 64 Heads × 512，汇总 96.99 MFLOPs"
+      ],
+      "spoken": "形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。",
+      "slide_id": "s14-lowrank-checkpoint-0",
+      "notes": "对应 Word：三.前向 2 Query 投影。\n段落索引（从 0 起）：[156, 188]。\n讲述：形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。\n点击顺序：\n1. W_QA：5120 → 1280，13.11 MFLOPs\n2. RMSNorm：维度仍为 1280\n3. W_QB：1280 → 32768，83.89 MFLOPs\n4. 重排为 64 Heads × 512，汇总 96.99 MFLOPs\n本页完成后再次点击切换下一页。",
+      "stage_cap": 0,
+      "page_no": 14
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "lowrank",
+      "title": "Query Low-Rank Projection：先压缩，再展开",
+      "section": "三.前向 2 Query 投影 | Visual QA · Click 1/4",
+      "script_paragraphs": [
+        156,
+        188
+      ],
+      "clicks": [
+        "W_QA：5120 → 1280，13.11 MFLOPs",
+        "RMSNorm：维度仍为 1280",
+        "W_QB：1280 → 32768，83.89 MFLOPs",
+        "重排为 64 Heads × 512，汇总 96.99 MFLOPs"
+      ],
+      "spoken": "形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。",
+      "slide_id": "s14-lowrank-checkpoint-1",
+      "notes": "对应 Word：三.前向 2 Query 投影。\n段落索引（从 0 起）：[156, 188]。\n讲述：形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。\n点击顺序：\n1. W_QA：5120 → 1280，13.11 MFLOPs\n2. RMSNorm：维度仍为 1280\n3. W_QB：1280 → 32768，83.89 MFLOPs\n4. 重排为 64 Heads × 512，汇总 96.99 MFLOPs\n本页完成后再次点击切换下一页。",
+      "stage_cap": 1,
+      "page_no": 14
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "lowrank",
+      "title": "Query Low-Rank Projection：先压缩，再展开",
+      "section": "三.前向 2 Query 投影 | Visual QA · Click 2/4",
+      "script_paragraphs": [
+        156,
+        188
+      ],
+      "clicks": [
+        "W_QA：5120 → 1280，13.11 MFLOPs",
+        "RMSNorm：维度仍为 1280",
+        "W_QB：1280 → 32768，83.89 MFLOPs",
+        "重排为 64 Heads × 512，汇总 96.99 MFLOPs"
+      ],
+      "spoken": "形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。",
+      "slide_id": "s14-lowrank-checkpoint-2",
+      "notes": "对应 Word：三.前向 2 Query 投影。\n段落索引（从 0 起）：[156, 188]。\n讲述：形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。\n点击顺序：\n1. W_QA：5120 → 1280，13.11 MFLOPs\n2. RMSNorm：维度仍为 1280\n3. W_QB：1280 → 32768，83.89 MFLOPs\n4. 重排为 64 Heads × 512，汇总 96.99 MFLOPs\n本页完成后再次点击切换下一页。",
+      "stage_cap": 2,
+      "page_no": 14
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "lowrank",
+      "title": "Query Low-Rank Projection：先压缩，再展开",
+      "section": "三.前向 2 Query 投影 | Visual QA · Click 3/4",
+      "script_paragraphs": [
+        156,
+        188
+      ],
+      "clicks": [
+        "W_QA：5120 → 1280，13.11 MFLOPs",
+        "RMSNorm：维度仍为 1280",
+        "W_QB：1280 → 32768，83.89 MFLOPs",
+        "重排为 64 Heads × 512，汇总 96.99 MFLOPs"
+      ],
+      "spoken": "形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。",
+      "slide_id": "s14-lowrank-checkpoint-3",
+      "notes": "对应 Word：三.前向 2 Query 投影。\n段落索引（从 0 起）：[156, 188]。\n讲述：形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。\n点击顺序：\n1. W_QA：5120 → 1280，13.11 MFLOPs\n2. RMSNorm：维度仍为 1280\n3. W_QB：1280 → 32768，83.89 MFLOPs\n4. 重排为 64 Heads × 512，汇总 96.99 MFLOPs\n本页完成后再次点击切换下一页。",
+      "stage_cap": 3,
+      "page_no": 14
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "lowrank",
+      "title": "Query Low-Rank Projection：先压缩，再展开",
+      "section": "三.前向 2 Query 投影 | Visual QA · Click 4/4",
+      "script_paragraphs": [
+        156,
+        188
+      ],
+      "clicks": [
+        "W_QA：5120 → 1280，13.11 MFLOPs",
+        "RMSNorm：维度仍为 1280",
+        "W_QB：1280 → 32768，83.89 MFLOPs",
+        "重排为 64 Heads × 512，汇总 96.99 MFLOPs"
+      ],
+      "spoken": "形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。",
+      "slide_id": "s14-lowrank-checkpoint-4",
+      "notes": "对应 Word：三.前向 2 Query 投影。\n段落索引（从 0 起）：[156, 188]。\n讲述：形状真实，向量宽度为示意，不按维度严格等比。主 FLOPs 仅两个 Linear，排除 RMSNorm / RoPE。Reshape 不增加浮点乘加。\n点击顺序：\n1. W_QA：5120 → 1280，13.11 MFLOPs\n2. RMSNorm：维度仍为 1280\n3. W_QB：1280 → 32768，83.89 MFLOPs\n4. 重排为 64 Heads × 512，汇总 96.99 MFLOPs\n本页完成后再次点击切换下一页。",
+      "stage_cap": 4,
+      "page_no": 14
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "backward",
+      "title": "Forward 保存输入；Backward 沿图反向传梯度",
+      "section": "三.Backward 1–2 五步与顺序 | Visual QA · Click 0/4",
+      "script_paragraphs": [
+        196,
+        214
+      ],
+      "clicks": [
+        "显示前向 X → W_QA → RMSNorm → W_QB → Q",
+        "① 从 Loss 获得 dQ",
+        "② 取回本层保存的输入和权重",
+        "反向从 W_QB 经 RMSNorm 回到 W_QA"
+      ],
+      "spoken": "原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。",
+      "slide_id": "s16-backward-checkpoint-0",
+      "notes": "对应 Word：三.Backward 1–2 五步与顺序。\n段落索引（从 0 起）：[196, 214]。\n讲述：原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。\n点击顺序：\n1. 显示前向 X → W_QA → RMSNorm → W_QB → Q\n2. ① 从 Loss 获得 dQ\n3. ② 取回本层保存的输入和权重\n4. 反向从 W_QB 经 RMSNorm 回到 W_QA\n本页完成后再次点击切换下一页。",
+      "stage_cap": 0,
+      "page_no": 16
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "backward",
+      "title": "Forward 保存输入；Backward 沿图反向传梯度",
+      "section": "三.Backward 1–2 五步与顺序 | Visual QA · Click 1/4",
+      "script_paragraphs": [
+        196,
+        214
+      ],
+      "clicks": [
+        "显示前向 X → W_QA → RMSNorm → W_QB → Q",
+        "① 从 Loss 获得 dQ",
+        "② 取回本层保存的输入和权重",
+        "反向从 W_QB 经 RMSNorm 回到 W_QA"
+      ],
+      "spoken": "原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。",
+      "slide_id": "s16-backward-checkpoint-1",
+      "notes": "对应 Word：三.Backward 1–2 五步与顺序。\n段落索引（从 0 起）：[196, 214]。\n讲述：原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。\n点击顺序：\n1. 显示前向 X → W_QA → RMSNorm → W_QB → Q\n2. ① 从 Loss 获得 dQ\n3. ② 取回本层保存的输入和权重\n4. 反向从 W_QB 经 RMSNorm 回到 W_QA\n本页完成后再次点击切换下一页。",
+      "stage_cap": 1,
+      "page_no": 16
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "backward",
+      "title": "Forward 保存输入；Backward 沿图反向传梯度",
+      "section": "三.Backward 1–2 五步与顺序 | Visual QA · Click 2/4",
+      "script_paragraphs": [
+        196,
+        214
+      ],
+      "clicks": [
+        "显示前向 X → W_QA → RMSNorm → W_QB → Q",
+        "① 从 Loss 获得 dQ",
+        "② 取回本层保存的输入和权重",
+        "反向从 W_QB 经 RMSNorm 回到 W_QA"
+      ],
+      "spoken": "原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。",
+      "slide_id": "s16-backward-checkpoint-2",
+      "notes": "对应 Word：三.Backward 1–2 五步与顺序。\n段落索引（从 0 起）：[196, 214]。\n讲述：原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。\n点击顺序：\n1. 显示前向 X → W_QA → RMSNorm → W_QB → Q\n2. ① 从 Loss 获得 dQ\n3. ② 取回本层保存的输入和权重\n4. 反向从 W_QB 经 RMSNorm 回到 W_QA\n本页完成后再次点击切换下一页。",
+      "stage_cap": 2,
+      "page_no": 16
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "backward",
+      "title": "Forward 保存输入；Backward 沿图反向传梯度",
+      "section": "三.Backward 1–2 五步与顺序 | Visual QA · Click 3/4",
+      "script_paragraphs": [
+        196,
+        214
+      ],
+      "clicks": [
+        "显示前向 X → W_QA → RMSNorm → W_QB → Q",
+        "① 从 Loss 获得 dQ",
+        "② 取回本层保存的输入和权重",
+        "反向从 W_QB 经 RMSNorm 回到 W_QA"
+      ],
+      "spoken": "原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。",
+      "slide_id": "s16-backward-checkpoint-3",
+      "notes": "对应 Word：三.Backward 1–2 五步与顺序。\n段落索引（从 0 起）：[196, 214]。\n讲述：原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。\n点击顺序：\n1. 显示前向 X → W_QA → RMSNorm → W_QB → Q\n2. ① 从 Loss 获得 dQ\n3. ② 取回本层保存的输入和权重\n4. 反向从 W_QB 经 RMSNorm 回到 W_QA\n本页完成后再次点击切换下一页。",
+      "stage_cap": 3,
+      "page_no": 16
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "backward",
+      "title": "Forward 保存输入；Backward 沿图反向传梯度",
+      "section": "三.Backward 1–2 五步与顺序 | Visual QA · Click 4/4",
+      "script_paragraphs": [
+        196,
+        214
+      ],
+      "clicks": [
+        "显示前向 X → W_QA → RMSNorm → W_QB → Q",
+        "① 从 Loss 获得 dQ",
+        "② 取回本层保存的输入和权重",
+        "反向从 W_QB 经 RMSNorm 回到 W_QA"
+      ],
+      "spoken": "原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。",
+      "slide_id": "s16-backward-checkpoint-4",
+      "notes": "对应 Word：三.Backward 1–2 五步与顺序。\n段落索引（从 0 起）：[196, 214]。\n讲述：原稿用 dZ 指末端梯度；此处聚焦 Query 子图，以 dQ 表示后续 Attention 已传回的梯度。整个模型的 Loss 不直接等于 Query 局部 Loss。\n点击顺序：\n1. 显示前向 X → W_QA → RMSNorm → W_QB → Q\n2. ① 从 Loss 获得 dQ\n3. ② 取回本层保存的输入和权重\n4. 反向从 W_QB 经 RMSNorm 回到 W_QA\n本页完成后再次点击切换下一页。",
+      "stage_cap": 4,
+      "page_no": 16
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "gradients",
+      "title": "每个 Linear 同时产生两种去向的 Gradient",
+      "section": "三.Backward 3–5 Weight / Input Gradient | Visual QA · Click 0/6",
+      "script_paragraphs": [
+        215,
+        234
+      ],
+      "clicks": [
+        "W_QB 收到 dQ",
+        "③ dW_QB = H′ᵀ dQ，向权重分支流动",
+        "④ dH′ = dQ W_QBᵀ，继续向前",
+        "RMSNorm 将 dH′ 转为 dH",
+        "W_QA 分支产生 dW_QA 与 dX",
+        "⑤ dX 继续传给前一模块"
+      ],
+      "spoken": "dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。",
+      "slide_id": "s17-gradients-checkpoint-0",
+      "notes": "对应 Word：三.Backward 3–5 Weight / Input Gradient。\n段落索引（从 0 起）：[215, 234]。\n讲述：dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。\n点击顺序：\n1. W_QB 收到 dQ\n2. ③ dW_QB = H′ᵀ dQ，向权重分支流动\n3. ④ dH′ = dQ W_QBᵀ，继续向前\n4. RMSNorm 将 dH′ 转为 dH\n5. W_QA 分支产生 dW_QA 与 dX\n6. ⑤ dX 继续传给前一模块\n本页完成后再次点击切换下一页。",
+      "stage_cap": 0,
+      "page_no": 17
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "gradients",
+      "title": "每个 Linear 同时产生两种去向的 Gradient",
+      "section": "三.Backward 3–5 Weight / Input Gradient | Visual QA · Click 1/6",
+      "script_paragraphs": [
+        215,
+        234
+      ],
+      "clicks": [
+        "W_QB 收到 dQ",
+        "③ dW_QB = H′ᵀ dQ，向权重分支流动",
+        "④ dH′ = dQ W_QBᵀ，继续向前",
+        "RMSNorm 将 dH′ 转为 dH",
+        "W_QA 分支产生 dW_QA 与 dX",
+        "⑤ dX 继续传给前一模块"
+      ],
+      "spoken": "dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。",
+      "slide_id": "s17-gradients-checkpoint-1",
+      "notes": "对应 Word：三.Backward 3–5 Weight / Input Gradient。\n段落索引（从 0 起）：[215, 234]。\n讲述：dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。\n点击顺序：\n1. W_QB 收到 dQ\n2. ③ dW_QB = H′ᵀ dQ，向权重分支流动\n3. ④ dH′ = dQ W_QBᵀ，继续向前\n4. RMSNorm 将 dH′ 转为 dH\n5. W_QA 分支产生 dW_QA 与 dX\n6. ⑤ dX 继续传给前一模块\n本页完成后再次点击切换下一页。",
+      "stage_cap": 1,
+      "page_no": 17
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "gradients",
+      "title": "每个 Linear 同时产生两种去向的 Gradient",
+      "section": "三.Backward 3–5 Weight / Input Gradient | Visual QA · Click 2/6",
+      "script_paragraphs": [
+        215,
+        234
+      ],
+      "clicks": [
+        "W_QB 收到 dQ",
+        "③ dW_QB = H′ᵀ dQ，向权重分支流动",
+        "④ dH′ = dQ W_QBᵀ，继续向前",
+        "RMSNorm 将 dH′ 转为 dH",
+        "W_QA 分支产生 dW_QA 与 dX",
+        "⑤ dX 继续传给前一模块"
+      ],
+      "spoken": "dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。",
+      "slide_id": "s17-gradients-checkpoint-2",
+      "notes": "对应 Word：三.Backward 3–5 Weight / Input Gradient。\n段落索引（从 0 起）：[215, 234]。\n讲述：dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。\n点击顺序：\n1. W_QB 收到 dQ\n2. ③ dW_QB = H′ᵀ dQ，向权重分支流动\n3. ④ dH′ = dQ W_QBᵀ，继续向前\n4. RMSNorm 将 dH′ 转为 dH\n5. W_QA 分支产生 dW_QA 与 dX\n6. ⑤ dX 继续传给前一模块\n本页完成后再次点击切换下一页。",
+      "stage_cap": 2,
+      "page_no": 17
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "gradients",
+      "title": "每个 Linear 同时产生两种去向的 Gradient",
+      "section": "三.Backward 3–5 Weight / Input Gradient | Visual QA · Click 3/6",
+      "script_paragraphs": [
+        215,
+        234
+      ],
+      "clicks": [
+        "W_QB 收到 dQ",
+        "③ dW_QB = H′ᵀ dQ，向权重分支流动",
+        "④ dH′ = dQ W_QBᵀ，继续向前",
+        "RMSNorm 将 dH′ 转为 dH",
+        "W_QA 分支产生 dW_QA 与 dX",
+        "⑤ dX 继续传给前一模块"
+      ],
+      "spoken": "dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。",
+      "slide_id": "s17-gradients-checkpoint-3",
+      "notes": "对应 Word：三.Backward 3–5 Weight / Input Gradient。\n段落索引（从 0 起）：[215, 234]。\n讲述：dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。\n点击顺序：\n1. W_QB 收到 dQ\n2. ③ dW_QB = H′ᵀ dQ，向权重分支流动\n3. ④ dH′ = dQ W_QBᵀ，继续向前\n4. RMSNorm 将 dH′ 转为 dH\n5. W_QA 分支产生 dW_QA 与 dX\n6. ⑤ dX 继续传给前一模块\n本页完成后再次点击切换下一页。",
+      "stage_cap": 3,
+      "page_no": 17
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "gradients",
+      "title": "每个 Linear 同时产生两种去向的 Gradient",
+      "section": "三.Backward 3–5 Weight / Input Gradient | Visual QA · Click 4/6",
+      "script_paragraphs": [
+        215,
+        234
+      ],
+      "clicks": [
+        "W_QB 收到 dQ",
+        "③ dW_QB = H′ᵀ dQ，向权重分支流动",
+        "④ dH′ = dQ W_QBᵀ，继续向前",
+        "RMSNorm 将 dH′ 转为 dH",
+        "W_QA 分支产生 dW_QA 与 dX",
+        "⑤ dX 继续传给前一模块"
+      ],
+      "spoken": "dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。",
+      "slide_id": "s17-gradients-checkpoint-4",
+      "notes": "对应 Word：三.Backward 3–5 Weight / Input Gradient。\n段落索引（从 0 起）：[215, 234]。\n讲述：dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。\n点击顺序：\n1. W_QB 收到 dQ\n2. ③ dW_QB = H′ᵀ dQ，向权重分支流动\n3. ④ dH′ = dQ W_QBᵀ，继续向前\n4. RMSNorm 将 dH′ 转为 dH\n5. W_QA 分支产生 dW_QA 与 dX\n6. ⑤ dX 继续传给前一模块\n本页完成后再次点击切换下一页。",
+      "stage_cap": 4,
+      "page_no": 17
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "gradients",
+      "title": "每个 Linear 同时产生两种去向的 Gradient",
+      "section": "三.Backward 3–5 Weight / Input Gradient | Visual QA · Click 5/6",
+      "script_paragraphs": [
+        215,
+        234
+      ],
+      "clicks": [
+        "W_QB 收到 dQ",
+        "③ dW_QB = H′ᵀ dQ，向权重分支流动",
+        "④ dH′ = dQ W_QBᵀ，继续向前",
+        "RMSNorm 将 dH′ 转为 dH",
+        "W_QA 分支产生 dW_QA 与 dX",
+        "⑤ dX 继续传给前一模块"
+      ],
+      "spoken": "dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。",
+      "slide_id": "s17-gradients-checkpoint-5",
+      "notes": "对应 Word：三.Backward 3–5 Weight / Input Gradient。\n段落索引（从 0 起）：[215, 234]。\n讲述：dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。\n点击顺序：\n1. W_QB 收到 dQ\n2. ③ dW_QB = H′ᵀ dQ，向权重分支流动\n3. ④ dH′ = dQ W_QBᵀ，继续向前\n4. RMSNorm 将 dH′ 转为 dH\n5. W_QA 分支产生 dW_QA 与 dX\n6. ⑤ dX 继续传给前一模块\n本页完成后再次点击切换下一页。",
+      "stage_cap": 5,
+      "page_no": 17
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "gradients",
+      "title": "每个 Linear 同时产生两种去向的 Gradient",
+      "section": "三.Backward 3–5 Weight / Input Gradient | Visual QA · Click 6/6",
+      "script_paragraphs": [
+        215,
+        234
+      ],
+      "clicks": [
+        "W_QB 收到 dQ",
+        "③ dW_QB = H′ᵀ dQ，向权重分支流动",
+        "④ dH′ = dQ W_QBᵀ，继续向前",
+        "RMSNorm 将 dH′ 转为 dH",
+        "W_QA 分支产生 dW_QA 与 dX",
+        "⑤ dX 继续传给前一模块"
+      ],
+      "spoken": "dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。",
+      "slide_id": "s17-gradients-checkpoint-6",
+      "notes": "对应 Word：三.Backward 3–5 Weight / Input Gradient。\n段落索引（从 0 起）：[215, 234]。\n讲述：dW 使用洋红色，dX / 继续传播梯度使用橙色。输入形状、输出形状均列出。RMSNorm 反向必须经过，不是恒等；γ 的梯度未在主图展开，成本小计另排除。\n点击顺序：\n1. W_QB 收到 dQ\n2. ③ dW_QB = H′ᵀ dQ，向权重分支流动\n3. ④ dH′ = dQ W_QBᵀ，继续向前\n4. RMSNorm 将 dH′ 转为 dH\n5. W_QA 分支产生 dW_QA 与 dX\n6. ⑤ dX 继续传给前一模块\n本页完成后再次点击切换下一页。",
+      "stage_cap": 6,
+      "page_no": 17
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "roofline",
+      "title": "Roofline：两条上限，共同限定可达性能",
+      "section": "四.1–3 概念与屋顶线 | Visual QA · Click 0/5",
+      "script_paragraphs": [
+        243,
+        266
+      ],
+      "clicks": [
+        "只显示 Arithmetic Intensity 与 Performance 坐标轴",
+        "绘制 Memory Bandwidth Limit：AI × BW",
+        "加入 Peak Compute 水平线",
+        "标出 Ridge Point = Peak / BW",
+        "标注 Memory-bound 与 Compute-bound"
+      ],
+      "spoken": "双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。",
+      "slide_id": "s19-roofline-checkpoint-0",
+      "notes": "对应 Word：四.1–3 概念与屋顶线。\n段落索引（从 0 起）：[243, 266]。\n讲述：双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。\n点击顺序：\n1. 只显示 Arithmetic Intensity 与 Performance 坐标轴\n2. 绘制 Memory Bandwidth Limit：AI × BW\n3. 加入 Peak Compute 水平线\n4. 标出 Ridge Point = Peak / BW\n5. 标注 Memory-bound 与 Compute-bound\n本页完成后再次点击切换下一页。",
+      "stage_cap": 0,
+      "page_no": 19
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "roofline",
+      "title": "Roofline：两条上限，共同限定可达性能",
+      "section": "四.1–3 概念与屋顶线 | Visual QA · Click 1/5",
+      "script_paragraphs": [
+        243,
+        266
+      ],
+      "clicks": [
+        "只显示 Arithmetic Intensity 与 Performance 坐标轴",
+        "绘制 Memory Bandwidth Limit：AI × BW",
+        "加入 Peak Compute 水平线",
+        "标出 Ridge Point = Peak / BW",
+        "标注 Memory-bound 与 Compute-bound"
+      ],
+      "spoken": "双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。",
+      "slide_id": "s19-roofline-checkpoint-1",
+      "notes": "对应 Word：四.1–3 概念与屋顶线。\n段落索引（从 0 起）：[243, 266]。\n讲述：双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。\n点击顺序：\n1. 只显示 Arithmetic Intensity 与 Performance 坐标轴\n2. 绘制 Memory Bandwidth Limit：AI × BW\n3. 加入 Peak Compute 水平线\n4. 标出 Ridge Point = Peak / BW\n5. 标注 Memory-bound 与 Compute-bound\n本页完成后再次点击切换下一页。",
+      "stage_cap": 1,
+      "page_no": 19
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "roofline",
+      "title": "Roofline：两条上限，共同限定可达性能",
+      "section": "四.1–3 概念与屋顶线 | Visual QA · Click 2/5",
+      "script_paragraphs": [
+        243,
+        266
+      ],
+      "clicks": [
+        "只显示 Arithmetic Intensity 与 Performance 坐标轴",
+        "绘制 Memory Bandwidth Limit：AI × BW",
+        "加入 Peak Compute 水平线",
+        "标出 Ridge Point = Peak / BW",
+        "标注 Memory-bound 与 Compute-bound"
+      ],
+      "spoken": "双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。",
+      "slide_id": "s19-roofline-checkpoint-2",
+      "notes": "对应 Word：四.1–3 概念与屋顶线。\n段落索引（从 0 起）：[243, 266]。\n讲述：双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。\n点击顺序：\n1. 只显示 Arithmetic Intensity 与 Performance 坐标轴\n2. 绘制 Memory Bandwidth Limit：AI × BW\n3. 加入 Peak Compute 水平线\n4. 标出 Ridge Point = Peak / BW\n5. 标注 Memory-bound 与 Compute-bound\n本页完成后再次点击切换下一页。",
+      "stage_cap": 2,
+      "page_no": 19
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "roofline",
+      "title": "Roofline：两条上限，共同限定可达性能",
+      "section": "四.1–3 概念与屋顶线 | Visual QA · Click 3/5",
+      "script_paragraphs": [
+        243,
+        266
+      ],
+      "clicks": [
+        "只显示 Arithmetic Intensity 与 Performance 坐标轴",
+        "绘制 Memory Bandwidth Limit：AI × BW",
+        "加入 Peak Compute 水平线",
+        "标出 Ridge Point = Peak / BW",
+        "标注 Memory-bound 与 Compute-bound"
+      ],
+      "spoken": "双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。",
+      "slide_id": "s19-roofline-checkpoint-3",
+      "notes": "对应 Word：四.1–3 概念与屋顶线。\n段落索引（从 0 起）：[243, 266]。\n讲述：双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。\n点击顺序：\n1. 只显示 Arithmetic Intensity 与 Performance 坐标轴\n2. 绘制 Memory Bandwidth Limit：AI × BW\n3. 加入 Peak Compute 水平线\n4. 标出 Ridge Point = Peak / BW\n5. 标注 Memory-bound 与 Compute-bound\n本页完成后再次点击切换下一页。",
+      "stage_cap": 3,
+      "page_no": 19
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "roofline",
+      "title": "Roofline：两条上限，共同限定可达性能",
+      "section": "四.1–3 概念与屋顶线 | Visual QA · Click 4/5",
+      "script_paragraphs": [
+        243,
+        266
+      ],
+      "clicks": [
+        "只显示 Arithmetic Intensity 与 Performance 坐标轴",
+        "绘制 Memory Bandwidth Limit：AI × BW",
+        "加入 Peak Compute 水平线",
+        "标出 Ridge Point = Peak / BW",
+        "标注 Memory-bound 与 Compute-bound"
+      ],
+      "spoken": "双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。",
+      "slide_id": "s19-roofline-checkpoint-4",
+      "notes": "对应 Word：四.1–3 概念与屋顶线。\n段落索引（从 0 起）：[243, 266]。\n讲述：双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。\n点击顺序：\n1. 只显示 Arithmetic Intensity 与 Performance 坐标轴\n2. 绘制 Memory Bandwidth Limit：AI × BW\n3. 加入 Peak Compute 水平线\n4. 标出 Ridge Point = Peak / BW\n5. 标注 Memory-bound 与 Compute-bound\n本页完成后再次点击切换下一页。",
+      "stage_cap": 4,
+      "page_no": 19
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "roofline",
+      "title": "Roofline：两条上限，共同限定可达性能",
+      "section": "四.1–3 概念与屋顶线 | Visual QA · Click 5/5",
+      "script_paragraphs": [
+        243,
+        266
+      ],
+      "clicks": [
+        "只显示 Arithmetic Intensity 与 Performance 坐标轴",
+        "绘制 Memory Bandwidth Limit：AI × BW",
+        "加入 Peak Compute 水平线",
+        "标出 Ridge Point = Peak / BW",
+        "标注 Memory-bound 与 Compute-bound"
+      ],
+      "spoken": "双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。",
+      "slide_id": "s19-roofline-checkpoint-5",
+      "notes": "对应 Word：四.1–3 概念与屋顶线。\n段落索引（从 0 起）：[243, 266]。\n讲述：双对数坐标。斜线与水平线的较小值构成屋顶；点的纵坐标是模型给出的性能上界，不是实测。H100 SXM BF16 Dense 989 TFLOP/s，3.35 TB/s。\n点击顺序：\n1. 只显示 Arithmetic Intensity 与 Performance 坐标轴\n2. 绘制 Memory Bandwidth Limit：AI × BW\n3. 加入 Peak Compute 水平线\n4. 标出 Ridge Point = Peak / BW\n5. 标注 Memory-bound 与 Compute-bound\n本页完成后再次点击切换下一页。",
+      "stage_cap": 5,
+      "page_no": 19
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "mfu",
+      "title": "MFU：把有效模型工作量与可用峰值放在同一尺度",
+      "section": "五.MFU 基本公式与示例 | Visual QA · Click 0/3",
+      "script_paragraphs": [
+        286,
+        320
+      ],
+      "clicks": [
+        "Useful FLOPs：100.6M × 60 GFLOPs = 6.036 EFLOPs",
+        "Total Peak：2048 × 989.5 TFLOP/s = 2.026496 EFLOP/s",
+        "Available FLOPs：乘 6 s；进度条自动在约 0.9 秒内填到 49.6%"
+      ],
+      "spoken": "Illustrative Example / Not Measured。报告 batch 100.6M tokens；60 GFLOPs/token、2048 GPUs 和 6 s 均为假设；989.5 为示例硬件规格。60 GFLOPs 不是已验证的全模型训练值。MFU 分子不计额外激活重计算；更高 MFU 不自动表示质量更高或总成本更低。",
+      "slide_id": "s21-mfu-checkpoint-0",
+      "notes": "对应 Word：五.MFU 基本公式与示例。\n段落索引（从 0 起）：[286, 320]。\n讲述：Illustrative Example / Not Measured。报告 batch 100.6M tokens；60 GFLOPs/token、2048 GPUs 和 6 s 均为假设；989.5 为示例硬件规格。60 GFLOPs 不是已验证的全模型训练值。MFU 分子不计额外激活重计算；更高 MFU 不自动表示质量更高或总成本更低。\n点击顺序：\n1. Useful FLOPs：100.6M × 60 GFLOPs = 6.036 EFLOPs\n2. Total Peak：2048 × 989.5 TFLOP/s = 2.026496 EFLOP/s\n3. Available FLOPs：乘 6 s；进度条自动在约 0.9 秒内填到 49.6%\n本页完成后再次点击切换下一页。",
+      "stage_cap": 0,
+      "page_no": 21
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "mfu",
+      "title": "MFU：把有效模型工作量与可用峰值放在同一尺度",
+      "section": "五.MFU 基本公式与示例 | Visual QA · Click 1/3",
+      "script_paragraphs": [
+        286,
+        320
+      ],
+      "clicks": [
+        "Useful FLOPs：100.6M × 60 GFLOPs = 6.036 EFLOPs",
+        "Total Peak：2048 × 989.5 TFLOP/s = 2.026496 EFLOP/s",
+        "Available FLOPs：乘 6 s；进度条自动在约 0.9 秒内填到 49.6%"
+      ],
+      "spoken": "Illustrative Example / Not Measured。报告 batch 100.6M tokens；60 GFLOPs/token、2048 GPUs 和 6 s 均为假设；989.5 为示例硬件规格。60 GFLOPs 不是已验证的全模型训练值。MFU 分子不计额外激活重计算；更高 MFU 不自动表示质量更高或总成本更低。",
+      "slide_id": "s21-mfu-checkpoint-1",
+      "notes": "对应 Word：五.MFU 基本公式与示例。\n段落索引（从 0 起）：[286, 320]。\n讲述：Illustrative Example / Not Measured。报告 batch 100.6M tokens；60 GFLOPs/token、2048 GPUs 和 6 s 均为假设；989.5 为示例硬件规格。60 GFLOPs 不是已验证的全模型训练值。MFU 分子不计额外激活重计算；更高 MFU 不自动表示质量更高或总成本更低。\n点击顺序：\n1. Useful FLOPs：100.6M × 60 GFLOPs = 6.036 EFLOPs\n2. Total Peak：2048 × 989.5 TFLOP/s = 2.026496 EFLOP/s\n3. Available FLOPs：乘 6 s；进度条自动在约 0.9 秒内填到 49.6%\n本页完成后再次点击切换下一页。",
+      "stage_cap": 1,
+      "page_no": 21
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "mfu",
+      "title": "MFU：把有效模型工作量与可用峰值放在同一尺度",
+      "section": "五.MFU 基本公式与示例 | Visual QA · Click 2/3",
+      "script_paragraphs": [
+        286,
+        320
+      ],
+      "clicks": [
+        "Useful FLOPs：100.6M × 60 GFLOPs = 6.036 EFLOPs",
+        "Total Peak：2048 × 989.5 TFLOP/s = 2.026496 EFLOP/s",
+        "Available FLOPs：乘 6 s；进度条自动在约 0.9 秒内填到 49.6%"
+      ],
+      "spoken": "Illustrative Example / Not Measured。报告 batch 100.6M tokens；60 GFLOPs/token、2048 GPUs 和 6 s 均为假设；989.5 为示例硬件规格。60 GFLOPs 不是已验证的全模型训练值。MFU 分子不计额外激活重计算；更高 MFU 不自动表示质量更高或总成本更低。",
+      "slide_id": "s21-mfu-checkpoint-2",
+      "notes": "对应 Word：五.MFU 基本公式与示例。\n段落索引（从 0 起）：[286, 320]。\n讲述：Illustrative Example / Not Measured。报告 batch 100.6M tokens；60 GFLOPs/token、2048 GPUs 和 6 s 均为假设；989.5 为示例硬件规格。60 GFLOPs 不是已验证的全模型训练值。MFU 分子不计额外激活重计算；更高 MFU 不自动表示质量更高或总成本更低。\n点击顺序：\n1. Useful FLOPs：100.6M × 60 GFLOPs = 6.036 EFLOPs\n2. Total Peak：2048 × 989.5 TFLOP/s = 2.026496 EFLOP/s\n3. Available FLOPs：乘 6 s；进度条自动在约 0.9 秒内填到 49.6%\n本页完成后再次点击切换下一页。",
+      "stage_cap": 2,
+      "page_no": 21
+    },
+    {
+      "type": "content",
+      "role": "evidence",
+      "variant": "standard",
+      "math_scene": "mfu",
+      "title": "MFU：把有效模型工作量与可用峰值放在同一尺度",
+      "section": "五.MFU 基本公式与示例 | Visual QA · Click 3/3",
+      "script_paragraphs": [
+        286,
+        320
+      ],
+      "clicks": [
+        "Useful FLOPs：100.6M × 60 GFLOPs = 6.036 EFLOPs",
+        "Total Peak：2048 × 989.5 TFLOP/s = 2.026496 EFLOP/s",
+        "Available FLOPs：乘 6 s；进度条自动在约 0.9 秒内填到 49.6%"
+      ],
+      "spoken": "Illustrative Example / Not Measured。报告 batch 100.6M tokens；60 GFLOPs/token、2048 GPUs 和 6 s 均为假设；989.5 为示例硬件规格。60 GFLOPs 不是已验证的全模型训练值。MFU 分子不计额外激活重计算；更高 MFU 不自动表示质量更高或总成本更低。",
+      "slide_id": "s21-mfu-checkpoint-3",
+      "notes": "对应 Word：五.MFU 基本公式与示例。\n段落索引（从 0 起）：[286, 320]。\n讲述：Illustrative Example / Not Measured。报告 batch 100.6M tokens；60 GFLOPs/token、2048 GPUs 和 6 s 均为假设；989.5 为示例硬件规格。60 GFLOPs 不是已验证的全模型训练值。MFU 分子不计额外激活重计算；更高 MFU 不自动表示质量更高或总成本更低。\n点击顺序：\n1. Useful FLOPs：100.6M × 60 GFLOPs = 6.036 EFLOPs\n2. Total Peak：2048 × 989.5 TFLOP/s = 2.026496 EFLOP/s\n3. Available FLOPs：乘 6 s；进度条自动在约 0.9 秒内填到 49.6%\n本页完成后再次点击切换下一页。",
+      "stage_cap": 3,
+      "page_no": 21
+    }
+  ]
+}

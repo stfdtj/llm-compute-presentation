@@ -1,0 +1,1416 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" agent="OpenAI model.py grounded architecture" version="24.7.17" type="device">
+  <diagram id="deepseek43" name="DeepSeek V4.1 Flash | 43-Layer Source-Aligned Flow">
+    <mxGraphModel dx="2400" dy="1300" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2980" pageHeight="11495" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="cell1" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0F6FF;strokeColor=#C4D8F4;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=73;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="867" width="960" height="4499" as="geometry"/>
+        </mxCell>
+        <mxCell id="text2" value="ENCODER — 20 consecutive backbone layers" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=27;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1033" y="874" width="916" height="39" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell3" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0F6FF;strokeColor=#C4D8F4;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=73;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="5398" width="960" height="4243" as="geometry"/>
+        </mxCell>
+        <mxCell id="text4" value="DECODER — 20 consecutive backbone layers" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=27;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1033" y="5405" width="916" height="39" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell5" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=73;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="10128" width="960" height="1139" as="geometry"/>
+        </mxCell>
+        <mxCell id="text6" value="DRAFT — 3 additional stages (separate speculative entry)" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=27;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1033" y="10135" width="916" height="39" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell7" value="&lt;b&gt;DeepSeek V4.1 Flash  |  Complete 43-Stage Architecture&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#183A5E;strokeColor=#183A5E;strokeWidth=2;fontColor=#FFFFFF;fontFamily=Arial;fontSize=37;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="150" y="38" width="2680" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell8" value="&lt;b&gt;ONE continuous 40-layer Transformer backbone • 1024-token prefill example • 3 connected draft stages shown after the main output&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFFFFF;strokeColor=#AFBCCB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=25;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="170" y="174" width="2640" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="text9" value="Follow the BLUE central path top → bottom. Side lanes supply memory, gates, and indices; they are not extra Transformer layers." style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=23;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="150" y="280" width="2680" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell10" value="&lt;b&gt;Hidden state / backbone&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="110" y="357" width="374" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell11" value="&lt;b&gt;HC mixing&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF0D8;strokeColor=#D9A144;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="506" y="357" width="374" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell12" value="&lt;b&gt;Local KV&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="902" y="357" width="374" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell13" value="&lt;b&gt;Shared compressed KV&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1298" y="357" width="374" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell14" value="&lt;b&gt;Index / Top-k&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1694" y="357" width="374" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell15" value="&lt;b&gt;Engram&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0E9FF;strokeColor=#7F54BA;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2090" y="357" width="374" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell16" value="&lt;b&gt;Draft&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2486" y="357" width="374" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell17" value="&lt;b&gt;1024 input token IDs   [1, 1024]&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFFFFF;strokeColor=#AFBCCB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=24;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="457" width="860" height="73" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell18" value="&lt;b&gt;Token Embeddings   [1, 1024, 5120]&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=25;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="568" width="860" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell19" value="&lt;b&gt;Replicate into 4 HC streams   [1, 1024, 4, 5120]&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF0D8;strokeColor=#D9A144;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=25;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="697" width="860" height="92" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell17" target="cell18">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell18" target="cell19">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell22" value="N-gram position preparation (text IDs)&lt;br&gt;Normalize + compressed IDs → 2/3/4-grams&lt;br&gt;24 hash addresses per token, for Layers 1 and 14" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0E9FF;strokeColor=#7F54BA;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="485" width="740" height="160" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge23" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7F54BA;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell17" target="cell22">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell24" value="Initial HC input weights&lt;br&gt;[1, 0, 0, 0] for every position&lt;br&gt;Next-layer mixing weights travel with the 4 streams" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF0D8;strokeColor=#D9A144;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="630" width="740" height="146" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge25" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D9A144;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell24" target="cell19">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell26" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="935" width="860" height="442" as="geometry"/>
+        </mxCell>
+        <mxCell id="text27" value="LAYER 00   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="948" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell28" value="&lt;b&gt;Collapse 4 HC streams with incoming Pre • normalize&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF0D8;strokeColor=#D9A144;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="999.0" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell29" value="Build Q (5120→1280→64×512) and own Local KV (512)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1071.8" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell30" value="Causal 128-token window → attention-weighted output" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1144.6" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell31" value="Inverse RoPE • grouped output projection → 5120" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1217.4" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell32" value="HC Post + Comb → MoE (6 routed + 1 shared) → HC Post" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1290.2" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge33" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell28" target="cell29">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell29" target="cell30">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge35" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell30" target="cell31">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge36" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell31" target="cell32">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell37" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0E9FF;strokeColor=#7F54BA;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="1405" width="860" height="310" as="geometry"/>
+        </mxCell>
+        <mxCell id="text38" value="LAYER 01   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="1418" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell39" value="&lt;b&gt;Inject Engram gate × retrieved value into all 4 streams&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0E9FF;strokeColor=#7F54BA;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1469.0" width="784" height="71.33333333333333" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell40" value="HC Pre → normalize → LOCAL attention (window 128)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1546.3333333333333" width="784" height="71.33333333333333" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell41" value="HC Post → 6 routed + 1 shared expert → 4 streams" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1623.6666666666667" width="784" height="71.33333333333333" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge42" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell39" target="cell40">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge43" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell40" target="cell41">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell44" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="1743" width="860" height="442" as="geometry"/>
+        </mxCell>
+        <mxCell id="text45" value="LAYER 02   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="1756" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell46" value="&lt;b&gt;Own Q and Local KV; read window of 128&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1807.0" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell47" value="2:1 gated compression → 512 shared positions" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1879.8" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell48" value="Index keys + scores → select up to 512 positions" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="1952.6" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell49" value="One sparse attention over Local + selected Shared KV" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="2025.4" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell50" value="Output projection → HC Post → MoE → HC Post" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="2098.2" width="784" height="66.8" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge51" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell46" target="cell47">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge52" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell47" target="cell48">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge53" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell48" target="cell49">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge54" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell49" target="cell50">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell55" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="2213" width="860" height="335" as="geometry"/>
+        </mxCell>
+        <mxCell id="text56" value="LAYER 03   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="2226" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell57" value="&lt;b&gt;Own Q and Local KV; no new compressed KV&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="2277.0" width="784" height="58.25" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell58" value="Read shared 2:1 KV produced by Layer 2" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="2341.25" width="784" height="58.25" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell59" value="Reuse selected compressed positions from Layer 2" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="2405.5" width="784" height="58.25" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell60" value="One sparse attention → HC / MoE update" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="2469.75" width="784" height="58.25" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge61" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell57" target="cell58">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge62" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell58" target="cell59">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge63" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell59" target="cell60">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell64" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="2576" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text65" value="LAYER 04   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="2589" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text66" value="Own Local KV • shared KV from L2 • selected positions from L2" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="2630" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell67" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="2730" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text68" value="LAYER 05   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="2743" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text69" value="Own Local KV • shared KV from L2 • selected positions from L2" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="2784" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell70" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="2884" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text71" value="LAYER 06   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="2897" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text72" value="Own Local KV • shared KV from L2 • selected positions from L2" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="2938" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell73" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="3038" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text74" value="LAYER 07   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="3051" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text75" value="Own Local KV • shared KV from L2 • selected positions from L2" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="3092" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell76" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="3192" width="860" height="230" as="geometry"/>
+        </mxCell>
+        <mxCell id="text77" value="LAYER 08   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="3205" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell78" value="&lt;b&gt;New 2:1 shared KV replaces the prior shared source&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="3256.0" width="784" height="70.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell79" value="Recompute Index Keys and Top-k for the new source" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="3332.0" width="784" height="70.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge80" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell78" target="cell79">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell81" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="3450" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text82" value="LAYER 09   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="3463" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text83" value="Own Local KV • shared KV from L8 • selected positions from L8" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="3504" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell84" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="3604" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text85" value="LAYER 10   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="3617" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text86" value="Own Local KV • shared KV from L8 • selected positions from L8" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="3658" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell87" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="3758" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text88" value="LAYER 11   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="3771" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text89" value="Own Local KV • shared KV from L8 • selected positions from L8" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="3812" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell90" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="3912" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text91" value="LAYER 12   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="3925" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text92" value="Own Local KV • shared KV from L8 • selected positions from L8" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="3966" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell93" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="4066" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text94" value="LAYER 13   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="4079" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text95" value="Own Local KV • shared KV from L8 • selected positions from L8" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="4120" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell96" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0E9FF;strokeColor=#7F54BA;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="4220" width="860" height="336" as="geometry"/>
+        </mxCell>
+        <mxCell id="text97" value="LAYER 14   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="4233" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell98" value="&lt;b&gt;Engram injects n-gram value BEFORE this layer&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0E9FF;strokeColor=#7F54BA;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="4284.0" width="784" height="80.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell99" value="Generate new 2:1 shared KV + index positions" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="4370.0" width="784" height="80.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell100" value="Local + shared attention → HC / MoE" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="4456.0" width="784" height="80.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge101" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell98" target="cell99">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge102" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell99" target="cell100">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell103" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="4584" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text104" value="LAYER 15   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="4597" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text105" value="Own Local KV • shared KV from L14 • selected positions from L14" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="4638" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell106" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="4738" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text107" value="LAYER 16   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="4751" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text108" value="Own Local KV • shared KV from L14 • selected positions from L14" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="4792" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell109" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="4892" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text110" value="LAYER 17   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="4905" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text111" value="Own Local KV • shared KV from L14 • selected positions from L14" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="4946" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell112" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="5046" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text113" value="LAYER 18   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="5059" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text114" value="Own Local KV • shared KV from L14 • selected positions from L14" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="5100" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell115" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="5200" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text116" value="LAYER 19   ENCODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="5213" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text117" value="Own Local KV • shared KV from L14 • selected positions from L14" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="5254" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell118" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="5466" width="860" height="520" as="geometry"/>
+        </mxCell>
+        <mxCell id="text119" value="LAYER 20   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="5479" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell120" value="&lt;b&gt;Continue HC stream from Layer 19; no new embedding&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF0D8;strokeColor=#D9A144;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="5530.0" width="784" height="67.66666666666667" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell121" value="Own Q + Local KV for causal window 128" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="5603.666666666667" width="784" height="67.66666666666667" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell122" value="Refresh shared KV with 1:1 projection (no 2:1 pooling)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="5677.333333333333" width="784" height="67.66666666666667" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell123" value="Write index keys; preselect 8-position candidate blocks" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="5751.0" width="784" height="67.66666666666667" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell124" value="Choose compressed positions → ONE sparse attention" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="5824.666666666667" width="784" height="67.66666666666667" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell125" value="Output projection → HC Post → MoE → HC Post" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="5898.333333333333" width="784" height="67.66666666666667" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge126" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell120" target="cell121">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge127" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell121" target="cell122">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge128" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell122" target="cell123">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge129" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell123" target="cell124">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge130" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell124" target="cell125">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell131" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="6014" width="860" height="345" as="geometry"/>
+        </mxCell>
+        <mxCell id="text132" value="LAYER 21   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="6027" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell133" value="&lt;b&gt;Own Q and Local KV (not reused from Layer 20)&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="6078.0" width="784" height="60.75" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell134" value="Read Layer 20 shared KV and its Index Keys" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="6144.75" width="784" height="60.75" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell135" value="Reuse Layer 20 selected positions and candidate mask" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="6211.5" width="784" height="60.75" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell136" value="One sparse attention → HC → MoE → next layer" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="6278.25" width="784" height="60.75" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge137" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell133" target="cell134">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge138" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell134" target="cell135">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge139" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell135" target="cell136">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell140" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="6387" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text141" value="LAYER 22   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="6400" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text142" value="Own Local KV • shared KV from L20 • selected positions from L20" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="6441" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell143" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="6541" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text144" value="LAYER 23   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="6554" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text145" value="Own Local KV • shared KV from L20 • selected positions from L20" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="6595" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell146" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="6695" width="860" height="248" as="geometry"/>
+        </mxCell>
+        <mxCell id="text147" value="LAYER 24   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="6708" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell148" value="&lt;b&gt;Keep Layer 20 compressed KV and index keys&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="6759.0" width="784" height="79.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell149" value="Rescore within Layer 20 candidate blocks → new Top-k" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="6844.0" width="784" height="79.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge150" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell148" target="cell149">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell151" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="6971" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text152" value="LAYER 25   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="6984" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text153" value="Own Local KV • shared KV from L20 • selected positions from L24" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="7025" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell154" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="7125" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text155" value="LAYER 26   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="7138" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text156" value="Own Local KV • shared KV from L20 • selected positions from L24" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="7179" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell157" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="7279" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text158" value="LAYER 27   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="7292" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text159" value="Own Local KV • shared KV from L20 • selected positions from L24" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="7333" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell160" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="7433" width="860" height="198" as="geometry"/>
+        </mxCell>
+        <mxCell id="text161" value="LAYER 28   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="7446" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell162" value="&lt;b&gt;Keep Layer 20 compressed KV&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="7497.0" width="784" height="54.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell163" value="Recompute Top-k inside shared candidate blocks" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="7557.0" width="784" height="54.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge164" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell162" target="cell163">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell165" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="7659" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text166" value="LAYER 29   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="7672" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text167" value="Own Local KV • shared KV from L20 • selected positions from L28" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="7713" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell168" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="7813" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text169" value="LAYER 30   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="7826" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text170" value="Own Local KV • shared KV from L20 • selected positions from L28" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="7867" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell171" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="7967" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text172" value="LAYER 31   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="7980" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text173" value="Own Local KV • shared KV from L20 • selected positions from L28" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="8021" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell174" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="8121" width="860" height="198" as="geometry"/>
+        </mxCell>
+        <mxCell id="text175" value="LAYER 32   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="8134" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell176" value="&lt;b&gt;Keep Layer 20 compressed KV&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="8185.0" width="784" height="54.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell177" value="Recompute Top-k inside shared candidate blocks" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="8245.0" width="784" height="54.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge178" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell176" target="cell177">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell179" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="8347" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text180" value="LAYER 33   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="8360" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text181" value="Own Local KV • shared KV from L20 • selected positions from L32" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="8401" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell182" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="8501" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text183" value="LAYER 34   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="8514" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text184" value="Own Local KV • shared KV from L20 • selected positions from L32" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="8555" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell185" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="8655" width="860" height="126" as="geometry"/>
+        </mxCell>
+        <mxCell id="text186" value="LAYER 35   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="8668" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="text187" value="Own Local KV • shared KV from L20 • selected positions from L32" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontColor=#17304C;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1082" y="8709" width="816" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell188" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="8809" width="860" height="198" as="geometry"/>
+        </mxCell>
+        <mxCell id="text189" value="LAYER 36   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="8822" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell190" value="&lt;b&gt;Keep Layer 20 compressed KV&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="8873.0" width="784" height="54.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell191" value="Last Top-k refresh before Layers 37–39" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="8933.0" width="784" height="54.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge192" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell190" target="cell191">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell193" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="9035" width="860" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="text194" value="LAYER 37   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="9048" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell195" value="&lt;b&gt;Before this block: capture mean of 4 HC streams&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF0D8;strokeColor=#D9A144;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="9099.0" width="784" height="40.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell196" value="Own Q / Local + shared KV → HC and MoE" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="9145.0" width="784" height="40.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge197" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell195" target="cell196">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell198" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="9233" width="860" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="text199" value="LAYER 38   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="9246" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell200" value="&lt;b&gt;Before this block: capture mean of 4 HC streams&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF0D8;strokeColor=#D9A144;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="9297.0" width="784" height="40.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell201" value="Own Q / Local + shared KV → HC and MoE" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="9343.0" width="784" height="40.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge202" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell200" target="cell201">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell203" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7F0FE;strokeColor=#3678C8;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="9431" width="860" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="text204" value="LAYER 39   DECODER" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="9444" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell205" value="&lt;b&gt;Before this block: capture mean of 4 HC streams&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF0D8;strokeColor=#D9A144;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="9495.0" width="784" height="40.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell206" value="Own Q / Local + shared KV → HC and MoE" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="9541.0" width="784" height="40.0" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge207" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell205" target="cell206">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell208" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="10196" width="860" height="405" as="geometry"/>
+        </mxCell>
+        <mxCell id="text209" value="LAYER 40   DRAFT" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="10209" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell210" value="&lt;b&gt;Separate speculative decode call receives current token&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="10260.0" width="784" height="59.4" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell211" value="Concatenate captured L37–39 states → project to 5120" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="10325.4" width="784" height="59.4" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell212" value="Current token + 4 placeholders → length-5 draft input" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="10390.8" width="784" height="59.4" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell213" value="Draft local attention reads main-context window + drafts" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="10456.2" width="784" height="59.4" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell214" value="3 routed + 1 shared expert → pass updated draft streams" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="10521.6" width="784" height="59.4" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge215" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell210" target="cell211">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge216" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell211" target="cell212">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge217" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell212" target="cell213">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge218" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell213" target="cell214">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell219" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="10629" width="860" height="215" as="geometry"/>
+        </mxCell>
+        <mxCell id="text220" value="LAYER 41   DRAFT" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="10642" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell221" value="&lt;b&gt;Draft local attention with main-context KV&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="10693.0" width="784" height="62.5" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell222" value="Draft HC + MoE → continue draft streams" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="10761.5" width="784" height="62.5" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge223" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell221" target="cell222">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell224" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="10872" width="860" height="355" as="geometry"/>
+        </mxCell>
+        <mxCell id="text225" value="LAYER 42   DRAFT" style="text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#17304C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1074" y="10885" width="832" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell226" value="&lt;b&gt;Draft local attention + HC + MoE&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="10936.0" width="784" height="86.33333333333333" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell227" value="Shared output head + Markov correction + confidence" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="11028.333333333334" width="784" height="86.33333333333333" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell228" value="Produce 5 candidate tokens; acceptance external" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF4DE;strokeColor=#D09A3E;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1098" y="11120.666666666666" width="784" height="86.33333333333333" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge229" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell226" target="cell227">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge230" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell227" target="cell228">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge231" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell19" target="cell26">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge232" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell26" target="cell37">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge233" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell37" target="cell44">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge234" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell44" target="cell55">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge235" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell55" target="cell64">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge236" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell64" target="cell67">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge237" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell67" target="cell70">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge238" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell70" target="cell73">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge239" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell73" target="cell76">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge240" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell76" target="cell81">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge241" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell81" target="cell84">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge242" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell84" target="cell87">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge243" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell87" target="cell90">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge244" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell90" target="cell93">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge245" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell93" target="cell96">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge246" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell96" target="cell103">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge247" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell103" target="cell106">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge248" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell106" target="cell109">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge249" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell109" target="cell112">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge250" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell112" target="cell115">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge251" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell115" target="cell118">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge252" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell118" target="cell131">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge253" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell131" target="cell140">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge254" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell140" target="cell143">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge255" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell143" target="cell146">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge256" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell146" target="cell151">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge257" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell151" target="cell154">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge258" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell154" target="cell157">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge259" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell157" target="cell160">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge260" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell160" target="cell165">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge261" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell165" target="cell168">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge262" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell168" target="cell171">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge263" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell171" target="cell174">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge264" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell174" target="cell179">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge265" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell179" target="cell182">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge266" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell182" target="cell185">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge267" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell185" target="cell188">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge268" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell188" target="cell193">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge269" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell193" target="cell198">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge270" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell198" target="cell203">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell271" value="&lt;b&gt;Final HC collapse → RMS normalization → vocabulary head&lt;br&gt;Last position: [1,5120] → logits [1,129280] → next-token ID&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#183A5E;strokeColor=#183A5E;strokeWidth=2;fontColor=#FFFFFF;fontFamily=Arial;fontSize=24;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="9683" width="860" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge272" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3678C8;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell203" target="cell271">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell273" value="&lt;b&gt;SPECULATIVE GENERATION ENTRY — separate invocation&lt;br&gt;Main inference does not automatically execute Draft 40–42.&lt;br&gt;They are explicitly included in this complete pipeline.&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF4DE;strokeColor=#D09A3E;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=23;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="9921" width="860" height="151" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge274" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell271" target="cell273">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge275" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell273" target="cell208">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge276" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell208" target="cell219">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge277" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=4;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell219" target="cell224">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell278" value="Own Local KV • 128-position causal window&lt;br&gt;No compressed KV / Indexer at this layer" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=20;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="1104.0" width="740" height="104" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge279" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#168863;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell278" target="cell26">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell280" value="Own Local KV • 128-position causal window&lt;br&gt;No compressed KV / Indexer at this layer" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E3F7F0;strokeColor=#168863;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=20;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="1508.0" width="740" height="104" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge281" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#168863;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell280" target="cell37">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell282" value="&lt;b&gt;NEW SHARED KV • source L2&lt;br&gt;Ratio 2:1 • 1024 → 512 entries&lt;br&gt;Index Key created from pre-RoPE latent&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="1885.0" width="740" height="158" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge283" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=3;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell44" target="cell282">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell284" value="&lt;b&gt;INDEX REFRESH • L2&lt;br&gt;New Index Keys → Top-k positions&lt;br&gt;Index addresses, not attention output&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=20;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="1886.0" width="740" height="156" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge285" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell44" target="cell284">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge286" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell282" target="cell47">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge287" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell284" target="cell48">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell288" value="READ compressed KV from L2&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="2225" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge289" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell288" target="cell55">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell290" value="REUSE Top-k positions from L2&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="2225" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge291" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell290" target="cell55">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell292" value="READ compressed KV from L2&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="2588" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge293" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell292" target="cell64">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell294" value="REUSE Top-k positions from L2&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="2588" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge295" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell294" target="cell64">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell296" value="READ compressed KV from L2&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="2742" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge297" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell296" target="cell67">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell298" value="REUSE Top-k positions from L2&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="2742" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge299" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell298" target="cell67">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell300" value="READ compressed KV from L2&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="2896" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge301" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell300" target="cell70">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell302" value="REUSE Top-k positions from L2&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="2896" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge303" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell302" target="cell70">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell304" value="READ compressed KV from L2&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="3050" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge305" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell304" target="cell73">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell306" value="REUSE Top-k positions from L2&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="3050" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge307" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell306" target="cell73">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell308" value="&lt;b&gt;NEW SHARED KV • source L8&lt;br&gt;Ratio 2:1 • 1024 → 512 entries&lt;br&gt;Index Key created from pre-RoPE latent&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="3228.0" width="740" height="158" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge309" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=3;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell76" target="cell308">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell310" value="&lt;b&gt;INDEX REFRESH • L8&lt;br&gt;New Index Keys → Top-k positions&lt;br&gt;Index addresses, not attention output&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=20;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="3229.0" width="740" height="156" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge311" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell76" target="cell310">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge312" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell308" target="cell78">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge313" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell310" target="cell79">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell314" value="READ compressed KV from L8&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="3462" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge315" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell314" target="cell81">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell316" value="REUSE Top-k positions from L8&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="3462" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge317" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell316" target="cell81">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell318" value="READ compressed KV from L8&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="3616" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge319" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell318" target="cell84">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell320" value="REUSE Top-k positions from L8&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="3616" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge321" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell320" target="cell84">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell322" value="READ compressed KV from L8&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="3770" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge323" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell322" target="cell87">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell324" value="REUSE Top-k positions from L8&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="3770" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge325" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell324" target="cell87">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell326" value="READ compressed KV from L8&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="3924" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge327" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell326" target="cell90">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell328" value="REUSE Top-k positions from L8&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="3924" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge329" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell328" target="cell90">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell330" value="READ compressed KV from L8&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="4078" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge331" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell330" target="cell93">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell332" value="&lt;b&gt;NEW SHARED KV • source L14&lt;br&gt;Ratio 2:1 • 1024 → 512 entries&lt;br&gt;Index Key created from pre-RoPE latent&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="4309.0" width="740" height="158" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge333" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=3;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell96" target="cell332">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell334" value="&lt;b&gt;INDEX REFRESH • L14&lt;br&gt;New Index Keys → Top-k positions&lt;br&gt;Index addresses, not attention output&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=20;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="4310.0" width="740" height="156" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge335" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell96" target="cell334">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge336" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell332" target="cell98">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge337" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell334" target="cell99">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell338" value="READ compressed KV from L14&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="4596" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge339" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell338" target="cell103">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell340" value="REUSE Top-k positions from L14&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="4596" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge341" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell340" target="cell103">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell342" value="READ compressed KV from L14&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="4750" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge343" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell342" target="cell106">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell344" value="REUSE Top-k positions from L14&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="4750" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge345" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell344" target="cell106">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell346" value="READ compressed KV from L14&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="4904" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge347" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell346" target="cell109">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell348" value="REUSE Top-k positions from L14&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="4904" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge349" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell348" target="cell109">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell350" value="READ compressed KV from L14&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="5058" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge351" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell350" target="cell112">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell352" value="REUSE Top-k positions from L14&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="5058" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge353" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell352" target="cell112">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell354" value="READ compressed KV from L14&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="5212" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge355" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell354" target="cell115">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell356" value="REUSE Top-k positions from L14&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="5212" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge357" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell356" target="cell115">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell358" value="&lt;b&gt;NEW SHARED KV • source L20&lt;br&gt;Ratio 1:1 • 1024 → 1024 entries&lt;br&gt;Index Key created from pre-RoPE latent&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="5647.0" width="740" height="158" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge359" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=3;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell118" target="cell358">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell360" value="&lt;b&gt;INDEX + CANDIDATE SOURCE • L20&lt;br&gt;8-position blocks → candidate mask → Top-k&lt;br&gt;Index addresses, not attention output&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=20;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="5648.0" width="740" height="156" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge361" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell118" target="cell360">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge362" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell358" target="cell122">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge363" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell360" target="cell124">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell364" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="6026" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge365" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell364" target="cell131">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell366" value="REUSE Top-k positions from L20&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="6026" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge367" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell366" target="cell131">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell368" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="6399" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge369" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell368" target="cell140">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell370" value="REUSE Top-k positions from L20&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="6399" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge371" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell370" target="cell140">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell372" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="6553" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge373" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell372" target="cell143">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell374" value="REUSE Top-k positions from L20&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="6553" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge375" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell374" target="cell143">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell376" value="READ L20 SHARED KV&lt;br&gt;This layer creates its own Local KV" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="6767.5" width="740" height="103" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell377" value="&lt;b&gt;REFRESH Top-k • L24&lt;br&gt;Use L20 candidate blocks and Index Keys&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="6765.5" width="740" height="107" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge378" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell376" target="cell146">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge379" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell146" target="cell377">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge380" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell377" target="cell149">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell381" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="6983" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge382" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell381" target="cell151">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell383" value="REUSE Top-k positions from L24&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="6983" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge384" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell383" target="cell151">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell385" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="7137" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge386" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell385" target="cell154">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell387" value="REUSE Top-k positions from L24&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="7137" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge388" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell387" target="cell154">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell389" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="7291" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge390" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell389" target="cell157">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell391" value="REUSE Top-k positions from L24&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="7291" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge392" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell391" target="cell157">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell393" value="READ L20 SHARED KV&lt;br&gt;This layer creates its own Local KV" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="7480.5" width="740" height="103" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell394" value="&lt;b&gt;REFRESH Top-k • L28&lt;br&gt;Use L20 candidate blocks and Index Keys&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="7478.5" width="740" height="107" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge395" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell393" target="cell160">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge396" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell160" target="cell394">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge397" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell394" target="cell163">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell398" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="7671" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge399" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell398" target="cell165">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell400" value="REUSE Top-k positions from L28&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="7671" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge401" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell400" target="cell165">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell402" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="7825" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge403" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell402" target="cell168">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell404" value="REUSE Top-k positions from L28&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="7825" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge405" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell404" target="cell168">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell406" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="7979" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge407" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell406" target="cell171">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell408" value="REUSE Top-k positions from L28&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="7979" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge409" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell408" target="cell171">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell410" value="READ L20 SHARED KV&lt;br&gt;This layer creates its own Local KV" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="8168.5" width="740" height="103" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell411" value="&lt;b&gt;REFRESH Top-k • L32&lt;br&gt;Use L20 candidate blocks and Index Keys&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="8166.5" width="740" height="107" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge412" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell410" target="cell174">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge413" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell174" target="cell411">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge414" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell411" target="cell177">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell415" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="8359" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge416" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell415" target="cell179">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell417" value="REUSE Top-k positions from L32&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="8359" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge418" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell417" target="cell179">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell419" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="8513" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge420" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell419" target="cell182">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell421" value="REUSE Top-k positions from L32&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="8513" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge422" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell421" target="cell182">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell423" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="8667" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge424" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell423" target="cell185">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell425" value="REUSE Top-k positions from L32&lt;br&gt;No new global projection / index scoring" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="8667" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge426" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell425" target="cell185">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell427" value="READ L20 SHARED KV&lt;br&gt;This layer creates its own Local KV" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="8856.5" width="740" height="103" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell428" value="&lt;b&gt;REFRESH Top-k • L36&lt;br&gt;Use L20 candidate blocks and Index Keys&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFEAF2;strokeColor=#D15C88;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="8854.5" width="740" height="107" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge429" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell427" target="cell188">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge430" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=3;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell188" target="cell428">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge431" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D15C88;strokeWidth=2;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell428" target="cell191">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell432" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="9047" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge433" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell432" target="cell193">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell434" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="9245" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge435" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell434" target="cell198">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell436" value="READ compressed KV from L20&lt;br&gt;Own Local KV is still computed" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#E7EDFF;strokeColor=#5C67C9;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="9443" width="740" height="99" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge437" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#5C67C9;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell436" target="cell203">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell438" value="&lt;b&gt;ENGRAM at L1 INPUT&lt;br&gt;Historical 2/3/4-gram → 24 hash lookups&lt;br&gt;24 × 256 → keys for 4 streams + shared value&lt;br&gt;Gate each stream, then ADD gated value&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0E9FF;strokeColor=#7F54BA;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="1228" width="740" height="147" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge439" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7F54BA;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell22" target="cell438">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2910" y="687"/>
+              <mxPoint x="2910" y="1205"/>
+              <mxPoint x="2450" y="1205"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge440" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7F54BA;strokeWidth=3;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell438" target="cell37">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell441" value="&lt;b&gt;ENGRAM at L14 INPUT&lt;br&gt;Historical 2/3/4-gram → 24 hash lookups&lt;br&gt;24 × 256 → keys for 4 streams + shared value&lt;br&gt;Gate each stream, then ADD gated value&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#F0E9FF;strokeColor=#7F54BA;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=17;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="4071" width="740" height="116" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge442" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7F54BA;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell22" target="cell441">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2910" y="687"/>
+              <mxPoint x="2910" y="3871"/>
+              <mxPoint x="2450" y="3871"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge443" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7F54BA;strokeWidth=3;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="cell441" target="cell96">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell444" value="CAPTURE BEFORE L37&lt;br&gt;Mean over 4 streams → [1,1024,5120]" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="9043" width="740" height="116" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge445" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell193" target="cell444">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell446" value="CAPTURE BEFORE L38&lt;br&gt;Mean over 4 streams → [1,1024,5120]" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="9241" width="740" height="116" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge447" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell198" target="cell446">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell448" value="CAPTURE BEFORE L39&lt;br&gt;Mean over 4 streams → [1,1024,5120]" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="9439" width="740" height="116" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge449" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell203" target="cell448">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell450" value="&lt;b&gt;JOIN 3 CAPTURES (L37 + L38 + L39)&lt;br&gt;[1,1024,15360] → draft context projection&lt;br&gt;Decode: last current-token row drives candidate generation&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#EAF8FF;strokeColor=#3282AB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=19;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="9703" width="740" height="146" as="geometry"/>
+        </mxCell>
+        <mxCell id="edge451" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell444" target="cell450">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2830" y="9167"/>
+              <mxPoint x="2830" y="9671"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge452" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell446" target="cell450">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2846" y="9365"/>
+              <mxPoint x="2846" y="9671"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge453" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell448" target="cell450">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2862" y="9563"/>
+              <mxPoint x="2862" y="9671"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge454" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3282AB;strokeWidth=3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=7 5;" edge="1" parent="1" source="cell450" target="cell208">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2870" y="10174"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cell455" value="DRAFT EXECUTION RULES&lt;br&gt;During draft-cache initialization: cache only, no candidates.&lt;br&gt;On later decode calls: 3 stages calculate candidate representations.&lt;br&gt;The external scheduler handles acceptance/rejection." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF4DE;strokeColor=#D09A3E;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=21;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="155" y="10219" width="740" height="225" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell456" value="DRAFT EXPERTS&lt;br&gt;3 routed experts + 1 shared expert per draft stage&lt;br&gt;Separate from backbone: 6 routed + 1 shared" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFF1E1;strokeColor=#B9783C;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=20;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="2080" y="10637" width="740" height="141" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell457" value="&lt;b&gt;READING NOTES / VERIFIED SCOPE&lt;/b&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#183A5E;strokeColor=#183A5E;strokeWidth=2;fontColor=#FFFFFF;fontFamily=Arial;fontSize=25;fontStyle=1;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="150" y="11290" width="2680" height="68" as="geometry"/>
+        </mxCell>
+        <mxCell id="cell458" value="Backbone = 40 sequential layers. Encoder and Decoder are contiguous phases of one model, not two separately invoked networks.&lt;br&gt;Every backbone layer has its own Query and local causal window. Shared compressed KV is refreshed only at L2 / L8 / L14 / L20.&lt;br&gt;Top-k is refreshed at L2 / L8 / L14 / L20 / L24 / L28 / L32 / L36. Engram modifies the 4 streams before L1 and L14.&lt;br&gt;Draft 40–42 are explicitly shown downstream as the complete speculative path, but must be invoked separately by orchestration.&lt;br&gt;Diagram simplifies implementation-level quantization and communications; it does not claim to describe training backward kernels." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fillColor=#FFFFFF;strokeColor=#AFBCCB;strokeWidth=2;fontColor=#17304C;fontFamily=Arial;fontSize=18;fontStyle=0;opacity=100;" vertex="1" parent="1">
+          <mxGeometry x="190" y="11372" width="2600" height="119" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

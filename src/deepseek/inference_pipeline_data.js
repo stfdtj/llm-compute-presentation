@@ -43,5 +43,14 @@
   const committed=['我','喜欢','先',...candidates.slice(0,accepted)],confirmed=[...committed,extra];
   return {scenario,algorithm,length,rows,rejected,accepted,extra,draw,replacement,confirmed,committed,pending:[extra],discarded:candidates.slice(accepted,length),deferred:candidates.slice(length),verificationInput:['先',...candidates.slice(0,length)],bonusContext:['我','喜欢','先',...candidates.slice(0,length)]};
  }
- return {vocab,candidates,scenarios,draft,anchor,bonus,softmax,argmax,sample,residual,evaluate,targetRow};
+ // Six lessons share the same deterministic example and computed outcome.
+ function lesson(step,r){return [
+ ['已有 Prompt：我 喜欢。','Backbone 40 层 → Final RMSNorm → LM Head → Logits → Sample。','选出 Anchor「先」，同时保留层 37/38/39 的输入 Features，交给 DSpark。'],
+ ['Anchor「先」和 Backbone Features。','把「先」放在第一个位置，后面放四个 Noise 占位；特征拼接、投影为上下文。','[先, Noise, Noise, Noise, Noise] 和上下文 → 三个 Draft Blocks；Noise 还不是候选。'],
+ ['五个位置和来自 Backbone 的上下文。','五个位置一起经过 mtp[0] → mtp[1] → mtp[2]；每块都处理全部五个位置。','五个位置的 Hidden States → LM Head，并供 Confidence Head 使用。'],
+ ['五个位置的 Hidden States，以及 Anchor「先」。','LM Head 给出五组 Base Logits；Markov Head 从「先」开始，逐个选出 A → B → C → D → E。','候选 [A, B, C, D, E]；Confidence Head 另用隐藏状态与前词特征给出分数，供调度选验证长度。'],
+ ['Anchor「先」、候选 A B C D E 和置信分数。','Confidence / Scheduler 选择验证长度，本例选五个；[先, A, B, C, D, E] 一起经过正常的 40 层 Backbone。','Target Logits → 接受判断：先的位置预测 A，A 预测 B，B 预测 C；依此类推，E 的预测供 Bonus 使用。'],
+ ['候选 A B C D E 和 Backbone 的对应预测。',r.rejected===null?'五个候选全部通过，再由 Backbone 产生 Bonus Token。':`保留连续通过的 ${candidates.slice(0,r.accepted).join(' ')||'空前缀'}；${candidates[r.rejected]} 被拒绝，其后候选作废；生成修正 ${r.extra}。`,`确认文本：${r.confirmed.join(' ')}。以 ${r.extra} 为新起点，进入下一轮生成。`]
+ ][step];}
+ return {vocab,candidates,scenarios,draft,anchor,bonus,softmax,argmax,sample,residual,evaluate,targetRow,lesson};
 });

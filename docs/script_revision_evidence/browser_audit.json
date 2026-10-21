@@ -1,0 +1,2100 @@
+{
+  "main": [
+    {
+      "id": "",
+      "text": "参数量"
+    },
+    {
+      "id": "",
+      "text": "FLOPs（前向）"
+    },
+    {
+      "id": "",
+      "text": "FLOPs（反向）"
+    },
+    {
+      "id": "flow-toggle",
+      "text": "Shape Trace"
+    },
+    {
+      "id": "assumptions-toggle",
+      "text": "Assumptions / 假设"
+    },
+    {
+      "id": "region-select",
+      "text": "完整架构\nA · 总体架构\nB · 逐层计算\nC · Encoder 细节\nC · Decoder 细节\nC · mHC + MoE\nD · Engram\nE · Indexer Detail\nDSpark · 3 draft stages",
+      "options": [
+        [
+          "all",
+          "完整架构"
+        ],
+        [
+          "a",
+          "A · 总体架构"
+        ],
+        [
+          "b",
+          "B · 逐层计算"
+        ],
+        [
+          "c1",
+          "C · Encoder 细节"
+        ],
+        [
+          "c2",
+          "C · Decoder 细节"
+        ],
+        [
+          "c3",
+          "C · mHC + MoE"
+        ],
+        [
+          "d",
+          "D · Engram"
+        ],
+        [
+          "indexer",
+          "E · Indexer Detail"
+        ],
+        [
+          "draft",
+          "DSpark · 3 draft stages"
+        ]
+      ]
+    },
+    {
+      "id": "zoom-out",
+      "text": "−"
+    },
+    {
+      "id": "zoom-in",
+      "text": "+"
+    },
+    {
+      "id": "reset",
+      "text": "适合窗口"
+    },
+    {
+      "id": "csa-tab-architecture",
+      "text": "Model Architecture"
+    },
+    {
+      "id": "csa-tab-walkthrough",
+      "text": "Step-by-step · CSA2"
+    },
+    {
+      "id": "csa-tab-pipeline",
+      "text": "Inference Pipeline"
+    },
+    {
+      "id": "close-panel",
+      "text": ""
+    }
+  ],
+  "pipeline": [
+    "Input：当前拿到了什么\n\n已有 Prompt：我 喜欢。\n\nProcessing：现在谁在处理\n\nBackbone 40 层 → Final RMSNorm → LM Head → Logits → Sample。\n\nOutput：产生了什么，下一步送去哪里\n\n选出 Anchor「先」，同时保留层 37/38/39 的输入 Features，交给 DSpark。",
+    "Input：当前拿到了什么\n\nAnchor「先」和 Backbone Features。\n\nProcessing：现在谁在处理\n\n把「先」放在第一个位置，后面放四个 Noise 占位；特征拼接、投影为上下文。\n\nOutput：产生了什么，下一步送去哪里\n\n[先, Noise, Noise, Noise, Noise] 和上下文 → 三个 Draft Blocks；Noise 还不是候选。",
+    "Input：当前拿到了什么\n\n五个位置和来自 Backbone 的上下文。\n\nProcessing：现在谁在处理\n\n五个位置一起经过 mtp[0] → mtp[1] → mtp[2]；每块都处理全部五个位置。\n\nOutput：产生了什么，下一步送去哪里\n\n五个位置的 Hidden States → LM Head，并供 Confidence Head 使用。",
+    "Input：当前拿到了什么\n\n五个位置的 Hidden States，以及 Anchor「先」。\n\nProcessing：现在谁在处理\n\nLM Head 给出五组 Base Logits；Markov Head 从「先」开始，逐个选出 A → B → C → D → E。\n\nOutput：产生了什么，下一步送去哪里\n\n候选 [A, B, C, D, E]；Confidence Head 另用隐藏状态与前词特征给出分数，供调度选验证长度。",
+    "Input：当前拿到了什么\n\nAnchor「先」、候选 A B C D E 和置信分数。\n\nProcessing：现在谁在处理\n\nConfidence / Scheduler 选择验证长度，本例选五个；[先, A, B, C, D, E] 一起经过正常的 40 层 Backbone。\n\nOutput：产生了什么，下一步送去哪里\n\nTarget Logits → 接受判断：先的位置预测 A，A 预测 B，B 预测 C；依此类推，E 的预测供 Bonus 使用。",
+    "Input：当前拿到了什么\n\n候选 A B C D E 和 Backbone 的对应预测。\n\nProcessing：现在谁在处理\n\n保留连续通过的 A B；C 被拒绝，其后候选作废；生成修正 X。\n\nOutput：产生了什么，下一步送去哪里\n\n确认文本：我 喜欢 先 A B X。以 X 为新起点，进入下一轮生成。"
+  ],
+  "pipelineControls": [
+    {
+      "id": "csa-tab-architecture",
+      "text": "Model Architecture"
+    },
+    {
+      "id": "csa-tab-walkthrough",
+      "text": "Step-by-step · CSA2"
+    },
+    {
+      "id": "csa-tab-pipeline",
+      "text": "Inference Pipeline"
+    },
+    {
+      "id": "ip-prev",
+      "text": "← Previous"
+    },
+    {
+      "id": "ip-play",
+      "text": "▶ Play"
+    },
+    {
+      "id": "ip-next",
+      "text": "Next →"
+    },
+    {
+      "id": "ip-reset",
+      "text": "Reset"
+    },
+    {
+      "id": "",
+      "text": "1 · Backbone 生成 Anchor"
+    },
+    {
+      "id": "",
+      "text": "2 · DSpark 准备输入"
+    },
+    {
+      "id": "",
+      "text": "3 · 执行三个 Draft Blocks"
+    },
+    {
+      "id": "",
+      "text": "4 · 产生五个候选 Token"
+    },
+    {
+      "id": "",
+      "text": "5 · Backbone 验证候选"
+    },
+    {
+      "id": "",
+      "text": "6 · 接受结果，进入下一轮"
+    },
+    {
+      "id": "",
+      "text": "Advanced Details · 算法、概率与源码"
+    },
+    {
+      "id": "ip-mode",
+      "text": "DSpark\nNormal Decode · Target greedy",
+      "options": [
+        [
+          "dspark",
+          "DSpark"
+        ],
+        [
+          "normal",
+          "Normal Decode · Target greedy"
+        ]
+      ]
+    },
+    {
+      "id": "ip-algorithm",
+      "text": "Greedy · Token ID 比较\nProbabilistic · 概率接受",
+      "options": [
+        [
+          "greedy",
+          "Greedy · Token ID 比较"
+        ],
+        [
+          "probabilistic",
+          "Probabilistic · 概率接受"
+        ]
+      ]
+    },
+    {
+      "id": "ip-scenario",
+      "text": "C 处 Target 分布有分歧\n各位置 Target Top-1 都匹配\nA 处 Target 分布有分歧\nE 处 Target 分布有分歧",
+      "options": [
+        [
+          "middle",
+          "C 处 Target 分布有分歧"
+        ],
+        [
+          "all",
+          "各位置 Target Top-1 都匹配"
+        ],
+        [
+          "first",
+          "A 处 Target 分布有分歧"
+        ],
+        [
+          "last",
+          "E 处 Target 分布有分歧"
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "text": "A\nAccept"
+    },
+    {
+      "id": "",
+      "text": "B\nAccept"
+    },
+    {
+      "id": "",
+      "text": "C\nReject"
+    },
+    {
+      "id": "",
+      "text": "D\nDiscard"
+    },
+    {
+      "id": "",
+      "text": "E\nDiscard"
+    },
+    {
+      "id": "",
+      "text": "A"
+    },
+    {
+      "id": "",
+      "text": "B"
+    },
+    {
+      "id": "",
+      "text": "C"
+    },
+    {
+      "id": "",
+      "text": "D"
+    },
+    {
+      "id": "",
+      "text": "E"
+    },
+    {
+      "id": "",
+      "text": "A\nAccept"
+    },
+    {
+      "id": "",
+      "text": "B\nAccept"
+    },
+    {
+      "id": "",
+      "text": "C\nReject"
+    },
+    {
+      "id": "",
+      "text": "D\nDiscard"
+    },
+    {
+      "id": "",
+      "text": "E\nDiscard"
+    },
+    {
+      "id": "",
+      "text": "完整 Logits、Markov 偏置与 Softmax 向量"
+    },
+    {
+      "id": "",
+      "text": "来源与边界：哪些是源码行为，哪些是教学算法？"
+    }
+  ],
+  "probabilistic": "DSpark · 6 / 6\n接受结果，进入下一轮\n\n教学示例，非模型实际输出。完整验证属于概念性的 Serving Pipeline。\n\nInput：当前拿到了什么\n\n候选 A B C D E 和 Backbone 的对应预测。\n\nProcessing：现在谁在处理\n\n保留连续通过的 A B；C 被拒绝，其后候选作废；生成修正 Y。\n\nOutput：产生了什么，下一步送去哪里\n\n确认文本：我 喜欢 先 A B Y。以 Y 为新起点，进入下一轮生成。\n\nAdvanced Details · 算法、概率与源码\n执行\nDSpark\nNormal Decode · Target greedy\nVerification\nGreedy · Token ID 比较\nProbabilistic · 概率接受\n输入数据\nC 处 Target 分布有分歧\n各位置 Target Top-1 都匹配\nA 处 Target 分布有分歧\nE 处 Target 分布有分歧\n10-token 完整玩具词表 · 假设数值 · 固定抽样值\n确认文本\n我 喜欢 先 A B Y\n有效 KV\n我 喜欢 先 A B\n待输入\nY\n末尾 Target token 已确认；下次 Forward 才生成它的 KV。\nINPUT\n有效 KV + 已确认 Y\n→\nOPERATION\n终止检查 → 下一轮准备\n→\nOUTPUT\n新 anchor=Y\n→\nNEXT CONSUMER\nDraft / 下次 Target\nA\nAccept\nB\nAccept\nC\nReject\nD\nDiscard\nE\nDiscard\n完整 q / p\n→\n同候选 p(x) / q(x)\n→\nα = min(1, p/q)\n→\n固定 u < α ?\n位置\tDraft ID\t同候选概率\t接受率 / 固定值\t计算结果\n1\tA\tq=0.800\np=0.600\tα=0.750\nu=0.50\tAccept ✓\n2\tB\tq=0.800\np=0.600\tα=0.750\nu=0.50\tAccept ✓\n3\tC\tq=0.800\np=0.200\tα=0.250\nu=0.50\tReject ✗\n4\tD\tq=0.800\np=0.600\tα=0.750\nu=0.50\tDiscard · 未评估接受\n5\tE\tq=0.800\np=0.600\tα=0.750\nu=0.50\tDiscard · 未评估接受\n后续 Target 预测已在同次 Verification 中计算，但首个 Reject 后不能再提交候选：它们依赖的草稿历史含有错误 token。\nReject → 用完整 p − q 构造 residual\nr(v) = max(0, p(v) − q(v)) / 0.600\n\n固定 u_residual=0.82 在 Y 的区间 [0.729, 0.979) → Y\nTarget residual correction\n\nTarget Top-1 是 X，修正采样却得到 Y。p(C) 和 q(C) 两个标量不足以构造 residual。\n\n完整 residual 向量（总和 1）\nNEXT → 提交前缀；丢弃拒绝后缀；修正 token 留给下一轮\nA\nAccept\nB\nAccept\nC\nReject\nD\nDiscard\nE\nDiscard\n数据对象\t提交后内容\t下一消费者\nAccepted prefix\tA B\t确认输出 / 有效 KV\nTarget correction\tY\t已确认，暂无自身 KV；下轮输入\nConfirmed context\t我 喜欢 先 A B Y\t显示给用户 / 后续上下文\nValid Target KV\t我 喜欢 先 A B\t下轮 Target 的有效历史\nDiscard / invalidate\tC D E\t拒绝位置和后缀不再是有效历史\n被拒绝 token 及其后缀的临时状态不能提交；即使后缀 Top-1 匹配，替换前缀后也必须重新计算。\n仅说明逻辑有效边界。KV、位置和其他模型状态必须一起对齐，不假定物理复制、清零或回退实现。\nNext cycle：不重新送入失效后缀\n有效 KV 到 我 喜欢 先 A B\n→\n待输入 anchor Y\n→\n与新 Draft 拼接\n→\n下一次 Target Forward\nNEXT → EOS / 长度上限 / 停止条件满足则 Finish\n修正 / bonus 的 KV 要等下次 Forward。DSpark 的特征、私有缓存和位置也需对齐确认边界，具体交接依赖完整 runtime。这里只到下一轮入口，没有伪造后续预测。\n追踪 C · 第 3 个预测位置\n点击任一候选切换\nDraft：slot 3 → 共享 Head → base_logits3 + Markov(B) → q3(C)\nTarget：输入位置 B → 40 层 → Hidden → Head → z3 → Softmax → p3(C)\nDraft proposal · q3\n0.800\nF(current Backbone) + anchor 先；Markov previous=B。包含本槽位 bias。\nTarget probability · p3\n0.200\n条件：我 喜欢 先 A B。不是输入 C 的同位置分布。\nα = min(1, 0.20 / 0.80) =\n0.25\n；固定 u=0.50 →\nu ≥ α / Reject\n完整 Logits、Markov 偏置与 Softmax 向量\n来源与边界：哪些是源码行为，哪些是教学算法？",
+  "shapeControls": [
+    {
+      "id": "",
+      "text": "参数量"
+    },
+    {
+      "id": "",
+      "text": "FLOPs（前向）"
+    },
+    {
+      "id": "",
+      "text": "FLOPs（反向）"
+    },
+    {
+      "id": "flow-toggle",
+      "text": "Shape Trace"
+    },
+    {
+      "id": "assumptions-toggle",
+      "text": "Assumptions / 假设"
+    },
+    {
+      "id": "region-select",
+      "text": "完整架构\nA · 总体架构\nB · 逐层计算\nC · Encoder 细节\nC · Decoder 细节\nC · mHC + MoE\nD · Engram\nE · Indexer Detail\nDSpark · 3 draft stages",
+      "options": [
+        [
+          "all",
+          "完整架构"
+        ],
+        [
+          "a",
+          "A · 总体架构"
+        ],
+        [
+          "b",
+          "B · 逐层计算"
+        ],
+        [
+          "c1",
+          "C · Encoder 细节"
+        ],
+        [
+          "c2",
+          "C · Decoder 细节"
+        ],
+        [
+          "c3",
+          "C · mHC + MoE"
+        ],
+        [
+          "d",
+          "D · Engram"
+        ],
+        [
+          "indexer",
+          "E · Indexer Detail"
+        ],
+        [
+          "draft",
+          "DSpark · 3 draft stages"
+        ]
+      ]
+    },
+    {
+      "id": "zoom-out",
+      "text": "−"
+    },
+    {
+      "id": "zoom-in",
+      "text": "+"
+    },
+    {
+      "id": "reset",
+      "text": "适合窗口"
+    },
+    {
+      "id": "csa-tab-architecture",
+      "text": "Model Architecture"
+    },
+    {
+      "id": "csa-tab-walkthrough",
+      "text": "Step-by-step · CSA2"
+    },
+    {
+      "id": "csa-tab-pipeline",
+      "text": "Inference Pipeline"
+    },
+    {
+      "id": "close-panel",
+      "text": ""
+    },
+    {
+      "id": "shape-layer",
+      "text": "0 · Encoder\n1 · Encoder\n2 · Encoder\n3 · Encoder\n4 · Encoder\n5 · Encoder\n6 · Encoder\n7 · Encoder\n8 · Encoder\n9 · Encoder\n10 · Encoder\n11 · Encoder\n12 · Encoder\n13 · Encoder\n14 · Encoder\n15 · Encoder\n16 · Encoder\n17 · Encoder\n18 · Encoder\n19 · Encoder\n20 · Decoder\n21 · Decoder\n22 · Decoder\n23 · Decoder\n24 · Decoder\n25 · Decoder\n26 · Decoder\n27 · Decoder\n28 · Decoder\n29 · Decoder\n30 · Decoder\n31 · Decoder\n32 · Decoder\n33 · Decoder\n34 · Decoder\n35 · Decoder\n36 · Decoder\n37 · Decoder\n38 · Decoder\n39 · Decoder",
+      "options": [
+        [
+          "0",
+          "0 · Encoder"
+        ],
+        [
+          "1",
+          "1 · Encoder"
+        ],
+        [
+          "2",
+          "2 · Encoder"
+        ],
+        [
+          "3",
+          "3 · Encoder"
+        ],
+        [
+          "4",
+          "4 · Encoder"
+        ],
+        [
+          "5",
+          "5 · Encoder"
+        ],
+        [
+          "6",
+          "6 · Encoder"
+        ],
+        [
+          "7",
+          "7 · Encoder"
+        ],
+        [
+          "8",
+          "8 · Encoder"
+        ],
+        [
+          "9",
+          "9 · Encoder"
+        ],
+        [
+          "10",
+          "10 · Encoder"
+        ],
+        [
+          "11",
+          "11 · Encoder"
+        ],
+        [
+          "12",
+          "12 · Encoder"
+        ],
+        [
+          "13",
+          "13 · Encoder"
+        ],
+        [
+          "14",
+          "14 · Encoder"
+        ],
+        [
+          "15",
+          "15 · Encoder"
+        ],
+        [
+          "16",
+          "16 · Encoder"
+        ],
+        [
+          "17",
+          "17 · Encoder"
+        ],
+        [
+          "18",
+          "18 · Encoder"
+        ],
+        [
+          "19",
+          "19 · Encoder"
+        ],
+        [
+          "20",
+          "20 · Decoder"
+        ],
+        [
+          "21",
+          "21 · Decoder"
+        ],
+        [
+          "22",
+          "22 · Decoder"
+        ],
+        [
+          "23",
+          "23 · Decoder"
+        ],
+        [
+          "24",
+          "24 · Decoder"
+        ],
+        [
+          "25",
+          "25 · Decoder"
+        ],
+        [
+          "26",
+          "26 · Decoder"
+        ],
+        [
+          "27",
+          "27 · Decoder"
+        ],
+        [
+          "28",
+          "28 · Decoder"
+        ],
+        [
+          "29",
+          "29 · Decoder"
+        ],
+        [
+          "30",
+          "30 · Decoder"
+        ],
+        [
+          "31",
+          "31 · Decoder"
+        ],
+        [
+          "32",
+          "32 · Decoder"
+        ],
+        [
+          "33",
+          "33 · Decoder"
+        ],
+        [
+          "34",
+          "34 · Decoder"
+        ],
+        [
+          "35",
+          "35 · Decoder"
+        ],
+        [
+          "36",
+          "36 · Decoder"
+        ],
+        [
+          "37",
+          "37 · Decoder"
+        ],
+        [
+          "38",
+          "38 · Decoder"
+        ],
+        [
+          "39",
+          "39 · Decoder"
+        ]
+      ]
+    },
+    {
+      "id": "shape-prev",
+      "text": "←"
+    },
+    {
+      "id": "shape-next",
+      "text": "→"
+    },
+    {
+      "id": "",
+      "text": "Input / mHC"
+    },
+    {
+      "id": "",
+      "text": "Q / KV"
+    },
+    {
+      "id": "",
+      "text": "Indexer"
+    },
+    {
+      "id": "",
+      "text": "Attention"
+    },
+    {
+      "id": "",
+      "text": "mHC Post"
+    },
+    {
+      "id": "",
+      "text": "MoE"
+    },
+    {
+      "id": "",
+      "text": "Next Layer"
+    },
+    {
+      "id": "shape-clear",
+      "text": "清除高亮"
+    }
+  ],
+  "shape": [
+    {
+      "id": "previous",
+      "name": "Layer 1 → Layer 2",
+      "inputs": {},
+      "outputs": {
+        "out": "[1,4,5120]"
+      }
+    },
+    {
+      "id": "premix",
+      "name": "Layer 1 FFN Pre Mix",
+      "inputs": {},
+      "outputs": {
+        "out": "[1,4]"
+      }
+    },
+    {
+      "id": "mixAflat",
+      "name": "Attention Mix · Flatten",
+      "inputs": {
+        "in": "[1,4,5120]"
+      },
+      "outputs": {
+        "out": "[1,20480]"
+      }
+    },
+    {
+      "id": "mixAproj",
+      "name": "Attention Mix · W_Mix",
+      "inputs": {
+        "in": "[1,20480]"
+      },
+      "outputs": {
+        "out": "[1,24]"
+      }
+    },
+    {
+      "id": "mixA",
+      "name": "Attention Mix · Split",
+      "inputs": {
+        "in": "[1,24]"
+      },
+      "outputs": {
+        "pre": "[1,4]",
+        "post": "[1,4]",
+        "comb": "[1,4,4]"
+      }
+    },
+    {
+      "id": "preA",
+      "name": "mHC Pre · Attention",
+      "inputs": {
+        "in": "[1,4,5120]",
+        "mix": "[1,4]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "normA",
+      "name": "Attention RMSNorm",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "qa",
+      "name": "W_QA",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,1280]"
+      }
+    },
+    {
+      "id": "qn",
+      "name": "Query RMSNorm",
+      "inputs": {
+        "in": "[1,1280]"
+      },
+      "outputs": {
+        "out": "[1,1280]"
+      }
+    },
+    {
+      "id": "qb",
+      "name": "W_QB",
+      "inputs": {
+        "in": "[1,1280]"
+      },
+      "outputs": {
+        "out": "[1,32768]"
+      }
+    },
+    {
+      "id": "qreshape",
+      "name": "Query Heads",
+      "inputs": {
+        "in": "[1,32768]"
+      },
+      "outputs": {
+        "out": "[1,64,512]"
+      }
+    },
+    {
+      "id": "qrope",
+      "name": "Query RoPE · tail 64",
+      "inputs": {
+        "in": "[1,64,512]"
+      },
+      "outputs": {
+        "out": "[1,64,512]"
+      }
+    },
+    {
+      "id": "lproj",
+      "name": "Local W_KV",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,512]"
+      }
+    },
+    {
+      "id": "lnorm",
+      "name": "Local KV RMSNorm",
+      "inputs": {
+        "in": "[1,512]"
+      },
+      "outputs": {
+        "out": "[1,512]"
+      }
+    },
+    {
+      "id": "lrope",
+      "name": "Local RoPE · tail 64",
+      "inputs": {
+        "in": "[1,512]"
+      },
+      "outputs": {
+        "out": "[1,512]"
+      }
+    },
+    {
+      "id": "lquant",
+      "name": "Local KV FP8",
+      "inputs": {
+        "in": "[1,512]"
+      },
+      "outputs": {
+        "out": "[1,512]"
+      }
+    },
+    {
+      "id": "local",
+      "name": "Local Window / Ring Cache",
+      "inputs": {
+        "in": "[1,512]"
+      },
+      "outputs": {
+        "out": "[128,512]",
+        "indices": "[1,128]"
+      }
+    },
+    {
+      "id": "localread",
+      "name": "Local KV Read",
+      "inputs": {
+        "in": "[128,512]"
+      },
+      "outputs": {
+        "out": "[128,512]"
+      }
+    },
+    {
+      "id": "cv",
+      "name": "Compressor W_KV",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,512]"
+      }
+    },
+    {
+      "id": "cg",
+      "name": "Compressor W_Gate",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,512]"
+      }
+    },
+    {
+      "id": "pair",
+      "name": "Compression Group Buffers",
+      "inputs": {
+        "in": "[1,512]",
+        "gate": "[1,512]"
+      },
+      "outputs": {
+        "values": "[2,512]",
+        "gates": "[2,512]"
+      }
+    },
+    {
+      "id": "pool",
+      "name": "2 → 1 Channel-wise Pool",
+      "inputs": {
+        "in": "[2,512]",
+        "gate": "[2,512]"
+      },
+      "outputs": {
+        "out": "[ΔS,512]"
+      }
+    },
+    {
+      "id": "latent",
+      "name": "Compressed RMSNorm",
+      "inputs": {
+        "in": "[ΔS,512]"
+      },
+      "outputs": {
+        "out": "[ΔS,512]"
+      }
+    },
+    {
+      "id": "grope",
+      "name": "Global KV RoPE",
+      "inputs": {
+        "in": "[ΔS,512]"
+      },
+      "outputs": {
+        "out": "[ΔS,512]"
+      }
+    },
+    {
+      "id": "gquant",
+      "name": "Global KV FP4",
+      "inputs": {
+        "in": "[ΔS,512]"
+      },
+      "outputs": {
+        "out": "[ΔS,512]"
+      }
+    },
+    {
+      "id": "global",
+      "name": "Global KV Cache · Layer 2",
+      "inputs": {
+        "in": "[ΔS,512]"
+      },
+      "outputs": {
+        "out": "[S,512]"
+      }
+    },
+    {
+      "id": "ik",
+      "name": "Indexer W_K",
+      "inputs": {
+        "in": "[ΔS,512]"
+      },
+      "outputs": {
+        "out": "[ΔS,128]"
+      }
+    },
+    {
+      "id": "iknorm",
+      "name": "Index Key Norm / RoPE / FP4",
+      "inputs": {
+        "in": "[ΔS,128]"
+      },
+      "outputs": {
+        "out": "[ΔS,128]"
+      }
+    },
+    {
+      "id": "keycache",
+      "name": "Index Keys Cache · Layer 2",
+      "inputs": {
+        "in": "[ΔS,128]"
+      },
+      "outputs": {
+        "out": "[S,128]"
+      }
+    },
+    {
+      "id": "iqproj",
+      "name": "Indexer W_Q",
+      "inputs": {
+        "in": "[1,1280]"
+      },
+      "outputs": {
+        "out": "[1,4096]"
+      }
+    },
+    {
+      "id": "iqreshape",
+      "name": "Indexer Query Heads",
+      "inputs": {
+        "in": "[1,4096]"
+      },
+      "outputs": {
+        "out": "[1,32,128]"
+      }
+    },
+    {
+      "id": "iqrope",
+      "name": "Indexer Query RoPE / FP4",
+      "inputs": {
+        "in": "[1,32,128]"
+      },
+      "outputs": {
+        "out": "[1,32,128]"
+      }
+    },
+    {
+      "id": "iweights",
+      "name": "Indexer Head Weights",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,32]"
+      }
+    },
+    {
+      "id": "dot",
+      "name": "Indexer Q · Keys",
+      "inputs": {
+        "query": "[1,32,128]",
+        "keys": "[S,128]"
+      },
+      "outputs": {
+        "out": "[1,32,S]"
+      }
+    },
+    {
+      "id": "score",
+      "name": "Indexer Score Vector",
+      "inputs": {
+        "in": "[1,32,S]",
+        "weights": "[1,32]"
+      },
+      "outputs": {
+        "out": "[1,S]"
+      }
+    },
+    {
+      "id": "mask",
+      "name": "Visible Position Mask",
+      "inputs": {
+        "in": "[1,S]"
+      },
+      "outputs": {
+        "out": "[1,S]"
+      }
+    },
+    {
+      "id": "top",
+      "name": "Top-K Global Positions",
+      "inputs": {
+        "in": "[1,S]"
+      },
+      "outputs": {
+        "out": "[1,K]"
+      }
+    },
+    {
+      "id": "kvcat",
+      "name": "Local + Global KV",
+      "inputs": {
+        "in": "[128,512]",
+        "global": "[S,512]"
+      },
+      "outputs": {
+        "out": "[128+S,512]"
+      }
+    },
+    {
+      "id": "icat",
+      "name": "Read Position Indices",
+      "inputs": {
+        "local": "[1,128]",
+        "global": "[1,K]"
+      },
+      "outputs": {
+        "out": "[1,128+K]"
+      }
+    },
+    {
+      "id": "gather",
+      "name": "KV Gather · inside sparse_attn",
+      "inputs": {
+        "in": "[128+S,512]",
+        "indices": "[1,128+K]"
+      },
+      "outputs": {
+        "out": "[N,512]"
+      }
+    },
+    {
+      "id": "attention",
+      "name": "CSA2 · Attention Scores",
+      "inputs": {
+        "query": "[1,64,512]",
+        "kv": "[N,512]"
+      },
+      "outputs": {
+        "out": "[1,64,N]"
+      }
+    },
+    {
+      "id": "softmax",
+      "name": "Attention Weights",
+      "inputs": {
+        "in": "[1,64,N]"
+      },
+      "outputs": {
+        "out": "[1,64,N]"
+      }
+    },
+    {
+      "id": "attnout",
+      "name": "Attention Output",
+      "inputs": {
+        "in": "[1,64,N]",
+        "values": "[N,512]"
+      },
+      "outputs": {
+        "out": "[1,64,512]"
+      }
+    },
+    {
+      "id": "inverse",
+      "name": "Inverse RoPE",
+      "inputs": {
+        "in": "[1,64,512]"
+      },
+      "outputs": {
+        "out": "[1,64,512]"
+      }
+    },
+    {
+      "id": "ogroup",
+      "name": "Output Groups",
+      "inputs": {
+        "in": "[1,64,512]"
+      },
+      "outputs": {
+        "out": "[1,8,4096]"
+      }
+    },
+    {
+      "id": "oquant",
+      "name": "Output FP8",
+      "inputs": {
+        "in": "[1,8,4096]"
+      },
+      "outputs": {
+        "out": "[1,8,4096]"
+      }
+    },
+    {
+      "id": "oa",
+      "name": "Grouped W_OA",
+      "inputs": {
+        "in": "[1,8,4096]"
+      },
+      "outputs": {
+        "out": "[1,8,1024]"
+      }
+    },
+    {
+      "id": "oflat",
+      "name": "Flatten Groups",
+      "inputs": {
+        "in": "[1,8,1024]"
+      },
+      "outputs": {
+        "out": "[1,8192]"
+      }
+    },
+    {
+      "id": "ob",
+      "name": "W_OB",
+      "inputs": {
+        "in": "[1,8192]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "postA",
+      "name": "mHC Post · Attention",
+      "inputs": {
+        "in": "[1,5120]",
+        "residual": "[1,4,5120]",
+        "post": "[1,4]",
+        "comb": "[1,4,4]"
+      },
+      "outputs": {
+        "out": "[1,4,5120]"
+      }
+    },
+    {
+      "id": "mixFflat",
+      "name": "FFN Mix · Flatten",
+      "inputs": {
+        "in": "[1,4,5120]"
+      },
+      "outputs": {
+        "out": "[1,20480]"
+      }
+    },
+    {
+      "id": "mixFproj",
+      "name": "FFN Mix · W_Mix",
+      "inputs": {
+        "in": "[1,20480]"
+      },
+      "outputs": {
+        "out": "[1,24]"
+      }
+    },
+    {
+      "id": "mixF",
+      "name": "FFN Mix · Split",
+      "inputs": {
+        "in": "[1,24]"
+      },
+      "outputs": {
+        "pre": "[1,4]",
+        "post": "[1,4]",
+        "comb": "[1,4,4]"
+      }
+    },
+    {
+      "id": "preF",
+      "name": "mHC Pre · FFN",
+      "inputs": {
+        "in": "[1,4,5120]",
+        "mix": "[1,4]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "normF",
+      "name": "FFN RMSNorm",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "route",
+      "name": "Router",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,384]"
+      }
+    },
+    {
+      "id": "routeScore",
+      "name": "Routing Scores",
+      "inputs": {
+        "in": "[1,384]"
+      },
+      "outputs": {
+        "out": "[1,384]"
+      }
+    },
+    {
+      "id": "routeBias",
+      "name": "Expert Selection Scores",
+      "inputs": {
+        "in": "[1,384]"
+      },
+      "outputs": {
+        "out": "[1,384]"
+      }
+    },
+    {
+      "id": "routeTop",
+      "name": "Select 6 / 384 Experts",
+      "inputs": {
+        "in": "[1,384]"
+      },
+      "outputs": {
+        "ids": "[1,6]"
+      }
+    },
+    {
+      "id": "routeWeights",
+      "name": "Selected Expert Weights",
+      "inputs": {
+        "in": "[1,384]",
+        "ids": "[1,6]"
+      },
+      "outputs": {
+        "out": "[1,6]"
+      }
+    },
+    {
+      "id": "dispatch",
+      "name": "Dispatch · 6 Selected Experts",
+      "inputs": {
+        "in": "[1,5120]",
+        "ids": "[1,6]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "egate",
+      "name": "Expert W_Gate",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "eup",
+      "name": "Expert W_Up",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "eact",
+      "name": "Clamp + SiLU",
+      "inputs": {
+        "in": "[1,2304]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "eclamp",
+      "name": "Clamp Up",
+      "inputs": {
+        "in": "[1,2304]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "emul",
+      "name": "SwiGLU Multiply",
+      "inputs": {
+        "in": "[1,2304]",
+        "up": "[1,2304]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "weight",
+      "name": "Selected Route Weight",
+      "inputs": {
+        "in": "[1,6]"
+      },
+      "outputs": {
+        "out": "[1,1]"
+      }
+    },
+    {
+      "id": "weighted",
+      "name": "Apply Route Weight",
+      "inputs": {
+        "in": "[1,2304]",
+        "weight": "[1,1]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "edown",
+      "name": "Expert W_Down",
+      "inputs": {
+        "in": "[1,2304]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "sgate",
+      "name": "Shared W_Gate",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "sup",
+      "name": "Shared W_Up",
+      "inputs": {
+        "in": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "sact",
+      "name": "Clamp + SiLU",
+      "inputs": {
+        "in": "[1,2304]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "sclamp",
+      "name": "Clamp Up",
+      "inputs": {
+        "in": "[1,2304]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "smul",
+      "name": "SwiGLU Multiply",
+      "inputs": {
+        "in": "[1,2304]",
+        "up": "[1,2304]"
+      },
+      "outputs": {
+        "out": "[1,2304]"
+      }
+    },
+    {
+      "id": "sdown",
+      "name": "Shared W_Down",
+      "inputs": {
+        "in": "[1,2304]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "sum",
+      "name": "MoE Output",
+      "inputs": {
+        "routed": "[1,5120]",
+        "shared": "[1,5120]"
+      },
+      "outputs": {
+        "out": "[1,5120]"
+      }
+    },
+    {
+      "id": "postF",
+      "name": "mHC Post · FFN",
+      "inputs": {
+        "in": "[1,5120]",
+        "residual": "[1,4,5120]",
+        "post": "[1,4]",
+        "comb": "[1,4,4]"
+      },
+      "outputs": {
+        "out": "[1,4,5120]"
+      }
+    },
+    {
+      "id": "next",
+      "name": "Layer 3 Input",
+      "inputs": {
+        "in": "[1,4,5120]",
+        "mix": "[1,4]"
+      },
+      "outputs": {
+        "out": "[1,4,5120]"
+      }
+    }
+  ],
+  "modules": [
+    {
+      "key": "qa",
+      "title": "Query 第一步：压缩"
+    },
+    {
+      "key": "qb",
+      "title": "Query 第三步：展开"
+    },
+    {
+      "key": "qnorm",
+      "title": "Query 归一化 / RMSNorm"
+    },
+    {
+      "key": "query",
+      "title": "Query 投影：先压缩，再展开"
+    },
+    {
+      "key": "router",
+      "title": "专家路由 / MoE Router"
+    },
+    {
+      "key": "expert",
+      "title": "专家网络 / Expert FFN"
+    },
+    {
+      "key": "shared",
+      "title": "共享专家 / Shared Expert"
+    },
+    {
+      "key": "moe",
+      "title": "专家混合 / MoE"
+    }
+  ],
+  "indexControls": [
+    {
+      "id": "presentationToggle",
+      "text": "演示模式 · 关闭"
+    },
+    {
+      "id": "methodButton",
+      "text": "计数方法 ↗"
+    },
+    {
+      "id": "tab-attention",
+      "text": "01 Attention 计算量"
+    },
+    {
+      "id": "tab-roofline",
+      "text": "02 Roofline 性能上界"
+    },
+    {
+      "id": "tab-mfu",
+      "text": "03 MFU 训练效率教学示例"
+    },
+    {
+      "id": "",
+      "text": "Prefill · 待实现"
+    },
+    {
+      "id": "",
+      "text": "认识六种架构与图表中的术语"
+    },
+    {
+      "id": "reset",
+      "text": "重置"
+    },
+    {
+      "id": "tokenMode",
+      "text": "逐个连续生成（Decode）\n只生成 1 个 token\nPrefill · 待实现",
+      "options": [
+        [
+          "autoregressive",
+          "逐个连续生成（Decode）"
+        ],
+        [
+          "single",
+          "只生成 1 个 token"
+        ],
+        [
+          "prefill",
+          "Prefill · 待实现"
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "text": "进阶：模型维度与计数设置"
+    },
+    {
+      "id": "precision",
+      "text": "",
+      "options": [
+        [
+          "BF16",
+          "BF16"
+        ],
+        [
+          "FP16",
+          "FP16"
+        ],
+        [
+          "FP32",
+          "FP32"
+        ],
+        [
+          "FP8",
+          "FP8"
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "text": "进阶：架构专属参数"
+    },
+    {
+      "id": "",
+      "text": "实验边界与精度"
+    },
+    {
+      "id": "scope",
+      "text": "整个 Attention 模块（已声明范围）\n只看核心运算（Core）",
+      "options": [
+        [
+          "total",
+          "整个 Attention 模块（已声明范围）"
+        ],
+        [
+          "core",
+          "只看核心运算（Core）"
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "text": "查看求和公式、代入过程与逐步检查"
+    },
+    {
+      "id": "chartMode",
+      "text": "FLOPs / token\nCache / State Capacity",
+      "options": [
+        [
+          "flops",
+          "FLOPs / token"
+        ],
+        [
+          "memory",
+          "Cache / State Capacity"
+        ]
+      ]
+    },
+    {
+      "id": "yScale",
+      "text": "线性\n对数",
+      "options": [
+        [
+          "linear",
+          "线性"
+        ],
+        [
+          "log",
+          "对数"
+        ]
+      ]
+    },
+    {
+      "id": "chartMax",
+      "text": "16,384\n65,536\n262,144\n1,048,576",
+      "options": [
+        [
+          "16384",
+          "16,384"
+        ],
+        [
+          "65536",
+          "65,536"
+        ],
+        [
+          "262144",
+          "262,144"
+        ],
+        [
+          "1048576",
+          "1,048,576"
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "text": "MHA"
+    },
+    {
+      "id": "",
+      "text": "GQA"
+    },
+    {
+      "id": "",
+      "text": "MLA"
+    },
+    {
+      "id": "",
+      "text": "SWA"
+    },
+    {
+      "id": "",
+      "text": "MSA"
+    },
+    {
+      "id": "",
+      "text": "GDA"
+    },
+    {
+      "id": "",
+      "text": "MHA"
+    },
+    {
+      "id": "",
+      "text": "GQA"
+    },
+    {
+      "id": "",
+      "text": "MLA"
+    },
+    {
+      "id": "",
+      "text": "SWA"
+    },
+    {
+      "id": "",
+      "text": "MSA"
+    },
+    {
+      "id": "",
+      "text": "GDA"
+    },
+    {
+      "id": "",
+      "text": "查看加速比公式与当前代入"
+    },
+    {
+      "id": "",
+      "text": "四种减少量 / 加速比，分别说明什么？"
+    },
+    {
+      "id": "export",
+      "text": "导出实验 JSON ↓"
+    },
+    {
+      "id": "",
+      "text": "MHA"
+    },
+    {
+      "id": "",
+      "text": "GQA"
+    },
+    {
+      "id": "",
+      "text": "MLA"
+    },
+    {
+      "id": "",
+      "text": "SWA"
+    },
+    {
+      "id": "",
+      "text": "MSA"
+    },
+    {
+      "id": "",
+      "text": "GDA"
+    },
+    {
+      "id": "",
+      "text": "MHA"
+    },
+    {
+      "id": "",
+      "text": "GQA"
+    },
+    {
+      "id": "",
+      "text": "MLA"
+    },
+    {
+      "id": "",
+      "text": "SWA"
+    },
+    {
+      "id": "",
+      "text": "MSA"
+    },
+    {
+      "id": "",
+      "text": "GDA"
+    },
+    {
+      "id": "",
+      "text": "展开第一步矩阵维度与 FLOPs · 8 步"
+    },
+    {
+      "id": "",
+      "text": "缓存容量、访存、权重：三个不同的量"
+    },
+    {
+      "id": "",
+      "text": "了解 Roofline →"
+    },
+    {
+      "id": "footerMethod",
+      "text": "Methodology & Sources"
+    }
+  ],
+  "roofControls": [
+    {
+      "id": "presentationToggle",
+      "text": "演示模式 · 关闭"
+    },
+    {
+      "id": "methodButton",
+      "text": "计数方法 ↗"
+    },
+    {
+      "id": "tab-attention",
+      "text": "01 Attention 计算量"
+    },
+    {
+      "id": "tab-roofline",
+      "text": "02 Roofline 性能上界"
+    },
+    {
+      "id": "tab-mfu",
+      "text": "03 MFU 训练效率教学示例"
+    },
+    {
+      "id": "",
+      "text": "五个变量的单位、含义与来源"
+    },
+    {
+      "id": "hardwareTemplate",
+      "text": "NVIDIA H100 SXM 80GB · BF16 Dense\n自定义硬件 / 教学假设",
+      "options": [
+        [
+          "h100",
+          "NVIDIA H100 SXM 80GB · BF16 Dense"
+        ],
+        [
+          "custom",
+          "自定义硬件 / 教学假设"
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "text": "规格来源与 Dense / Sparse 区别"
+    },
+    {
+      "id": "",
+      "text": "查看或修改硬件规格"
+    },
+    {
+      "id": "bandwidthUnit",
+      "text": "",
+      "options": [
+        [
+          "GB/s",
+          "GB/s"
+        ],
+        [
+          "TB/s",
+          "TB/s"
+        ]
+      ]
+    },
+    {
+      "id": "hardwarePrecision",
+      "text": "",
+      "options": [
+        [
+          "BF16",
+          "BF16"
+        ],
+        [
+          "FP16",
+          "FP16"
+        ],
+        [
+          "FP32",
+          "FP32"
+        ],
+        [
+          "FP8",
+          "FP8"
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "text": "进阶：访存假设与计算范围"
+    },
+    {
+      "id": "roofScope",
+      "text": "",
+      "options": [
+        [
+          "total",
+          "整个 Attention 模块（已声明范围）"
+        ],
+        [
+          "core",
+          "只看核心运算（Core）"
+        ]
+      ]
+    },
+    {
+      "id": "trafficMode",
+      "text": "",
+      "options": [
+        [
+          "model",
+          "声明假设的 HBM 模型估算"
+        ],
+        [
+          "custom",
+          "用户输入整批区间总字节"
+        ],
+        [
+          "unknown",
+          "未知 · 不绘制数据点"
+        ]
+      ]
+    },
+    {
+      "id": "headReuse",
+      "text": "",
+      "options": [
+        [
+          "shared",
+          "组内 / latent 头之间理想共享"
+        ],
+        [
+          "none",
+          "按 Query Head 重读"
+        ]
+      ]
+    },
+    {
+      "id": "intermediate",
+      "text": "",
+      "options": [
+        [
+          "fused",
+          "片上融合 · 无 score 回写"
+        ],
+        [
+          "materialized",
+          "score / probability 写回 HBM"
+        ]
+      ]
+    },
+    {
+      "id": "exportRoofline",
+      "text": "导出分析 JSON ↓"
+    },
+    {
+      "id": "",
+      "text": "◆ AI 100\n带宽限制 · 335 TFLOP/s"
+    },
+    {
+      "id": "",
+      "text": "◆ AI 500\n算力限制 · 989 TFLOP/s"
+    },
+    {
+      "id": "demoBandwidth",
+      "text": "带宽 × 2"
+    },
+    {
+      "id": "demoCompute",
+      "text": "算力 × 2"
+    },
+    {
+      "id": "restoreHardware",
+      "text": "恢复 H100 规格"
+    },
+    {
+      "id": "demoContext",
+      "text": "历史长度 × 2"
+    },
+    {
+      "id": "restoreAttention",
+      "text": "重置 Attention 配置"
+    },
+    {
+      "id": "",
+      "text": "用上面的数字，逐步算出性能与时间"
+    },
+    {
+      "id": "",
+      "text": "MHA"
+    },
+    {
+      "id": "",
+      "text": "GQA"
+    },
+    {
+      "id": "",
+      "text": "MLA"
+    },
+    {
+      "id": "",
+      "text": "SWA"
+    },
+    {
+      "id": "",
+      "text": "MSA"
+    },
+    {
+      "id": "",
+      "text": "GDA"
+    },
+    {
+      "id": "",
+      "text": "进阶：完整公式与访存分项"
+    },
+    {
+      "id": "",
+      "text": ""
+    },
+    {
+      "id": "",
+      "text": ""
+    },
+    {
+      "id": "",
+      "text": "逐架构输入总访存量 / 实测 Runtime"
+    },
+    {
+      "id": "",
+      "text": "MHA"
+    },
+    {
+      "id": "",
+      "text": "GQA"
+    },
+    {
+      "id": "",
+      "text": "MLA"
+    },
+    {
+      "id": "",
+      "text": "SWA"
+    },
+    {
+      "id": "",
+      "text": "MSA"
+    },
+    {
+      "id": "",
+      "text": "GDA"
+    },
+    {
+      "id": "",
+      "text": "Roofline 假设、计数范围与证据"
+    },
+    {
+      "id": "footerMethod",
+      "text": "Methodology & Sources"
+    }
+  ],
+  "mfuText": "EXPERIMENT 03 / TRAINING ONLY\n训练吞吐量，离理论峰值还有多远？\n\nMFU = Model FLOPs Utilization（模型浮点运算利用率）。它衡量训练中模型计算吞吐量占硬件理论峰值的比例，帮助判断训练系统的计算效率。\n\n1 · 先分清三个概念\nFLOPs 是工作量\n\n模型训练一个 token 需要多少浮点运算？包括 Forward（前向，产生预测）和 Backward（反向，计算梯度）。理论工作量可以从模型架构推导。\n\nFLOP/s 是速度\n\n每秒完成多少模型运算 = 每 token 理论工作量 × 全设备实测 Tokens/s（每秒训练 token 数）。真实吞吐量通常来自训练日志或计时。\n\nMFU 是比例\n\n把模型运算速度除以全部设备的理论峰值。它不是模型预测准确率，也不是直接测得的 GPU / NPU 忙碌百分比；没有真实训练速度，就没有真实 MFU。\n\n同一模型、精度与计数口径下，MFU 越高通常表示越接近硬件理论算力。但训练质量还取决于数据、模型和优化方法，不能用 MFU 判断学得好不好。\n\n2 · 用简单数字试算\n全部为教学假设数据\n\n以下数字仅解释公式，不代表 H100、Ascend 或任何模型的实际训练性能。“训练速度”栏也是假设值，修改后会实时重算。\n\nMFU = 模型训练 FLOPs/s ÷ 全部硬件峰值 FLOP/s\n模型 FLOPs/s = 每 token 训练 FLOPs × 全设备 Tokens/s\n一键对照：训练更快，MFU 就更高吗？\n\n以下两种情景均从默认 50% 假设示例出发；点击会载入整组教学输入。\n\nA · 训练速度减半\nB · 计算减半、速度翻倍\n恢复初始情景\nTraining FLOPs/token · 每 token 训练计算量\n单位：TFLOPs/token；1 = 1 × 10¹² 次。包含前向 + 反向；本示例不推导具体模型。\n训练吞吐量输入方式\n直接填写全设备 Tokens/s\n用每步 token 数 ÷ 每步时间\n全设备训练吞吐量 · Tokens/s\n教学假设；实际使用应测量所有设备的总量，不要重复乘设备数。\nDevice Count · 设备数\n单设备 Peak Compute\nTFLOP/s，假设同一种精度的 Dense 峰值\n恢复 50% 教学示例\nMFU · 教学假设结果\n50%\n\n2,000 TFLOP/s 模型吞吐量 ÷ 4,000 TFLOP/s 全设备峰值\n\n每秒假设完成 2,000 个训练 token，相当于达到理论计算峰值的 50%。这不是 GPU / NPU 忙碌百分比，也不是训练实测。\n\n3 · 一步一步代入公式\n① 准备模型工作量与吞吐量\nTraining FLOPs/token = 1 × 10¹² = 1 × 1012\nMeasured Tokens/s = 2,000（本页为假设值）\n\n在真实分析中，前者来自全模型前向 + 反向推导，后者必须训练测量。\n\n② 算模型每秒完成的计算量\nModel FLOP/s = Training FLOPs/token × Tokens/s\n= 1 × 1012 × 2,000 = 2 × 1015 FLOP/s\n\n把每 token 的工作量乘以每秒 token 数。\n\n③ 算全部设备的理论峰值\nHardware Peak = Device Count × Peak/device\n= 4 × 1,000 × 10¹² = 4 × 1015 FLOP/s\n\n这里假设设备相同，峰值对应训练精度与 Dense 口径。\n\n④ 两种速度相除\nMFU = Model Training FLOPs/s / Total Hardware Peak FLOP/s\n= 2 × 1015 / 4 × 1015 = 0.5 = 50%\n\n工作量定义与峰值口径一致时，这个比例可以帮助比较训练系统效率。\n\n1 TFLOP/s = 10¹² FLOP/s。分子是全部设备的模型计算吞吐量；分母是全部设备的峰值，二者使用同一训练精度和 Dense / Sparse 口径。\n\n4 · 如何解读 MFU？\n为什么常常不到 100%？\n\n数据准备与传输、显存读取、设备间通信、Kernel Launch（启动计算内核）和算子效率都会占时间。同样的 token 数用时增加，Tokens/s 变小，MFU 随之降低。\n\n算得更少，会怎样？\n\n工作量减少可能让训练更快，但 MFU 看的是“工作量 × 速度”。例如本示例计算量减半、Tokens/s 翻倍，MFU 不变；若速度只提高 50%，MFU 反而下降。\n\n它与 Roofline 有何关系？\n\n两者都用硬件理论上限做参照。Roofline 结合搬运量分析任务受什么限制；训练 MFU 需要实测吞吐量，汇总整个训练系统达到峰值的多少。本页 Roofline 估计并不能代替训练测量。\n\nDecode 与 Training（训练）不能混用。Attention 页面计算单层、逐个生成的前向运算；训练还涉及全模型、前向 + 反向和批量序列。当前单层 Decode FLOPs 不能直接作为 Training FLOPs/token，也不能由理论 Decode 时间下界推出真实训练 MFU。\n\n进阶：模型 FLOPs、MoE 与实测口径\n保留接口：导入已核验的训练计算量",
+  "mfuControls": [
+    {
+      "id": "presentationToggle",
+      "text": "演示模式 · 关闭"
+    },
+    {
+      "id": "methodButton",
+      "text": "计数方法 ↗"
+    },
+    {
+      "id": "tab-attention",
+      "text": "01 Attention 计算量"
+    },
+    {
+      "id": "tab-roofline",
+      "text": "02 Roofline 性能上界"
+    },
+    {
+      "id": "tab-mfu",
+      "text": "03 MFU 训练效率教学示例"
+    },
+    {
+      "id": "mfuSlow",
+      "text": "A · 训练速度减半"
+    },
+    {
+      "id": "mfuLessWork",
+      "text": "B · 计算减半、速度翻倍"
+    },
+    {
+      "id": "mfuScenarioReset",
+      "text": "恢复初始情景"
+    },
+    {
+      "id": "mfuRateMode",
+      "text": "直接填写全设备 Tokens/s\n用每步 token 数 ÷ 每步时间",
+      "options": [
+        [
+          "rate",
+          "直接填写全设备 Tokens/s"
+        ],
+        [
+          "step",
+          "用每步 token 数 ÷ 每步时间"
+        ]
+      ]
+    },
+    {
+      "id": "mfuReset",
+      "text": "恢复 50% 教学示例"
+    },
+    {
+      "id": "",
+      "text": "进阶：模型 FLOPs、MoE 与实测口径"
+    },
+    {
+      "id": "",
+      "text": "保留接口：导入已核验的训练计算量"
+    },
+    {
+      "id": "trainingTemplate",
+      "text": ""
+    },
+    {
+      "id": "footerMethod",
+      "text": "Methodology & Sources"
+    }
+  ],
+  "effRoof": "What Limits Our Computing Speed?\n\nA processor has to load data and do calculations. Depending on the job, either one can be the bottleneck. Roofline analysis tells us which one — for a given computation, on given hardware.\n\n𝐴\n𝐼\n=\n𝐹\no\np\ns\n𝑀\nb\ny\nt\ne\ns\nAI=\nM\nbytes\n\t​\n\nF\nops\n\t​\n\n\t​\n\n\nHow much computing happens per byte of data moved.\n\n𝑃\nr\no\no\nf\n(\n𝐴\n𝐼\n)\n=\nmin\n⁡\n(\n𝑃\np\ne\na\nk\n,\n \n𝐴\n𝐼\n×\n𝐵\np\ne\na\nk\n)\nP\nroof\n\t​\n\n(AI)=min(P\npeak\n\t​\n\n, AI×B\npeak\n\t​\n\n)\n\nThe fastest this computation could theoretically run.\n\n𝐴\n𝐼\nr\ni\nd\ng\ne\n=\n𝑃\np\ne\na\nk\n𝐵\np\ne\na\nk\nAI\nridge\n\t​\n\n=\nB\npeak\n\t​\n\nP\npeak\n\t​\n\n\t​\n\n\nWhere the two limits cross over.\n\nSYMBOL\tMEANING\tUNIT\n\n𝐹\no\np\ns\nF\nops\n\t​\n\n\tFloating-point operations\tFLOPs\n\n𝑀\nb\ny\nt\ne\ns\nM\nbytes\n\t​\n\n\tData transferred\tBytes\n\n𝐴\n𝐼\nAI\tArithmetic intensity\tFLOPs/Byte\n\n𝑃\np\ne\na\nk\nP\npeak\n\t​\n\n\tPeak compute throughput\tTFLOP/s\n\n𝐵\np\ne\na\nk\nB\npeak\n\t​\n\n\tPeak memory bandwidth\tTB/s or GB/s\n\n𝐴\n𝐼\nr\ni\nd\ng\ne\nAI\nridge\n\t​\n\n\tArithmetic intensity at the ridge point\tFLOPs/Byte\nTokens Processed Together: 1,024\nAI ≈ 552.3 · Compute-bound\nMemory-bound\nCompute-bound\nRidge Point\nlow\nhigh\nArithmetic Intensity (FLOPs / Byte)\nPerformance\nDecode\nBatch\nDecode — 1 Token\nFLOPs\n96.99 MFLOPs\nEst. Memory Traffic\n97.07 MB\nAI\n1 FLOPs/Byte\nMemory-bound under the illustrative hardware configuration\nBatch — 1024 Tokens\nFLOPs\n99.32 GFLOPs\nEst. Memory Traffic\n179.83 MB\nAI\n552.3 FLOPs/Byte\nCompute-bound under the illustrative hardware configuration\n\nWhy is Batch different? Because many tokens reuse the same weights, so more computation happens per byte of data transferred.\n\nShow Calculation\nAdvanced Settings",
+  "effControls": [
+    {
+      "id": "tab-btn-roofline",
+      "text": "Roofline"
+    },
+    {
+      "id": "tab-btn-mfu",
+      "text": "MFU"
+    },
+    {
+      "id": "reset-defaults",
+      "text": "↺ Reset"
+    },
+    {
+      "id": "",
+      "text": "Show Calculation"
+    },
+    {
+      "id": "",
+      "text": "Advanced Settings"
+    },
+    {
+      "id": "in-hw-preset",
+      "text": "",
+      "options": [
+        [
+          "h100",
+          "NVIDIA H100 SXM 80GB (reference)"
+        ],
+        [
+          "illustrative",
+          "Illustrative accelerator (hypothetical)"
+        ],
+        [
+          "custom",
+          "Custom"
+        ]
+      ]
+    },
+    {
+      "id": "in-bw-unit",
+      "text": "",
+      "options": [
+        [
+          "TB/s",
+          "TB/s"
+        ],
+        [
+          "GB/s",
+          "GB/s"
+        ]
+      ]
+    },
+    {
+      "id": "in-precision",
+      "text": "",
+      "options": [
+        [
+          "BF16",
+          "BF16 (2 B)"
+        ],
+        [
+          "FP16",
+          "FP16 (2 B)"
+        ],
+        [
+          "FP32",
+          "FP32 (4 B)"
+        ],
+        [
+          "FP8",
+          "FP8 (1 B)"
+        ]
+      ]
+    }
+  ],
+  "effMFU": "How Much Computing Power Are We Actually Using?\n\nMFU compares the model's useful training computation per second with the hardware's theoretical peak computing power.\n\nM\nF\nU\n=\n𝐹\ns\nt\ne\np\n𝑡\ns\nt\ne\np\n×\n𝑁\nG\nP\nU\n×\n𝑃\np\ne\na\nk\n×\n100\n%\nMFU=\nt\nstep\n\t​\n\n×N\nGPU\n\t​\n\n×P\npeak\n\t​\n\nF\nstep\n\t​\n\n\t​\n\n×100%\nSYMBOL\tMEANING\tUNIT\n\n𝐹\ns\nt\ne\np\nF\nstep\n\t​\n\n\tUseful model FLOPs for one training step\tFLOPs\n\n𝑡\ns\nt\ne\np\nt\nstep\n\t​\n\n\tTraining step time\ts\n\n𝑁\nG\nP\nU\nN\nGPU\n\t​\n\n\tNumber of GPUs\tcount\n\n𝑃\np\ne\na\nk\nP\npeak\n\t​\n\n\tPeak compute per GPU\tFLOP/s\n\nM\nF\nU\nMFU\tModel FLOPs Utilization\t%\n\nIllustrative DeepSeek V4.1 Flash MFU — Not Measured. The training batch size (100.6M tokens/step) is reported in the technical report; FLOPs/token, GPU count, and step time are hypothetical teaching assumptions.\n\nTraining Step Time: 6.0 s\nTraining FLOPs per Token: 60 GFLOPs\nStep 1 — Useful model FLOPs per training step\n𝐹\ns\nt\ne\np\n\t\n=\n𝑁\nt\no\nk\ne\nn\ns\n×\n𝐹\nt\no\nk\ne\nn\n\n\n\t\n=\n100,600,000 tokens\n×\n60.00 GFLOPs\n\n\n\t\n=\n6.04 EFLOPs\nF\nstep\n\t​\n\n\t​\n\n=N\ntokens\n\t​\n\n×F\ntoken\n\t​\n\n=100,600,000 tokens×60.00 GFLOPs\n=\n6.04 EFLOPs\n\t​\n\n\t​\n\nStep 2 — Total hardware peak throughput\n𝑃\nt\no\nt\na\nl\n\t\n=\n𝑁\nG\nP\nU\n×\n𝑃\np\ne\na\nk\n\n\n\t\n=\n2\n,\n048\n×\n989.5 TFLOP/s\n\n\n\t\n=\n2,026,496 TFLOP/s\nP\ntotal\n\t​\n\n\t​\n\n=N\nGPU\n\t​\n\n×P\npeak\n\t​\n\n=2,048×989.5 TFLOP/s\n=\n2,026,496 TFLOP/s\n\t​\n\n\t​\n\nStep 3 — MFU\nM\nF\nU\n\t\n=\n𝐹\ns\nt\ne\np\n𝑡\ns\nt\ne\np\n×\n𝑁\nG\nP\nU\n×\n𝑃\np\ne\na\nk\n×\n100\n%\n\n\n\t\n=\n6.04 EFLOPs\n6.0 s\n×\n2\n,\n048\n×\n989.5 TFLOP/s\n×\n100\n%\n\n\n\t\n≈\n49.6%\nMFU\n\t​\n\n=\nt\nstep\n\t​\n\n×N\nGPU\n\t​\n\n×P\npeak\n\t​\n\nF\nstep\n\t​\n\n\t​\n\n×100%\n=\n6.0 s×2,048×989.5 TFLOP/s\n6.04 EFLOPs\n\t​\n\n×100%\n≈\n49.6%\n\t​\n\n\t​\n\n50%\nMFU\n100% = hardware's theoretical peak\n\nUnder these illustrative assumptions, useful model training computations achieve throughput equivalent to approximately 49.6% of the hardware's theoretical peak.\n\nShow Calculation\nAdvanced Settings"
+}

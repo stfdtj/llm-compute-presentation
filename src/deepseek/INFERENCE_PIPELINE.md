@@ -1,18 +1,12 @@
-# Inference Pipeline — Detailed Data Flow
+# Inference Pipeline ? Six-step teaching flow
 
-The existing **Inference Pipeline** tab in `deepseek_v4_1_interactive.html` follows one example: confirmed context `我喜欢`, current Backbone input `喜欢`, Target anchor `先`, and five symbolic Draft candidates `A B C D E`. Historical KV initially contains only `我`; the current Backbone Decode completes the context KV before selecting Anchor. Open the standalone HTML directly with `file://`; no server or network assets are required.
+The default lesson now has **6 major steps instead of 23**: Backbone Anchor, input preparation, three Draft Blocks, five candidates, Backbone verification, and acceptance / next cycle. The same symbolic example `我 喜欢 ? 先 ? A B C D E` is used throughout; these are teaching values, not model output.
 
-The SVG overview is created once and stays visible while the detail panel scrolls. Its persistent connections carry history into the current Backbone Decode, then its Logits into Anchor selection, selected features into DSpark, and processed KV into later Target reuse. Draft IDs/q feed Target input, Target distributions, aligned comparison, confirmation and the next iteration. Every action names **Input → Operation → Output → Next consumer**. Controls provide previous/next, deterministic play/pause, reset, chapter navigation, candidate inspection, Normal/DSpark and Greedy/Probabilistic modes.
+Each step has three fixed Input / Processing / Output sections. The persistent SVG highlights modules and connecting arrows together. Probability tables, all-position logits, causal mask, cache ledger, per-position Markov details and algorithm selectors are inside a closed Advanced Details disclosure. The computed greedy / probabilistic algorithms remain unchanged. Main-diagram cards similarly use three short Chinese sentences, retaining source detail under Technical Details.
 
-## What changed
+The diagram has separate Anchor and Backbone-feature inputs, separate LM Head and Markov modules, and a Confidence branch fed by hidden states and previous-token features. Candidate IDs and confidence scores reach conceptual Backbone Verification separately; accepted/corrected output supplies the next Anchor.
 
-- The example begins after a historical Prefill boundary: `我` is cached and `喜欢` is the pending confirmed input. A normal current Backbone Decode first runs 40 layers, Final RMSNorm and LM Head; its distribution selects anchor `先` and its before-layer-37/38/39 features condition DSpark. This is an explicitly selected chunk boundary, not a claim that generate.py defaults to holding back a Prompt token.
-- Three Draft Blocks are shown as a **3-row × 5-position** computation. Input slots are `[先, noise, noise, noise, noise]`. After three blocks, the shared vocabulary Head produces five base-logit rows. Five separate Markov actions show the previous token, its bias, the resulting full q distribution, fixed sampling value, and selected candidate.
-- The handoff explicitly constructs `[先,A,B,C,D,E]` plus existing Prompt KV. Those six IDs enter Target Embedding and the 40-layer Backbone. Resulting new KV positions are provisional.
-- Selecting C highlights input B, Target p3 and Draft q3 together. The position table and q/p inspector appear side by side on desktop. Contexts, logits and full Softmax vectors can be expanded.
-- The former independent outcome selector is replaced by **Target distribution datasets**. All decisions are computed from those distributions; selecting a dataset changes the input data, not an arbitrary result flag.
-- State views separate confirmed text, committed Target KV, provisional/invalid KV and the new pending Target correction/bonus token. Later candidate predictions remain visible after a rejection but are not evaluated for acceptance or committed.
-- Normal Decode follows the same Target greedy distributions one position at a time, stopping at the first correction or the all-matched bonus boundary; it does not continue using distributions conditioned on a rejected Draft suffix.
+The default six steps compress the existing-history boundary into the first Backbone step. The advanced example uses cached 我 and current input 喜欢; it does not claim public generate.py splits every prompt this way. At start_pos=0, forward_spec only seeds its private window. Complete speculative serving remains conceptual.
 
 ## Deterministic numerical examples
 
@@ -47,11 +41,11 @@ The reference Target Forward still executes all 40 layers; optimized CED Prefill
 
 - Build: `.venv/Scripts/python.exe src/deepseek/build.py`.
 - Numerical tests: `npm run test:pipeline`. Checks 8 algorithm/dataset combinations, normalization, base+Markov composition, fixed sampling, argmax, position alignment and committed/pending state. Also checks the full categorical identity `accepted draft mass + residual correction mass = Target distribution` at every toy position.
-- Browser: `npm run test:browser:pipeline`. Drives real controls; verifies persistent SVG identity and connected edges, all three blocks/five slots, all five proposal stages, prediction shift and causal masking, all comparison outcomes, residual correction, KV boundaries, normal Decode, offline use, playback, tab isolation and Shape Trace restoration. Checks 40 scenes at 1366×768, 1920×1080, 768×900 and 390×844, including expanded numerical tables.
-- Existing regressions: `npm run test:browser:deepseek`, `npm run test:browser:walkthrough`, `npm run test:browser:layout`.
-- Actual screenshots are generated under `qa/pipeline/` and ignored by Git. Machine-readable coverage is in `qa/pipeline/validation.json`. Desktop screenshots at 1366×768 and 1920×1080 were visually inspected, including the 3×5 block matrix, input-position/q/p alignment, acceptance table and residual correction. A narrow-screen overflow with expanded vectors was found and fixed.
+- Browser: `npm run test:browser:pipeline` checks all six steps at four sizes (24 scenes), fixed Input/Processing/Output, collapsed advanced content, changing arrow highlights, persistent SVG nodes, eight algorithm/dataset outcomes, causal prediction alignment, playback and tab pausing.
+- Main diagram: `npm run test:browser:dspark` checks independent input/output connections, nine card topics, collapsed technical detail, keyboard dismissal, bounds, and links.
+- Screenshots are generated under `qa/pipeline/` and `qa/dspark_overview/` (ignored PNGs). Both desktop sizes were visually inspected. Validation JSONs record the latest results.
 
-Editable sources: `inference_pipeline_data.js` (pure teaching math), `inference_pipeline.js` (interaction and persistent graph), and `inference_pipeline.html` (layout). `build.py` embeds them into the existing standalone HTML. Model files and calculation data are unchanged. The connected DSpark branch is added to the architecture SVG while all 745 pre-existing rectangle/path instances are preserved. The SVG preservation hash is refreshed only after this structural containment check; all other pinned calculation-source hashes remain unchanged.
+Editable sources: `inference_pipeline_data.js` (pure teaching math), `inference_pipeline.js` (interaction and persistent graph), and `inference_pipeline.html` (layout). `build.py` embeds them into the existing standalone HTML. Model files and calculation data are unchanged. The connected DSpark branch is added to the architecture SVG while all rectangle/path geometry outside the DSpark group is preserved. The SVG preservation hash is refreshed only after this structural containment check; all other pinned calculation-source hashes remain unchanged.
 
 
 ## Connected main architecture overview (2026-10-21)
@@ -65,6 +59,10 @@ The public Hugging Face files were inspected on 2026-10-21:
 - [inference/model.py](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/main/inference/model.py): implements Backbone Forward and DSpark Forward; features are collected before the specified layers, and the Anchor comes from Backbone `self.head(self.norm(h))` followed by sampling. `forward_spec(0)` seeds private caches, returning None.
 - [inference/generate.py](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/main/inference/generate.py): `generate` processes the initial prompt chunk, then calls `model.forward(...)[0]` each round and writes one next token. It does not call `forward_spec` or provide the full speculative verification loop. The page labels the complete serving loop as conceptual.
 
-Additional validation: `npm run test:browser:dspark` checks the connected branch, popup content, keyboard dismissal, panel bounds, text containment, detail/pipeline links and Backbone-before-Anchor order at 1366?768, 1920?1080, 768?900 and 390?844. Screenshots are in `qa/dspark_overview/` (ignored PNGs); `qa/dspark_overview/validation.json` records results. The main architecture and Anchor cards were inspected at both desktop sizes.
+Additional validation: `npm run test:browser:dspark` checks the connected branch, popup content, keyboard dismissal, panel bounds, text containment, detail/pipeline links and Backbone-before-Anchor order at 1366x768, 1920x1080, 768x900 and 390x844. Screenshots are in `qa/dspark_overview/` (ignored PNGs); `qa/dspark_overview/validation.json` records results. The main architecture and Anchor cards were inspected at both desktop sizes.
 
 New editable sources: `dspark_overview.py` and `dspark_ui.html`. Rebuild with the same `build.py` entry point. No model parameters or existing calculation formulas are modified.
+
+## Simplification validation (2026-10-21)
+
+Local reference model.py and inference/config.json were checked. generate.py is absent from the local reference directory, so its official Hugging Face raw source was checked: the loop calls model.forward and never forward_spec. Six lessons and both verification algorithms are exercised by the browser tests, with screenshots at 1920, 1366, 768 and 390 pixels. The SVG preservation baseline was refreshed only after comparing all elements outside dspark-overview (the only other intentional change is the prediction caption).

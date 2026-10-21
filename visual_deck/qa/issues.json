@@ -1,0 +1,1360 @@
+{
+  "slide-01": {
+    "shape-014": {
+      "name": "s01-architecture:1:14:text",
+      "text": "Image\nVision + Aligner",
+      "bounds_in": {
+        "x": 0.63,
+        "y": 3.85,
+        "w": 1.49,
+        "h": 0.75
+      },
+      "overflow": {
+        "overflow_inches": 0.152
+      }
+    }
+  },
+  "slide-05": {
+    "shape-010": {
+      "name": "s05-reuse:0:10:text",
+      "text": "Full",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 1.65,
+        "w": 1.5,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.146
+      }
+    },
+    "shape-011": {
+      "name": "s05-reuse:0:11:text",
+      "text": "Reindex",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 1.65,
+        "w": 2.0,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.146
+      }
+    },
+    "shape-012": {
+      "name": "s05-reuse:0:12:text",
+      "text": "Reuse",
+      "bounds_in": {
+        "x": 6.75,
+        "y": 1.65,
+        "w": 2.0,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.146
+      }
+    }
+  },
+  "slide-07": {
+    "shape-416": {
+      "name": "s07-moe:3:416:text",
+      "text": "Top-6",
+      "bounds_in": {
+        "x": 8.25,
+        "y": 3.27,
+        "w": 1.2,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.163
+      }
+    },
+    "shape-419": {
+      "name": "s07-moe:5:419:text",
+      "text": "6 \u00d7 Expert FFN",
+      "bounds_in": {
+        "x": 5.0,
+        "y": 4.45,
+        "w": 2.8,
+        "h": 0.3
+      },
+      "overflow": {
+        "overflow_inches": 0.128
+      }
+    },
+    "shape-422": {
+      "name": "s07-moe:6:422:text",
+      "text": "\u03a3 \u03b1\u1d62 Expert\u1d62(x) + Shared(x)",
+      "bounds_in": {
+        "x": 5.0,
+        "y": 4.88,
+        "w": 4.6,
+        "h": 0.27
+      },
+      "overflow": {
+        "overflow_inches": 0.124
+      }
+    }
+  },
+  "slide-10": {
+    "shape-014": {
+      "name": "s10-expert_params:1:14:text",
+      "text": "11,796,480",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 4.38,
+        "w": 2.5,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-019": {
+      "name": "s10-expert_params:2:19:text",
+      "text": "11,796,480",
+      "bounds_in": {
+        "x": 3.75,
+        "y": 4.38,
+        "w": 2.5,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-024": {
+      "name": "s10-expert_params:2:24:text",
+      "text": "11,796,480",
+      "bounds_in": {
+        "x": 6.9,
+        "y": 4.38,
+        "w": 2.5,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-025": {
+      "name": "s10-expert_params:3:25:text",
+      "text": "P(Expert) = 3 \u00d7 5120 \u00d7 2304 = 35,389,440",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 4.82,
+        "w": 8.8,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.163
+      }
+    },
+    "shape-026": {
+      "name": "s10-expert_params:3:26:text",
+      "text": "\u4e09\u4e2a Linear \u5747\u65e0\u52a0\u6027 Bias",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 1.45,
+        "w": 8.8,
+        "h": 0.25
+      },
+      "overflow": {
+        "overflow_inches": 0.127
+      }
+    }
+  },
+  "slide-11": {
+    "shape-010": {
+      "name": "s11-active:0:10:text",
+      "text": "Total Parameters",
+      "bounds_in": {
+        "x": 0.55,
+        "y": 1.7,
+        "w": 4.0,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.13
+      }
+    },
+    "shape-011": {
+      "name": "s11-active:0:11:text",
+      "text": "Active Parameters / Token",
+      "bounds_in": {
+        "x": 5.0,
+        "y": 1.7,
+        "w": 4.5,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.13
+      }
+    },
+    "shape-398": {
+      "name": "s11-active:1:398:text",
+      "text": "385 \u00d7 35,389,440",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 4.48,
+        "w": 4.0,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-399": {
+      "name": "s11-active:1:399:text",
+      "text": "13,624,934,400",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 4.05,
+        "w": 4.0,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.147
+      }
+    },
+    "shape-786": {
+      "name": "s11-active:2:786:text",
+      "text": "7 \u00d7 35,389,440",
+      "bounds_in": {
+        "x": 5.05,
+        "y": 4.48,
+        "w": 4.3,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-787": {
+      "name": "s11-active:2:787:text",
+      "text": "247,726,080",
+      "bounds_in": {
+        "x": 5.05,
+        "y": 4.05,
+        "w": 4.3,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.147
+      }
+    },
+    "shape-788": {
+      "name": "s11-active:3:788:text",
+      "text": "+ Router 1,966,080 \u2192 \u7ea6 136.27 \u4ebf",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 4.86,
+        "w": 4.2,
+        "h": 0.24
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-789": {
+      "name": "s11-active:3:789:text",
+      "text": "+ Router \u2192 \u7ea6 2.50 \u4ebf",
+      "bounds_in": {
+        "x": 5.05,
+        "y": 4.86,
+        "w": 4.2,
+        "h": 0.24
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    }
+  },
+  "slide-12": {
+    "shape-012": {
+      "name": "s12-matmul:0:12:text",
+      "text": "1",
+      "bounds_in": {
+        "x": 0.8,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-045",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-014": {
+      "name": "s12-matmul:0:14:text",
+      "text": "2",
+      "bounds_in": {
+        "x": 1.34,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-047",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-016": {
+      "name": "s12-matmul:0:16:text",
+      "text": "3",
+      "bounds_in": {
+        "x": 1.88,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-049",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-023": {
+      "name": "s12-matmul:0:23:text",
+      "text": "\u00d7",
+      "bounds_in": {
+        "x": 2.85,
+        "y": 2.4,
+        "w": 0.45,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.214
+      }
+    },
+    "shape-026": {
+      "name": "s12-matmul:0:26:text",
+      "text": "1",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 1.8,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-052",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-028": {
+      "name": "s12-matmul:0:28:text",
+      "text": "2",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 1.8,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-054",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-030": {
+      "name": "s12-matmul:0:30:text",
+      "text": "3",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 2.34,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-056",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-032": {
+      "name": "s12-matmul:0:32:text",
+      "text": "4",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 2.34,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-058",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-034": {
+      "name": "s12-matmul:0:34:text",
+      "text": "5",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 2.88,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-060",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-036": {
+      "name": "s12-matmul:0:36:text",
+      "text": "6",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 2.88,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-062",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-037": {
+      "name": "s12-matmul:0:37:text",
+      "text": "=",
+      "bounds_in": {
+        "x": 5.4,
+        "y": 2.4,
+        "w": 0.5,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.214
+      }
+    },
+    "shape-045": {
+      "name": "s12-matmul:1:45:text",
+      "text": "1",
+      "bounds_in": {
+        "x": 0.8,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-012",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-047": {
+      "name": "s12-matmul:1:47:text",
+      "text": "2",
+      "bounds_in": {
+        "x": 1.34,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-014",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-049": {
+      "name": "s12-matmul:1:49:text",
+      "text": "3",
+      "bounds_in": {
+        "x": 1.88,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-016",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-052": {
+      "name": "s12-matmul:2:52:text",
+      "text": "1",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 1.8,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-026",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-054": {
+      "name": "s12-matmul:2:54:text",
+      "text": "2",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 1.8,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-028",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-056": {
+      "name": "s12-matmul:2:56:text",
+      "text": "3",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 2.34,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-030",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-058": {
+      "name": "s12-matmul:2:58:text",
+      "text": "4",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 2.34,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-032",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-060": {
+      "name": "s12-matmul:2:60:text",
+      "text": "5",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 2.88,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-034",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-062": {
+      "name": "s12-matmul:2:62:text",
+      "text": "6",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 2.88,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-036",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-064": {
+      "name": "s12-matmul:3:64:text",
+      "text": "1 \u00d7 1 = 1",
+      "bounds_in": {
+        "x": 0.7,
+        "y": 4.12,
+        "w": 2.1,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.13
+      }
+    },
+    "shape-065": {
+      "name": "s12-matmul:4:65:text",
+      "text": "2 \u00d7 3 = 6",
+      "bounds_in": {
+        "x": 3.2,
+        "y": 4.12,
+        "w": 2.1,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.13
+      }
+    },
+    "shape-066": {
+      "name": "s12-matmul:5:66:text",
+      "text": "3 \u00d7 5 = 15",
+      "bounds_in": {
+        "x": 5.7,
+        "y": 4.12,
+        "w": 2.5,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.13
+      }
+    }
+  },
+  "slide-13": {
+    "shape-012": {
+      "name": "s13-matmul_next:0:12:text",
+      "text": "1",
+      "bounds_in": {
+        "x": 0.8,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-045",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-014": {
+      "name": "s13-matmul_next:0:14:text",
+      "text": "2",
+      "bounds_in": {
+        "x": 1.34,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-047",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-016": {
+      "name": "s13-matmul_next:0:16:text",
+      "text": "3",
+      "bounds_in": {
+        "x": 1.88,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-049",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-023": {
+      "name": "s13-matmul_next:0:23:text",
+      "text": "\u00d7",
+      "bounds_in": {
+        "x": 2.85,
+        "y": 2.4,
+        "w": 0.45,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.214
+      }
+    },
+    "shape-026": {
+      "name": "s13-matmul_next:0:26:text",
+      "text": "1",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 1.8,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-051",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-028": {
+      "name": "s13-matmul_next:0:28:text",
+      "text": "2",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 1.8,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-053",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-030": {
+      "name": "s13-matmul_next:0:30:text",
+      "text": "3",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 2.34,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-055",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-032": {
+      "name": "s13-matmul_next:0:32:text",
+      "text": "4",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 2.34,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-057",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-034": {
+      "name": "s13-matmul_next:0:34:text",
+      "text": "5",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 2.88,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-059",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-036": {
+      "name": "s13-matmul_next:0:36:text",
+      "text": "6",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 2.88,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-061",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-037": {
+      "name": "s13-matmul_next:0:37:text",
+      "text": "=",
+      "bounds_in": {
+        "x": 5.4,
+        "y": 2.4,
+        "w": 0.5,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.214
+      }
+    },
+    "shape-040": {
+      "name": "s13-matmul_next:0:40:text",
+      "text": "22",
+      "bounds_in": {
+        "x": 6.35,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-064",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-045": {
+      "name": "s13-matmul_next:1:45:text",
+      "text": "1",
+      "bounds_in": {
+        "x": 0.8,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-012",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-047": {
+      "name": "s13-matmul_next:1:47:text",
+      "text": "2",
+      "bounds_in": {
+        "x": 1.34,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-014",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-049": {
+      "name": "s13-matmul_next:1:49:text",
+      "text": "3",
+      "bounds_in": {
+        "x": 1.88,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-016",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-051": {
+      "name": "s13-matmul_next:1:51:text",
+      "text": "1",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 1.8,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-026",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-053": {
+      "name": "s13-matmul_next:1:53:text",
+      "text": "2",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 1.8,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-028",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-055": {
+      "name": "s13-matmul_next:1:55:text",
+      "text": "3",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 2.34,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-030",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-057": {
+      "name": "s13-matmul_next:1:57:text",
+      "text": "4",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 2.34,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-032",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-059": {
+      "name": "s13-matmul_next:1:59:text",
+      "text": "5",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 2.88,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-034",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-061": {
+      "name": "s13-matmul_next:1:61:text",
+      "text": "6",
+      "bounds_in": {
+        "x": 4.19,
+        "y": 2.88,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-036",
+          "overlap_inches": 0.505
+        }
+      ]
+    },
+    "shape-064": {
+      "name": "s13-matmul_next:3:64:text",
+      "text": "22",
+      "bounds_in": {
+        "x": 6.35,
+        "y": 2.0,
+        "w": 0.505,
+        "h": 0.505
+      },
+      "overlap": [
+        {
+          "with": "shape-040",
+          "overlap_inches": 0.505
+        }
+      ]
+    }
+  },
+  "slide-14": {
+    "shape-027": {
+      "name": "s14-lowrank:3:27:text",
+      "text": "83.89 MFLOPs",
+      "bounds_in": {
+        "x": 5.4,
+        "y": 4.15,
+        "w": 2.3,
+        "h": 0.4
+      },
+      "overlap": [
+        {
+          "with": "shape-028",
+          "overlap_inches": 0.2
+        }
+      ]
+    },
+    "shape-028": {
+      "name": "s14-lowrank:4:28:text",
+      "text": "64 Heads \u00d7 512",
+      "bounds_in": {
+        "x": 7.5,
+        "y": 3.95,
+        "w": 2.0,
+        "h": 0.4
+      },
+      "overlap": [
+        {
+          "with": "shape-027",
+          "overlap_inches": 0.2
+        }
+      ]
+    },
+    "shape-029": {
+      "name": "s14-lowrank:4:29:text",
+      "text": "\u4e24\u6b21 Linear \u5408\u8ba1\uff1a96.99 MFLOPs",
+      "bounds_in": {
+        "x": 0.5,
+        "y": 4.6,
+        "w": 9.0,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.197
+      }
+    },
+    "shape-030": {
+      "name": "s14-lowrank:4:30:text",
+      "text": "\u5bbd\u5ea6\u4e3a\u793a\u610f\uff1bFLOPs \u4e0d\u542b RMSNorm / RoPE",
+      "bounds_in": {
+        "x": 0.5,
+        "y": 5.02,
+        "w": 8.0,
+        "h": 0.16
+      },
+      "overflow": {
+        "overflow_inches": 0.141
+      }
+    }
+  },
+  "slide-16": {
+    "shape-029": {
+      "name": "s16-backward:2:29:text",
+      "text": "\u2460 dQ",
+      "bounds_in": {
+        "x": 7.8,
+        "y": 3.35,
+        "w": 1.2,
+        "h": 0.32
+      },
+      "overflow": {
+        "overflow_inches": 0.159
+      }
+    },
+    "shape-030": {
+      "name": "s16-backward:3:30:text",
+      "text": "\u2461 \u53d6\u56de\u524d\u5411\u8f93\u5165\u4e0e\u6743\u91cd",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 4.6,
+        "w": 4.6,
+        "h": 0.4
+      },
+      "overlap": [
+        {
+          "with": "shape-036",
+          "overlap_inches": 0.3
+        }
+      ]
+    },
+    "shape-036": {
+      "name": "s16-backward:4:36:text",
+      "text": "Backward \u2190",
+      "bounds_in": {
+        "x": 4.9,
+        "y": 4.6,
+        "w": 2.85,
+        "h": 0.4
+      },
+      "overflow": {
+        "overflow_inches": 0.13
+      },
+      "overlap": [
+        {
+          "with": "shape-030",
+          "overlap_inches": 0.3
+        }
+      ]
+    }
+  },
+  "slide-17": {
+    "shape-019": {
+      "name": "s17-gradients:1:19:text",
+      "text": "dQ",
+      "bounds_in": {
+        "x": 8.65,
+        "y": 2.18,
+        "w": 0.9,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.163
+      }
+    },
+    "shape-027": {
+      "name": "s17-gradients:4:27:text",
+      "text": "dH\u2032 \u2192 dH",
+      "bounds_in": {
+        "x": 3.65,
+        "y": 3.25,
+        "w": 2.3,
+        "h": 0.3
+      },
+      "overflow": {
+        "overflow_inches": 0.128
+      }
+    },
+    "shape-034": {
+      "name": "s17-gradients:6:34:text",
+      "text": "\u2464 dX [1,5120] \u2192 \u524d\u4e00\u6a21\u5757",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 4.88,
+        "w": 8.9,
+        "h": 0.3
+      },
+      "overflow": {
+        "overflow_inches": 0.179
+      }
+    }
+  },
+  "slide-18": {
+    "shape-016": {
+      "name": "s18-backward_flops:2:16:text",
+      "text": "dW",
+      "bounds_in": {
+        "x": 3.6,
+        "y": 3.45,
+        "w": 1.3,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-017": {
+      "name": "s18-backward_flops:2:17:text",
+      "text": "dX",
+      "bounds_in": {
+        "x": 6.1,
+        "y": 3.45,
+        "w": 1.3,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    }
+  },
+  "slide-19": {
+    "shape-013": {
+      "name": "s19-roofline:1:13:text",
+      "text": "Arithmetic Intensity \u00b7 FLOPs/Byte",
+      "bounds_in": {
+        "x": 1.2,
+        "y": 4.8,
+        "w": 6.4,
+        "h": 0.22
+      },
+      "overflow": {
+        "overflow_inches": 0.157
+      }
+    },
+    "shape-024": {
+      "name": "s19-roofline:2:24:text",
+      "text": "AI \u00d7 BW",
+      "bounds_in": {
+        "x": 3.05,
+        "y": 3.35,
+        "w": 2.8,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-034": {
+      "name": "s19-roofline:5:34:text",
+      "text": "H100 SXM \u00b7 BF16 Dense\uff1a989 TFLOP/s\uff0c3.35 TB/s\uff1b\u53cc\u5bf9\u6570\u5750\u6807\uff1b\u7406\u8bba\u4e0a\u754c\u3002",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 5.03,
+        "w": 8.8,
+        "h": 0.16
+      },
+      "overflow": {
+        "overflow_inches": 0.149
+      }
+    }
+  },
+  "slide-20": {
+    "shape-013": {
+      "name": "s20-roofline_batch:0:13:text",
+      "text": "Arithmetic Intensity \u00b7 FLOPs/Byte",
+      "bounds_in": {
+        "x": 1.2,
+        "y": 4.8,
+        "w": 6.4,
+        "h": 0.22
+      },
+      "overflow": {
+        "overflow_inches": 0.157
+      },
+      "overlap": [
+        {
+          "with": "shape-032",
+          "overlap_inches": 0.1
+        }
+      ]
+    },
+    "shape-025": {
+      "name": "s20-roofline_batch:0:25:text",
+      "text": "Memory-bound",
+      "bounds_in": {
+        "x": 1.55,
+        "y": 2.72,
+        "w": 3.0,
+        "h": 0.35
+      },
+      "overlap": [
+        {
+          "with": "shape-034",
+          "overlap_inches": 0.13
+        }
+      ]
+    },
+    "shape-032": {
+      "name": "s20-roofline_batch:3:32:text",
+      "text": "M=1024\n99.32 GFLOPs\n179.83 MB\nAI\u2248552.3",
+      "bounds_in": {
+        "x": 7.5,
+        "y": 3.95,
+        "w": 2.0,
+        "h": 1.1
+      },
+      "overlap": [
+        {
+          "with": "shape-013",
+          "overlap_inches": 0.1
+        }
+      ]
+    },
+    "shape-034": {
+      "name": "s20-roofline_batch:4:34:text",
+      "text": "M \u2191",
+      "bounds_in": {
+        "x": 3.8,
+        "y": 2.5,
+        "w": 1.0,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.163
+      },
+      "overlap": [
+        {
+          "with": "shape-025",
+          "overlap_inches": 0.13
+        }
+      ]
+    },
+    "shape-035": {
+      "name": "s20-roofline_batch:4:35:text",
+      "text": "\u53ea\u542b\u4e24\u4e2a Query Linear\uff1b\u7b80\u5316\u6d41\u91cf\u6a21\u578b\uff0c\u975e\u5b9e\u6d4b\uff1bM \u4e3a\u4e00\u6b21\u5171\u540c\u5904\u7406\u7684\u884c\u6570\u3002",
+      "bounds_in": {
+        "x": 0.6,
+        "y": 5.03,
+        "w": 8.8,
+        "h": 0.16
+      },
+      "overflow": {
+        "overflow_inches": 0.149
+      }
+    }
+  },
+  "slide-21": {
+    "shape-011": {
+      "name": "s21-mfu:1:11:text",
+      "text": "01  Useful Model FLOPs / Step",
+      "bounds_in": {
+        "x": 0.55,
+        "y": 2.0,
+        "w": 5.8,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-014": {
+      "name": "s21-mfu:2:14:text",
+      "text": "02  Total Hardware Peak Throughput",
+      "bounds_in": {
+        "x": 0.55,
+        "y": 3.0,
+        "w": 6.1,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    },
+    "shape-016": {
+      "name": "s21-mfu:2:16:text",
+      "text": "= 2.026496\nEFLOP/s",
+      "bounds_in": {
+        "x": 6.6,
+        "y": 3.25,
+        "w": 2.9,
+        "h": 0.7
+      },
+      "overflow": {
+        "overflow_inches": 0.186
+      }
+    },
+    "shape-017": {
+      "name": "s21-mfu:3:17:text",
+      "text": "03  MFU = 6.036 / (6.0 \u00d7 2.026496)",
+      "bounds_in": {
+        "x": 0.55,
+        "y": 4.13,
+        "w": 6.8,
+        "h": 0.35
+      },
+      "overflow": {
+        "overflow_inches": 0.146
+      }
+    },
+    "shape-029": {
+      "name": "s21-mfu:3:29:text",
+      "text": "49.6%",
+      "bounds_in": {
+        "x": 7.5,
+        "y": 4.12,
+        "w": 2.0,
+        "h": 0.55
+      },
+      "overflow": {
+        "overflow_inches": 0.166
+      }
+    },
+    "shape-030": {
+      "name": "s21-mfu:3:30:text",
+      "text": "60 GFLOPs/token\u30012048 GPUs\u30016.0 s\uff1a\u5047\u8bbe\uff1b989.5\uff1a\u793a\u4f8b\u89c4\u683c",
+      "bounds_in": {
+        "x": 0.55,
+        "y": 5.02,
+        "w": 9.0,
+        "h": 0.18
+      },
+      "overflow": {
+        "overflow_inches": 0.129
+      }
+    }
+  }
+}

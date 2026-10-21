@@ -1,0 +1,43 @@
+{
+  "input": "D:\\working\\llm-compute-presentation\\backprop_five_steps.pptx",
+  "outline": "D:\\working\\llm-compute-presentation\\backprop_slides\\outline.json",
+  "outdir": "D:\\working\\llm-compute-presentation\\backprop_slides\\qa\\visual_review",
+  "renders_dir": "D:\\working\\llm-compute-presentation\\backprop_slides\\qa\\renders",
+  "render_status": "Error: Required binary not found in PATH: soffice\n",
+  "rendered_slide_count": 0,
+  "contact_sheet": "",
+  "warning_count": 1,
+  "info_count": 2,
+  "issue_count": 3,
+  "issues": [
+    {
+      "slide": 2,
+      "type": "text_box_tight",
+      "severity": "info",
+      "message": "Estimated text height uses 88% of its box.",
+      "shape_id": "shape-11",
+      "suggestion": "Check the rendered slide for clipping or awkward wrap.",
+      "estimated_height_in": 1.14,
+      "box_height_in": 1.29
+    },
+    {
+      "slide": 2,
+      "type": "text_box_tight",
+      "severity": "info",
+      "message": "Estimated text height uses 88% of its box.",
+      "shape_id": "shape-14",
+      "suggestion": "Check the rendered slide for clipping or awkward wrap.",
+      "estimated_height_in": 1.14,
+      "box_height_in": 1.29
+    },
+    {
+      "slide": 0,
+      "type": "render_unavailable",
+      "severity": "warning",
+      "message": "Slides could not be rendered for visual contact-sheet review.",
+      "suggestion": "Install LibreOffice/Poppler or rerun with a valid --renders-dir.",
+      "render_output": "Error: Required binary not found in PATH: soffice\n"
+    }
+  ],
+  "passed": false
+}

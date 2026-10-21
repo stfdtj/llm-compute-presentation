@@ -1,0 +1,159 @@
+{
+  "schema_version": "visual_review_receipt_v1",
+  "review_schema_version": "visual_judgment_v1",
+  "deck": {
+    "filename": "DeepSeek_V41_Flash_计算成本可视化.pptx",
+    "sha256": "d342cca13c4eb61579414af03a7d56e4208931d1341ac69390f441630f43f126",
+    "normalized_office_sha256": "000eb81db0502e5cb9817b20ecff9c9bee3acf2404d691457fc261091981bda4"
+  },
+  "renders": [
+    {
+      "name": "slide-01.png",
+      "sha256": "06e8ad920086d75248b151005b144b295f5ba7d4adf8d53bdab90d96d3e8127a",
+      "size_bytes": 84809
+    },
+    {
+      "name": "slide-02.png",
+      "sha256": "43b8d8a56ccc877acafd1a956de425d525e0b7960e6be78fd11229ec3a887f83",
+      "size_bytes": 92515
+    },
+    {
+      "name": "slide-03.png",
+      "sha256": "e3a0a3c0b08aa8f85db5a3e10b5f3914dff1dd4b30f6374cf1e1bccce3b93c48",
+      "size_bytes": 89912
+    },
+    {
+      "name": "slide-04.png",
+      "sha256": "20beea2936673a58ae938ddbfca31e0d36ea0681f885c1f93beb5be8becec5f1",
+      "size_bytes": 85292
+    },
+    {
+      "name": "slide-05.png",
+      "sha256": "851be99e10c2bcf32ea55d6a8ff22f43d456aa3bb1a8fd2607db423e33a7c0ba",
+      "size_bytes": 76275
+    },
+    {
+      "name": "slide-06.png",
+      "sha256": "4fafeca31399e9f0176ffe4a3364574e035d2689bfe48f91d7a0030b1c7c4695",
+      "size_bytes": 75410
+    },
+    {
+      "name": "slide-07.png",
+      "sha256": "9c4c8ccf66dcb14757c85032ec550438c23da84b067ab981f1213c7a0374120f",
+      "size_bytes": 89421
+    },
+    {
+      "name": "slide-08.png",
+      "sha256": "8eee4f4eb9c8f3b43dbb53c029cf05158f562961201806bdb0e133f50032cde2",
+      "size_bytes": 76773
+    },
+    {
+      "name": "slide-09.png",
+      "sha256": "b8a308698697a4c0a88aa6efc8b83a1fc6e23b8ef9a74e80add16dce912240fe",
+      "size_bytes": 75455
+    },
+    {
+      "name": "slide-10.png",
+      "sha256": "ecbab548f1076bd60292ff1a30b562b53797727b8e769d787fd857b516aa6df5",
+      "size_bytes": 73082
+    },
+    {
+      "name": "slide-11.png",
+      "sha256": "eaf0d370fad1376ee6585c4510cc6eddb304cc2a607ac4ab3ee010b56389e5d9",
+      "size_bytes": 90904
+    },
+    {
+      "name": "slide-12.png",
+      "sha256": "494f2bcd356488f19286d3a08a72e9567fc02a8088baaffd347b692db441853d",
+      "size_bytes": 73622
+    },
+    {
+      "name": "slide-13.png",
+      "sha256": "3414bfdb05195b9322469f5c0256eb303f1642f74eec52700fa483a74179c9bc",
+      "size_bytes": 80113
+    },
+    {
+      "name": "slide-14.png",
+      "sha256": "ccca177dc68146c56408c536f79e9e8147df74bc7f39e6c17a1235bd653cf7aa",
+      "size_bytes": 83023
+    },
+    {
+      "name": "slide-15.png",
+      "sha256": "e0e34892a95d2b67994eba466e9d42e03a80891a49f63891890bfbb0433afc95",
+      "size_bytes": 75832
+    },
+    {
+      "name": "slide-16.png",
+      "sha256": "0d82a42983d825be73bb83706f7930bb11e543f2a8d43074e396b083fbb6b775",
+      "size_bytes": 79805
+    },
+    {
+      "name": "slide-17.png",
+      "sha256": "ce919cc2252f1c6f136a1d2fe83d47721307b928039c1c9ce307a7a336a44703",
+      "size_bytes": 86395
+    },
+    {
+      "name": "slide-18.png",
+      "sha256": "4378761bfb60b638ac0a817c3e8e7704a2b251e166545e67c3014cda28e5ae03",
+      "size_bytes": 92343
+    },
+    {
+      "name": "slide-19.png",
+      "sha256": "75b22013fdff6e69e675b74106f4975d8c67059365444946f30c69038adafaa0",
+      "size_bytes": 97883
+    },
+    {
+      "name": "slide-20.png",
+      "sha256": "b38e6b9fe8a37df98731730c0d21059221504bd714bdce8cc6a6c5d9863ed70e",
+      "size_bytes": 109069
+    },
+    {
+      "name": "slide-21.png",
+      "sha256": "cefc7f7e8efacd875005b1e86f03e7d5e8aa4f378f70bac0c2b0c01344b49167",
+      "size_bytes": 108265
+    },
+    {
+      "name": "slide-22.png",
+      "sha256": "1b2fd5f8c4e3d096966c9fbb5d9b19e05a1b6597bd8c5b2d9fbdc68784a929c5",
+      "size_bytes": 85668
+    }
+  ],
+  "render_count": 22,
+  "reviewer": {
+    "type": "model",
+    "name": "Codex"
+  },
+  "verdict": "pass",
+  "findings": [
+    {
+      "severity": "warning",
+      "slide": 20,
+      "message": "Initial Roofline labels overlapped the axes and ridge panel; moved the traffic and AI examples to a separate readout column, separated the axis label and ticks, and inspected new renders.",
+      "resolved": true
+    },
+    {
+      "severity": "warning",
+      "slide": 17,
+      "message": "Initial weight-gradient arrows crossed the superscript formulas; moved the computational nodes down and terminated arrows below formula labels, then inspected the final native slide and checkpoints.",
+      "resolved": true
+    },
+    {
+      "severity": "warning",
+      "slide": 11,
+      "message": "Initial Router annotations approached the footer and overlapped source text frames; raised them and separated the columns, then inspected the final page.",
+      "resolved": true
+    },
+    {
+      "severity": "info",
+      "message": "Matrix highlight layers intentionally cover and repeat the same cell text; formula superscripts are separate font-fallback glyph spans. These are not unintended collisions.",
+      "resolved": true
+    },
+    {
+      "severity": "info",
+      "message": "Live Microsoft PowerPoint slideshow playback was unavailable. Native OOXML timeline references and an independent LibreOffice import were checked; 83 click groups are retained.",
+      "resolved": true
+    }
+  ],
+  "reviewed_at": null,
+  "review_context": {}
+}

@@ -1,0 +1,43 @@
+{
+  "slides": 22,
+  "click_groups": 83,
+  "rendered_pages": 22,
+  "reviewed_key_states": 47,
+  "files": [
+    {
+      "name": "DeepSeek_V41_Flash_计算成本可视化.pptx",
+      "bytes": 144621,
+      "sha256": "d342cca13c4eb61579414af03a7d56e4208931d1341ac69390f441630f43f126"
+    },
+    {
+      "name": "DeepSeek_V41_Flash_计算成本可视化.pdf",
+      "bytes": 711295,
+      "sha256": "34952be3f25055293f0b45759cb00269a7b01fed7a859164b6f16e47491b7ae0"
+    },
+    {
+      "name": "DeepSeek_V41_Flash_sources.zip",
+      "bytes": 241599,
+      "sha256": "f84bea94652f86bea09532193ac1d6829d7b425e28874b3a80e6dc52fe098bc2"
+    },
+    {
+      "name": "slide_mapping.md",
+      "bytes": 14776,
+      "sha256": "a259f316adf3406c7f6a2c4a80096999d687ca37de9104453f6917c318f78700"
+    },
+    {
+      "name": "technical_report.md",
+      "bytes": 6422,
+      "sha256": "ce377d428e69ecd163c4b18405edef87c40a9f0c9a9d84f4b6c9b323984c3561"
+    },
+    {
+      "name": "source_differences.md",
+      "bytes": 2434,
+      "sha256": "464ed425f235fe1e25d9cb9e26dbe20c02c530231c2d67f39fecde39e16a408a"
+    },
+    {
+      "name": "README.md",
+      "bytes": 2935,
+      "sha256": "64221be7b90def6d8f22126dc5d2d68fa91f23b182f2f730843932d80c4c08b7"
+    }
+  ]
+}

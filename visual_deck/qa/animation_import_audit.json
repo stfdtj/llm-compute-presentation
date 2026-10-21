@@ -1,0 +1,130 @@
+{
+  "passed": true,
+  "engine": "LibreOffice 26.2.6.3 independent OOXML animation import",
+  "click_groups": 83,
+  "mfu_progress_delays": [
+    "0.09s",
+    "0.18s",
+    "0.27s",
+    "0.36s",
+    "0.45s",
+    "0.54s",
+    "0.63s",
+    "0.72s",
+    "0.81s",
+    "0.9s"
+  ],
+  "slides": [
+    {
+      "page": 1,
+      "click_groups": 3,
+      "animation_sets": 17
+    },
+    {
+      "page": 2,
+      "click_groups": 3,
+      "animation_sets": 12
+    },
+    {
+      "page": 3,
+      "click_groups": 3,
+      "animation_sets": 30
+    },
+    {
+      "page": 4,
+      "click_groups": 4,
+      "animation_sets": 15
+    },
+    {
+      "page": 5,
+      "click_groups": 3,
+      "animation_sets": 21
+    },
+    {
+      "page": 6,
+      "click_groups": 3,
+      "animation_sets": 25
+    },
+    {
+      "page": 7,
+      "click_groups": 6,
+      "animation_sets": 404
+    },
+    {
+      "page": 8,
+      "click_groups": 3,
+      "animation_sets": 18
+    },
+    {
+      "page": 9,
+      "click_groups": 3,
+      "animation_sets": 91
+    },
+    {
+      "page": 10,
+      "click_groups": 3,
+      "animation_sets": 17
+    },
+    {
+      "page": 11,
+      "click_groups": 3,
+      "animation_sets": 778
+    },
+    {
+      "page": 12,
+      "click_groups": 7,
+      "animation_sets": 30
+    },
+    {
+      "page": 13,
+      "click_groups": 4,
+      "animation_sets": 29
+    },
+    {
+      "page": 14,
+      "click_groups": 4,
+      "animation_sets": 19
+    },
+    {
+      "page": 15,
+      "click_groups": 3,
+      "animation_sets": 45
+    },
+    {
+      "page": 16,
+      "click_groups": 4,
+      "animation_sets": 27
+    },
+    {
+      "page": 17,
+      "click_groups": 6,
+      "animation_sets": 17
+    },
+    {
+      "page": 18,
+      "click_groups": 3,
+      "animation_sets": 11
+    },
+    {
+      "page": 19,
+      "click_groups": 5,
+      "animation_sets": 25
+    },
+    {
+      "page": 20,
+      "click_groups": 4,
+      "animation_sets": 9
+    },
+    {
+      "page": 21,
+      "click_groups": 3,
+      "animation_sets": 20
+    },
+    {
+      "page": 22,
+      "click_groups": 3,
+      "animation_sets": 14
+    }
+  ],
+  "limitation": "This checks native timeline interpretation, not a live Microsoft PowerPoint slideshow session."
+}

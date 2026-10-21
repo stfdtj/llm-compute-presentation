@@ -1,0 +1,435 @@
+{
+  "engine": "LibreOffice 26.2.6.3 PDF export + PyMuPDF 1.26.5 rasterization",
+  "pptx": "D:\\working\\llm-compute-presentation\\visual_deck\\qa\\checkpoints\\animation_checkpoints.pptx",
+  "pptx_sha256": "1391f8ddda87af92b9a652c88efb4f269692ef89ca759298780d5098532ebd33",
+  "pdf": "D:\\working\\llm-compute-presentation\\visual_deck\\qa\\checkpoints\\renders\\animation_checkpoints.pdf",
+  "count": 47,
+  "elapsed_seconds": 8.98,
+  "slides": [
+    {
+      "page": 1,
+      "file": "slide-01.png",
+      "sha256": "225cec600aff4193331e14aa0a8a42eff3031b6213b1190df4e25250a3c26cb3",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 2,
+      "file": "slide-02.png",
+      "sha256": "e3d63d19f1180bb624f984dfbc97e40c00c8fe25d464002323471d898daeab84",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 3,
+      "file": "slide-03.png",
+      "sha256": "5aba8d0bf8945363d9a4ca016ef2594c0e56d4be6ab6207a4dbae389d4315bc1",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 4,
+      "file": "slide-04.png",
+      "sha256": "9d0b5e3ead65dd69cdbd9bb936324eacad0d150c65e3e28d8cdcf638a88ee528",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 5,
+      "file": "slide-05.png",
+      "sha256": "3722d9c10fc2bf5eb9bb2150decf8467cb42034026b7e72a6f7ca9941478b6eb",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 6,
+      "file": "slide-06.png",
+      "sha256": "a59fcc0ae8c941a7038bb7a6fa43b3d4926a8c03285b8360e9b8214d8a7df380",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 7,
+      "file": "slide-07.png",
+      "sha256": "f568fc2f52c04eb68de8757d6f13a4acd8df84310f902e9754b2ce0d9f1387ac",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 8,
+      "file": "slide-08.png",
+      "sha256": "6f1af9327872229f7fcea172c7310573e0f942a2c0f77a93c742f52ca43802d9",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 9,
+      "file": "slide-09.png",
+      "sha256": "9cecf905cd2d58af2adff1e86b7da98ed9cca72953555e5696cfa8bad7c93861",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 10,
+      "file": "slide-10.png",
+      "sha256": "7707c9f77c96d3b2824971fad6982b50961fb0fd8fd2ea61dcc53a93b4e14025",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 11,
+      "file": "slide-11.png",
+      "sha256": "18d68abcf4b1628554fba5198227cdc48ad59338e37c4b0095cbdd06e0bf2f44",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 12,
+      "file": "slide-12.png",
+      "sha256": "8ee83454ce50456239e64bbd55a4b9557e9469766455d7da36908aa7267db4c2",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 13,
+      "file": "slide-13.png",
+      "sha256": "328934ba24d5066a594f0bb7bbe4f4c72fcecdc1a7351c36b231694d7857794f",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 14,
+      "file": "slide-14.png",
+      "sha256": "111164eefe385bbf1385b0814eecc0007f9640859cdceba2c2a857f364e4f182",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 15,
+      "file": "slide-15.png",
+      "sha256": "aeb541c05ea4bc04984bff698ec2f910d99da7366eb9572fa9d26b7d5673d788",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 16,
+      "file": "slide-16.png",
+      "sha256": "7c0d83578775f81a70f99adb2d7bf61984111925aeff7c8f451aebdf019bfb2b",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 17,
+      "file": "slide-17.png",
+      "sha256": "ec907c9ff4e434597a6f713526d3f75d8788c88453fcbdd619d4f2c21924a5f0",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 18,
+      "file": "slide-18.png",
+      "sha256": "07e65f440e7218e2a2abfb9c346f561ea356e76f5d7b93127f93d26398d0788f",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 19,
+      "file": "slide-19.png",
+      "sha256": "7d44da7abbc16248540b75a3a9974e89639ae432d6d965e0572295665f4362d0",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 20,
+      "file": "slide-20.png",
+      "sha256": "90959d6129fc07de36cb2f9049e2a8f296472234463c61af2d0724c3177610f4",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 21,
+      "file": "slide-21.png",
+      "sha256": "3262333e819d747487d2cd1fe427853ba92eb8c20d0084f5ec413432c0b43a3a",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 22,
+      "file": "slide-22.png",
+      "sha256": "d3c7d42ab401a1c21d0581fa97744d5e62aeae7f5b1fbd09cf476c7685da6d54",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 23,
+      "file": "slide-23.png",
+      "sha256": "2a0be47dc12ed49deaeb8ad4a15e525b8e762f4e42d4d23ac84f2bb4ad570546",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 24,
+      "file": "slide-24.png",
+      "sha256": "640533316f671530f0b9da5079c08ec5926ed9c00c7331bdafb37e42dae62930",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 25,
+      "file": "slide-25.png",
+      "sha256": "3430c3b902d64661a8e397a5f2f881fa9332db60f848963f7145630afb7a40f7",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 26,
+      "file": "slide-26.png",
+      "sha256": "f4c41336f22c22300814c3fde50d96470b85dd27efaa1d60f62e2f050592632d",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 27,
+      "file": "slide-27.png",
+      "sha256": "388fe89e7484d8ac1ba8c1431bc00f7c695d74e4ea7da16eae7210d046332f00",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 28,
+      "file": "slide-28.png",
+      "sha256": "35e11598f2c9df3b4ae0e9e1ef100d9c39563cb9d65711b2ad0ef061fce20b03",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 29,
+      "file": "slide-29.png",
+      "sha256": "247e0ca3992e859589bc077b8aa8a24e500c51d67ddcddfa56181658c51cc799",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 30,
+      "file": "slide-30.png",
+      "sha256": "78d97437392a00b7bbc1dff3dd4eb416a7958eb2cdd842e1e80597ef084e2c40",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 31,
+      "file": "slide-31.png",
+      "sha256": "e69b89e545e0050902865b1d68a950866ccf9a9c429557f997a173dc05c54c29",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 32,
+      "file": "slide-32.png",
+      "sha256": "0940fe29985a97c47c622ed980886b09f72391fa630de3ffab3e0004f74c33d6",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 33,
+      "file": "slide-33.png",
+      "sha256": "5164fc91dee78e26e8ce9724a67d48d6148ce87d34040570f6ca5e111e505432",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 34,
+      "file": "slide-34.png",
+      "sha256": "6f9f5774be3220fefc344170132922e61319ab7b46758dc3bf25dd70c5afe07e",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 35,
+      "file": "slide-35.png",
+      "sha256": "451d8825921d94562fda0c5a34bd2a0350b6f39c51860d4144546e7fc6e65691",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 36,
+      "file": "slide-36.png",
+      "sha256": "4fa44d9962b9298c9d5b106907459a95bb7371ccb05a31ff23dbcc5e0c426639",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 37,
+      "file": "slide-37.png",
+      "sha256": "556a7ee7c173754f9aeef1ecdbd995cc64727c2600451ed7bc3f1e6807a2c5eb",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 38,
+      "file": "slide-38.png",
+      "sha256": "abc5a9b0ab05d614d6997342626cb0a68935992453a4e704d459a5bae3ba70bd",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 39,
+      "file": "slide-39.png",
+      "sha256": "061dec138ebb4eeabe776f585cbaf3c3d33f0865192bc4612a22790c001a0d78",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 40,
+      "file": "slide-40.png",
+      "sha256": "5253544e391bda69e99e6c72d7be51185c557d0e1396c50fbb82ba4f82f11d2e",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 41,
+      "file": "slide-41.png",
+      "sha256": "b8b46395e57f5a530a2db8426fce36ab56a68e30e46d3799cab28b59944588e1",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 42,
+      "file": "slide-42.png",
+      "sha256": "34795b24bb55d3c26118b58c09f964af127575d23e7f9b10491dcfc5c980ba0f",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 43,
+      "file": "slide-43.png",
+      "sha256": "f93b44ee7dac12eae98f936af1e2e584722b5b3a0f9c1c8ba062e0c256472cc8",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 44,
+      "file": "slide-44.png",
+      "sha256": "fb18853fd118acb11f427b98691916b5848d1d9653d4272f1fbf24ea6af9ab72",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 45,
+      "file": "slide-45.png",
+      "sha256": "fed510858e8a47945e28002a14e0a1faef7fb91064ddd806f27c6ad4ad52ae16",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 46,
+      "file": "slide-46.png",
+      "sha256": "0b1ec4c2f3bf608a2a841f726bcbdd6b3c2e435911687d1ce7cf063d63c68ae1",
+      "size": [
+        1440,
+        811
+      ]
+    },
+    {
+      "page": 47,
+      "file": "slide-47.png",
+      "sha256": "6bd20328883c8acc1030bd1b107fcd452863ff2de4c9fc8ef2fcffb60b5ef6f0",
+      "size": [
+        1440,
+        811
+      ]
+    }
+  ],
+  "stdout": "convert D:\\working\\llm-compute-presentation\\visual_deck\\qa\\checkpoints\\animation_checkpoints.pptx as a Impress document -> D:\\working\\llm-compute-presentation\\visual_deck\\qa\\checkpoints\\renders\\animation_checkpoints.pdf using filter : impress_pdf_Export\n",
+  "stderr": "Could not find platform independent libraries <prefix>\n"
+}
