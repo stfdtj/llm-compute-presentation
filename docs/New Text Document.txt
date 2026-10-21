@@ -1,0 +1,580 @@
+我们先来看下这个模型的整体架构
+
+首先是它使用了CED的架构，也就是causual encoder decoder
+
+普通 Encoder 可以双向读取输入，Decoder 通过 Cross-Attention 使用 Encoder 的输出
+
+但是这里Causal Encoder 和 Causal Decoder 都遵循 Causal Mask，Decoder 主要通过共享的 Global KV 使用 Encoder 提供的历史信息。
+
+causual encoder主要是0-19层， decoder是20-39层，他们在结构上没有什么特别不一样的地方，主要是使用或者生成global kv的一个却别。
+
+然后是DSaprk, 一共有三层，它主要负责快速运算，提供5个候选的token来加快计算的速度。
+
+然后我们看细节部分。
+
+首先是encoder部分，输入的hidden state 首先会经过RMS Norm, RMSNorm 用于稳定 Hidden States 的数值尺度，帮助模型稳定训练。
+
+然后是attention, 从 Layer 2 开始，Attention 引入 CSA2 机制， 也就是Compressed Sparse Attention 2，结合 Local Sliding Window 和压缩后的 Global KV，实现局部与全局信息的读取
+
+然后是mHC, 也就是Manifold-Constrained Hyper-Connections, mHC 通过混合多路 Hidden States，增强信息传递能力并稳定模型训练。
+
+然后这边会再经过一次RMSNorm再进入到我们的MoE部分
+
+对于MoE的输入结果，我们会再次进行一个信息的混合和重构，然后得到一个最终的输出
+
+
+
+
+
+然后我们再来看一下 Encoder Attention 的细节部分。
+
+首先是每一层都会使用的 Low-rank Query Projection 和 RoPE。
+
+Low-rank Projection 负责生成 Attention 所需要的 Query，通过低秩投影减少参数量和计算量。
+
+RoPE 则负责加入位置信息，让 Attention 在计算相关性时，能够考虑 Token 之间的相对位置和顺序。
+
+接下来是 Layer 0 和 Layer 1，它们都使用 Local Sliding Window Attention，每个 Token 最多读取最近 128 个位置。
+
+这两层都会生成自己的 Query 和 Local KV，暂时不涉及 Global KV 和 Indexer。
+
+Layer 1 额外使用了 Engram，在进入这一层前通过查表获取记忆信息，并将其加入四路 Hidden States。Engram 的具体机制我们一会儿再介绍。
+
+从 Layer 2 开始，模型就会引入 CSA2 机制。
+
+我们可以看到，Layer 2 的 Compression Ratio 是 2，并且使用 Full Mode。
+
+也就是说，Layer 2 除了计算自己的 Query 和 Local KV，还会把相邻两个 Token 的信息压缩成一个 Global KV 位置，生成一份 Global KV，供后面的 Layer 使用。
+
+然后 Layer 2 会执行 Indexer，从 Global KV 中选出最多 512 个位置，main attention 会读取这些位置，再结合最近 128 个 Token 的 Local KV，一起参与 Main Attention 的计算。
+
+最后，Layer 2 将计算得到的 Hidden States 传给下一层。而 Layer 3 到 Layer 7 可以复用 Layer 2 生成的 Global KV 和 Top-K 选择结果。
+
+Layer3 也会计算自己的query和local kv，但是不会生成新的global kv, 而是使用layer2生成的global kv和layer2 选好的512个位置
+
+这里的 Compression Ratio 仍然是 2，因为它使用的是 Layer 2 已经按照 2:1 压缩好的 Global KV，不需要重新进行压缩和 Indexer 计算。
+
+
+按照参数的配置去看， 我们在2/8/14层的时候都会去生成一份新的global kv,让后面的层去使用
+
+按照参数配置，Layer 2、8、14 都会生成自己的 Global KV，提供给后面的 Layer 使用。
+
+比如 Layer 2 生成的 Global KV 会被 Layer 3 到 7 复用。到了 Layer 8，模型会根据这一层的 Hidden States 生成新的一份 Global KV，供 Layer 8 到 13 使用。
+
+原来的 Global KV 仍然属于 Layer 2 这一组，后续 Layer 则切换到新生成的 Global KV。
+
+
+接下来是 Layer 20，这里的 Compression Ratio 是 1，也就是说，我们不再把两个 Token 压缩成一个位置，而是每个 Token 对应一个 Global KV 位置。
+
+Layer 20 同样使用 Full Mode，会生成一份新的 Global KV，并执行 Indexer。
+
+这份 Global KV 会被 Layer 21 到 39 复用，不过在 Layer 24、28、32、36，模型会重新执行 Indexer，选择新的 Top-K 位置。
+
+21-23层就是简单的reuse，机制和上面reuse的机制一样。
+
+到了 Layer 24，我们会进行一次 Reindex。这里继续使用 Layer 20 生成的 Global KV 和 Index Keys，但是会根据当前层的 Hidden States 生成新的 Indexer Query，重新评分，选出最多 512 个 Global KV 位置。
+
+然后 Layer 25 到 27 会复用这次选出来的 Top-K 结果。到了 Layer 28，再进行下一次 Reindex。
+
+总结一下就是Full Mode 会生成新的 Global KV，并执行 Indexer 选择 Top-K 位置；Reindex 会复用已有的 Global KV，但重新选择 Top-K 位置；Reuse 则同时复用 Global KV 和 Top-K 结果，省去这两部分的重复计算。
+
+
+这就是 CSA2 的主要特点之一：通过跨层复用 Global KV 和 Top-K 选择结果，减少重复计算和 KV Cache 的存储开销，提高长上下文处理效率。
+
+然后我们再来看一下mHC和MoE的细节部分。
+
+
+mHC 的主要作用是增强信息传递能力。
+
+模型在 Token Embedding 之后，会把每个 Token 的 Hidden States 初始化成四路 Residual Streams，之后每一层通过 mHC 对这四路信息进行混合和更新。
+
+具体怎么运作，我们可以打开一个 Layer 看一下。
+
+首先是 **Pre**，它会根据四个混合系数，把四路 Residual Streams 合并成一路 5120 维的输入，交给 Attention 或 MoE 计算。
+
+然后是 **Post**，它会通过四个系数，把 Attention 或 MoE 的输出重新分配到四路 Residual Streams。
+
+最后是 **Comb**，它使用一个 4×4 的混合矩阵，决定每一路从其他 Residual Streams 中获取多少信息。
+
+最后把 Post 和 Comb 的结果相加，就得到了更新后的四路 Hidden States，继续传给下一层。
+
+这里我们可以看到，一个 Layer 会执行两次 Post 和 Comb。因为每层包含 Attention 和 MoE 两个模块，Attention 计算完成后需要更新一次四路信息，然后重新经过 Pre 和 RMSNorm，进入 MoE。
+
+MoE 计算完成后，再执行一次 Post 和 Comb，把 MoE 的输出也混合到四路 Residual Streams 中，最后传给下一层。
+
+
+接下来我们看 MoE，也就是 Mixture of Experts。
+
+这一层一共有 384 个 Routed Experts 和 1 个 Shared Expert。
+
+首先，输入的 Hidden States 会经过 Router，Router 对不同的 Expert 进行评分，从中选出 6 个 Routed Experts 参与计算，同时还有 1 个 Shared Expert。
+
+每个 Expert 内部都是一个使用 SwiGLU 的 FFN。
+
+最后，模型根据 Router 给出的权重，对这 6 个 Routed Experts 的输出进行加权合并，再加上 Shared Expert 的输出，得到一个 5120 维的 MoE Output。
+
+这样每个 Token 只需要使用部分 Expert，就能减少实际计算量。
+
+右边的 Fetch Token 展示的是 Router 的具体过程。
+
+首先，Router 会对 384 个 Experts 进行评分，选出 Top-6，并计算对应的权重。
+
+然后对这些权重进行归一化，用来加权合并 6 个 Routed Experts 的输出，最后加上 Shared Expert 的输出，得到 MoE Output。
+
+
+最后我们看一下 Engram。
+
+Engram 是模型中的一个记忆模块，主要通过查表的方式获取信息。
+
+它会根据当前和之前的 Token，构造不同长度的 N-gram，然后通过 Hashing，从 Memory Table 中读取对应的 Embedding。
+
+接下来，这些 Embedding 会经过 Projection 和 Gating，转换成模型需要的维度，并控制这些记忆信息的使用程度。
+
+最后，得到的结果会加入到四路 Residual Streams 中，继续参与后面的计算。
+
+在这个模型中，Engram 分别在进入 Layer 1 和 Layer 14 之前使用。
+
+
+接下来我们看一下 DSpark。
+
+DSpark 是一个包含三个 Draft Blocks 的辅助模块，主要用于 Speculative Decoding，也就是提前预测多个 Token，来加快推理速度。
+
+首先，Backbone 会先经过 40 层计算，生成一个 Anchor Token，同时提供 Layer 37 到 39 的 Hidden Features。
+
+然后 DSpark 会接收这个 Anchor Token 和 Hidden Features，经过三个 Draft Blocks，再通过 Markov Head，依次生成五个候选 Token。
+
+接下来，这五个候选 Token 会和 Anchor 一起送回 Backbone，进行一次 Forward，得到每个位置对应的 Logits，然后用这些结果验证刚才生成的五个候选 Token。
+
+如果前面的 Token 验证通过，就可以直接接受。到了第一个没有通过的位置，就停止接受后面的候选，并根据 Backbone 的预测结果进行修正，然后继续下一轮生成。
+
+这样做可以加快推理速度，因为普通 Decode 通常每次 Forward 只能推进一个 Token，而 DSpark 可以让 Backbone 通过一次 Forward 验证多个 Token。如果连续接受了多个候选，就可以减少 Backbone 的调用次数。
+
+
+
+
+架构介绍到这里就结束了， 然后我们来看一下从输入到输出向量维度的一个变化
+(打开shape trace)
+
+我们假设输入是一个 Token，然后以 Layer 2 为例看一下。
+
+一个 Token 的 Hidden States 是 [1, 5120]。
+
+四路 Residual Streams 就是 [1, 4, 5120]。
+
+经过 mHC Pre 之后，四路信息会合并成一路，得到 Attention Input [1, 5120]。
+
+然后我们做一次 RMSNorm，这一步不会改变 Shape。
+
+接下来我们通过 Low-rank Projection 计算 Query。
+
+这里有两个矩阵，首先是 W_QA，它负责压缩，把 [1, 5120] 的输入变成 [1, 1280]。
+
+然后再经过一次 RMSNorm，把输出交给 W_QB。
+
+W_QB 会把 [1, 1280] 展开成 [1, 32768]。
+
+这里的 32768 等于 64 乘以 512，所以我们可以把它 Reshape 成 [1, 64, 512]，也就是 64 个 Query Heads，每个 Head 是 512 维。
+
+接下来经过 RoPE，加入位置信息，Shape 保持不变。
+
+这样我们就得到了当前 Token 的 Query。
+
+然后我们看 KV 部分。
+
+首先是 Local KV。当前 Token 会经过 KV Projection，得到一个 512 维的 KV 表示，然后把它写入 Local KV Cache。
+
+这里的 Window Size 是 128，所以每一层最多会保留最近 128 个位置的 Local KV。
+
+接下来是 Global KV。
+
+因为我们选择的是 Layer 2，它的 Compression Ratio 是 2。
+
+模型会把相邻两个 Token 位置的信息进行压缩，生成一个 512 维的 Global KV 表示。
+
+这里我们跟踪的是一个 Token，但 Global KV 的压缩需要结合历史 Token 的信息。
+
+压缩后的 Global KV 会存入 Cache，供后面的 Layer 继续使用。
+
+然后我们来看 Indexer。
+
+Indexer 会使用前面得到的 1280 维 Low-rank Query，经过一个 Projection，变成 4096 维。
+
+然后把它分成 32 个 Heads，每个 Head 是 128 维。
+
+Indexer 会用这些 Query 和历史 Index Keys 计算相关性分数，然后选出最多 512 个 Global KV 位置。
+
+这样我们就得到了当前 Token 需要读取的 Global KV 位置。
+
+接下来进入 Main Attention。
+
+这里我们已经有了当前 Token 的 Query、最近 128 个位置以内的 Local KV，以及 Indexer 选出来的 Global KV。
+
+Main Attention 会根据 Query 和这些 KV 计算 Attention Scores，然后经过 Softmax 得到 Attention Weights。
+
+接下来使用这些 Weights 对 Value 进行加权求和，最后得到 [1, 64, 512] 的 Attention Output。
+
+然后我们需要通过 Output Projection，把它重新转换回 5120 维。
+
+这里首先把 64 个 Heads 分成 8 组，每组经过 W_OA，从 4096 维变成 1024 维。
+
+八组合起来就是 8192 维，然后经过 W_OB，把 [1, 8192] 变成 [1, 5120]。
+
+这样我们就得到了 Attention 模块的最终输出。
+
+接下来，这个输出会经过 mHC Post 和 Comb，和原来的四路 Residual Streams 进行混合和更新，得到 [1, 4, 5120]。
+
+然后我们进入 MoE 部分。
+
+首先通过 mHC Pre，再把四路信息合并成 [1, 5120]，然后经过 FFN RMSNorm。
+
+接下来是 Router。
+
+Router 的输入是 [1, 5120]，经过一个 [5120, 384] 的权重矩阵，得到 [1, 384]，也就是当前 Token 对 384 个 Routed Experts 的评分。
+
+然后模型会选择其中 6 个 Experts，再加上一个 Shared Expert，一起参与计算。
+
+我们看其中一个 Expert。
+
+它的输入是 [1, 5120]，首先分别经过 Gate 和 Up 两个 Projection。
+
+这两个 Projection 都会把输入变成 [1, 2304]。
+
+然后 Gate 的结果经过 SiLU，再和 Up 的结果逐元素相乘，得到 [1, 2304]。
+
+接下来经过 Down Projection，把 [1, 2304] 重新变成 [1, 5120]。
+
+这就是一个 Expert 的完整计算过程。
+
+其他被选中的 Experts 也会进行相同结构的计算。
+
+最后，模型根据 Router 给出的权重，把 6 个 Routed Experts 的输出加权合并，再加上 Shared Expert 的输出，得到 [1, 5120] 的 MoE Output。
+
+然后再经过一次 mHC Post 和 Comb，把 MoE Output 混合回四路 Residual Streams。
+
+最终得到 [1, 4, 5120] 的 Hidden States，传给 Layer 3。
+
+这样我们就完成了 Layer 2 的一次 Forward 数据流。
+
+
+
+然后我们来简单介绍一下参数量的计算
+
+参数量就是模型中可学习的参数数量。对于一个 Linear Layer，我们可以直接通过权重矩阵的 Shape 来计算参数量。
+
+接下来我们开始计算 MoE 的参数量。
+
+首先看 Router，它会接收一个 5120 维的 Hidden States，然后给 384 个 Routed Experts 分别打分。
+
+这里 Router 的权重矩阵是 [5120, 384]，所以它的参数量就是：
+
+5120 × 384 = 1,966,080
+
+另外 Router 还有两组 Bias，分别用于文本和图像，每组有 384 个参数。
+
+所以 Router 总共的参数量就是：
+
+1,966,080 + 384 + 384 = 1,966,848
+
+
+
+
+接下来我们看 Top-6 Expert Selection。
+
+Router 会根据刚才的评分，从 384 个 Routed Experts 中选出 6 个，然后计算对应的权重，再经过 Normalize，用这些权重来组合 Expert 的输出。
+
+这里的选择和 Normalize 都没有额外的可学习参数。
+
+
+
+
+然后我们来看 Expert FFN。
+
+每个 Expert 都包含三个 Projection，分别是 Gate、Up 和 Down。
+
+这里 Hidden Size 是 5120，Intermediate Size 是 2304。
+
+Gate 的权重矩阵是 [5120, 2304]，Up 也是一样，Down 则是 [2304, 5120]。
+
+所以每个 Projection 都有：
+
+5120 × 2304 = 11,796,480 个参数。
+
+三个 Projection 加起来就是：
+
+3 × 11,796,480 = 35,389,440
+
+也就是说，一个 Expert 大约有 3540 万参数。
+
+
+
+
+接下来是 Shared Expert。它的结构和普通的专家是一样的，所以参数量也是一样的
+
+最后一步合并。
+
+这里会把 6 个 Routed Experts 的结果按照 Router 给出的权重进行加权合并，再加上 Shared Expert 的输出，得到最终的 MoE Output。
+
+这个加权合并过程也不需要额外的可学习参数。
+
+
+
+这样我们就可以计算整个 MoE Layer 的参数量了。
+
+首先，384 个 Routed Experts 加上一个 Shared Expert，一共是 385 个。
+
+所有expert, 加上router的参数量，大概是这么多参数13,626,901,248
+
+对于当前一个文本 Token，实际上只有 6 个 Routed Experts 和 1 个 Shared Expert 参与计算。
+
+所以 Active Expert Parameters 就是：
+
+7 × 35,389,440 = 247,726,080
+
+然后再加上 Router 的权重矩阵和文本 Bias：
+
+247,726,080 + 1,966,080 + 384 = 249,692,544
+
+所以 MoE 虽然保存了大量 Expert 参数，但每个 Token 只需要执行其中一部分 Expert 的计算，这也是 MoE 能够在扩大模型参数规模的同时，控制每个 Token 计算成本的原因。
+
+
+
+前面我们已经计算了 MoE 的参数量，接下来我们再来看 FLOPs。
+
+FLOPs 就是是 Floating Point Operations，也就是浮点运算次数。
+
+前面的参数量主要是计算模型有多少可学习的权重，而 FLOPs 则是计算这些权重在实际运算中需要进行多少次浮点运算。
+
+这里我们主要以 Matrix Multiplication 为例。
+
+对于一个矩阵乘法，假设输入 X 的 Shape 是 [M, K]，权重 W 的 Shape 是 [K, N]，那么输出就是 [M, N]。
+
+我们可以使用一个近似公式：
+
+**FLOPs ≈ 2 × M × K × N**
+
+这里的 2 是因为我们把一次乘法和一次加法分别算作一次浮点运算。
+
+然后我们用 Query Low-rank Projection，分别计算 W_QA 和 W_QB 的 Forward FLOPs。
+前面我们已经计算了参数量，接下来我们来看 FLOPs，也就是 Floating Point Operations，浮点运算次数。
+
+这里我们继续用刚才的 Query Low-rank Projection 作为例子，计算一次 Forward 需要多少 FLOPs。
+
+首先，我们来看一下矩阵乘法。
+
+假设输入矩阵 X 的 Shape 是 [M, K]，权重矩阵 W 是 [K, N]，那么输出就是 [M, N]。
+
+对于输出中的每一个数字，我们需要做 K 次乘法，以及大约 K 次加法。
+
+所以，我们可以用一个近似公式来计算矩阵乘法的 FLOPs：
+
+**FLOPs ≈ 2 × M × K × N**
+
+这里的 2 代表一次乘法和一次加法，M 是输入的行数，K 是输入维度，N 是输出维度。
+
+【操作：打开 FLOPs（前向）→ Query Low-rank Projection → W_QA】
+
+然后我们来看 W_QA。
+
+前面介绍过，W_QA 会把一个 Token 从 5120 维压缩到 1280 维。
+
+它的输入 Shape 是 [1, 5120]，权重矩阵是 [5120, 1280]。
+
+所以我们直接代入刚才的公式：
+
+**2 × 1 × 5120 × 1280 = 13,107,200 FLOPs**
+
+也就是大约 13.11 MFLOPs。
+
+【操作：点击 RMSNorm】
+
+然后中间会经过一次 RMSNorm，输出仍然是 1280 维。
+
+这里我们先只统计两个 Linear Projection 的矩阵乘法，所以暂时跳过 RMSNorm 的 FLOPs。
+
+【操作：点击 W_QB】
+
+接下来是 W_QB。
+
+W_QB 会把 1280 维展开成 32768 维，所以它的权重矩阵是 [1280, 32768]。
+
+我们继续使用相同的公式：
+
+**2 × 1 × 1280 × 32768 = 83,886,080 FLOPs**
+
+也就是大约 83.89 MFLOPs。
+
+最后，我们把这两次矩阵乘法的 FLOPs 加起来：
+
+**13,107,200 + 83,886,080 = 96,993,280 FLOPs**
+
+也就是大约 97 MFLOPs。
+
+所以对于当前一个 Token，一层 Query Low-rank Projection 的两次矩阵乘法，大约需要 9700 万次浮点运算。
+
+然后我们可以把这个计算扩展到整个模型。
+
+前面介绍过，40 个主干 Layer 都会进行自己的 Query Projection。
+
+所以在普通 Decode 阶段，我们把刚才的结果乘以 40：
+
+**40 × 96,993,280 ≈ 3.88 GFLOPs**
+
+这样就得到了一个 Token 经过整个主干时，仅 Query Projection 这两次矩阵乘法产生的 FLOPs。
+
+其他模块，比如 Attention、MoE 和 mHC，也可以按照各自的计算过程继续统计，最后加起来得到整个 Forward 的计算量。
+
+
+
+
+前面我们已经算完了 Forward FLOPs，接下来我们再看一下 Backward，也就是反向传播。
+
+Backward 主要用于模型训练。首先模型会通过 Forward 得到预测结果，然后根据预测结果和正确答案计算 Loss。
+
+接下来我们需要通过 Backward，计算 Loss 对每个可学习参数的 Gradient，也就是梯度，之后 Optimizer 会利用这些 Gradient 更新参数。
+
+我们先看一下 Backward 的计算方法。
+
+【操作：切换到 PPT，展示 Linear Backward 公式推导】
+
+这里我们以一个普通的 Linear Layer 为例。
+
+假设 Forward 的公式是：
+
+Y = X × W
+
+X 是输入，W 是权重矩阵，Y 是输出。
+
+然后我们从后面的模块接收到一个 Gradient，叫作 dY，也就是 Loss 对当前输出 Y 的梯度。
+
+接下来我们需要计算两个东西。
+
+首先是 dW，也就是 Weight Gradient，它表示 Loss 对当前权重 W 的梯度，之后会用于更新权重。
+
+它的计算公式是：
+
+dW = Xᵀ × dY
+
+然后是 dX，也就是 Input Gradient，它负责把 Gradient 继续传回前面的模块。
+
+公式是：
+
+dX = dY × Wᵀ
+
+这里的 T 表示 Transpose，也就是矩阵转置。
+
+【PPT 待制作：这里演示两个公式的推导过程，展示为什么 dW 和 dX 分别需要这样的矩阵乘法。】
+
+所以对于一个 Linear Layer，Backward 主要需要计算两个矩阵乘法，一个用来得到 Weight Gradient，另一个用来得到 Input Gradient。
+
+然后我们把 dX 继续传给前一层，重复同样的过程，Gradient 就可以沿着模型逐层往回传播。
+
+【操作：返回网页，打开 FLOPs（反向）→ Query Projection】
+
+接下来我们还是使用刚才的 Query Low-rank Projection 作为例子。
+
+前面介绍过，它的 Forward 顺序是 W_QA、RMSNorm，然后是 W_QB。
+
+所以 Backward 的顺序就反过来了，我们先从 W_QB 开始，然后经过 RMSNorm，最后回到 W_QA。
+
+这里我们假设后面的 Attention 已经完成了对应的 Backward，把 Gradient dQ 传回了 W_QB 的输出位置。
+
+【操作：点击 ① W_QB】
+
+首先看 W_QB。
+
+它在 Forward 时接收一个 [1, 1280] 的输入，经过 [1280, 32768] 的权重矩阵，输出 [1, 32768]。
+
+现在我们已经有了传回来的 dQ，它的 Shape 也是 [1, 32768]。
+
+首先我们计算 Weight Gradient。
+
+按照前面的公式，用 Forward 输入的转置乘以 dQ：
+
+dW_QB = H′ᵀ × dQ
+
+得到的 Shape 是 [1280, 32768]，和 W_QB 的权重矩阵相同。
+
+然后我们计算 Input Gradient。
+
+用 dQ 乘以 W_QB 的转置：
+
+dH′ = dQ × W_QBᵀ
+
+得到 [1, 1280]，继续传给前面的 RMSNorm。
+
+这里两个 Gradient 都需要一次矩阵乘法，所以我们可以沿用刚才的 2MKN 公式。
+
+W_QB 的 Forward FLOPs 是大约 83.89 MFLOPs。
+
+Backward 要计算两个矩阵乘法，所以这里就是：
+
+2 × 83,886,080 = 167,772,160 FLOPs
+
+【操作：点击 ② RMSNorm】
+
+接下来是 RMSNorm。
+
+它会接收刚才得到的 dH′，经过对应的 Backward 计算，得到 dH，然后继续传给 W_QA。
+
+同时也会计算 RMSNorm 自己的可学习参数 Gamma 的 Gradient。
+
+这里我们先不展开 RMSNorm 的计算公式，后面的 FLOPs 合计也暂时只统计两个 Linear Projection。
+
+【操作：点击 ③ W_QA】
+
+最后我们回到 W_QA。
+
+它的 Forward 输入是 [1, 5120]，权重矩阵是 [5120, 1280]。
+
+这里的计算方法和刚才一样。
+
+首先用原始输入 X 的转置乘以 dH，得到 dW_QA。
+
+dW_QA = Xᵀ × dH
+
+输出 Shape 是 [5120, 1280]。
+
+然后用 dH 乘以 W_QA 的转置，得到 dX。
+
+dX = dH × W_QAᵀ
+
+输出 Shape 是 [1, 5120]，然后这个 Gradient 就可以继续传给前面的模块。
+
+W_QA 的 Forward FLOPs 是 13,107,200。
+
+所以 Backward FLOPs 就是：
+
+2 × 13,107,200 = 26,214,400 FLOPs
+
+【操作：查看反向 FLOPs 汇总】
+
+最后我们把 W_QA 和 W_QB 的 Backward FLOPs 加起来：
+
+167,772,160 + 26,214,400 = 193,986,560 FLOPs
+
+也就是大约 194 MFLOPs。
+
+前面算出的 Forward 是 97 MFLOPs，所以在这个例子中，Backward FLOPs 大约是 Forward 的两倍。
+
+如果把 Forward 和 Backward 加起来，就得到大约 291 MFLOPs。
+
+这里统计的是 Query Projection 中两个 Linear 的矩阵乘法。对于其他模块，我们也可以按照各自的 Forward 和 Backward 计算过程，继续统计 FLOPs。
+
+这样我们就完成了 Query Low-rank Projection 的 Forward 和 Backward FLOPs 计算。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
