@@ -40,7 +40,7 @@
  // Unchanged from the original CSA2 walkthrough engine: a persistent scene graph whose
  // nodes are repositioned/recolored by `layout()`, never recreated.
  function el(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const [k,v]of Object.entries(attrs))e.setAttribute(k,String(v));if(parent)parent.append(e);return e;}
- const svg=el('svg',{viewBox:'0 0 1200 600',role:'img','aria-labelledby':'csa-motion-title csa-motion-desc'});
+ const svg=el('svg',{viewBox:'0 0 1200 680',role:'img','aria-labelledby':'csa-motion-title csa-motion-desc'});
  const svgTitle=el('title',{id:'csa-motion-title'},svg),svgDesc=el('desc',{id:'csa-motion-desc'},svg);
  const defs=el('defs',{},svg);
  for(const [k,c] of Object.entries(COLOR)){const m=el('marker',{id:'csa-m-'+k,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'},defs);el('path',{d:'M0 0L10 5L0 10Z',fill:c},m);}
@@ -199,19 +199,22 @@
  textNode('mhc-pre-dim',mhc,800,330,'Attention Input [1,5120]',COLOR.q,18);
  wire('mhc-pre-arrow',mhc,'M360 255 H460','hc');wire('mhc-pre-arrow2',mhc,'M700 255 H790','q');
 
- // 2. Query Projection (new scene, matches the user's literal worked example)
+ // 2. Query Projection (new scene, matches the user's literal worked example).
+ // Single top-to-bottom column, every wire a straight vertical drop with one clear
+ // source and one clear destination -- no branch rejoins the chain out of order.
  const qscene=scene('query');
- label(qscene,70,60,'Hidden State [1,5120]',21,COLOR.q);
- const qIn=row('q-in',qscene,70,110,COLOR.q,'h',230);
- box('q-norm1',qscene,70,185,230,60,COLOR.q,'RMSNorm');
- box('q-wqa',qscene,70,290,230,80,COLOR.q,'W_QA [5120,1280]');
- const qMid=row('q-mid',qscene,430,315,COLOR.q,'qr',140);textNode('q-mid-dim',qscene,430,375,'[1,1280]',COLOR.q,15);
- box('q-norm2',qscene,430,420,140,55,COLOR.q,'RMSNorm');
- box('q-wqb',qscene,70,500,500,70,COLOR.q,'W_QB [1280,32768]');
- const qOut=row('q-out',qscene,650,310,COLOR.s,'Q',320,16);textNode('q-out-dim',qscene,650,280,'[1,32768]',COLOR.s,16);
- const qReshape=dataNode(node('q-reshape',qscene,g=>{for(let i=0;i<8;i++)el('rect',{x:(i%8)*30,y:Math.floor(i/8)*30,width:27,height:27,rx:2,fill:'currentColor','fill-opacity':.2,stroke:'currentColor'},g);label(g,0,-12,'Query [1,64,512]',17,COLOR.s);},{x:650,y:400,color:COLOR.s}),'query-out');
- wire('q-w1',qscene,'M185 140 V183','q');wire('q-w2',qscene,'M185 245 V288','q');wire('q-w3',qscene,'M300 330 H425','q');
- wire('q-w4',qscene,'M500 420 V 480 H320 V498','q');wire('q-w5',qscene,'M570 500 H640 V345','s');wire('q-w6',qscene,'M650 345 V397','s');
+ label(qscene,170,48,'Hidden State [1,5120]',21,COLOR.q);
+ const qIn=row('q-in',qscene,170,75,COLOR.q,'h',260);
+ box('q-norm1',qscene,170,122,260,55,COLOR.q,'RMSNorm (Attention Input)');
+ box('q-wqa',qscene,170,197,260,68,COLOR.q,'W_QA [5120,1280]');
+ const qMid=row('q-mid',qscene,170,285,COLOR.q,'qr',260);textNode('q-mid-dim',qscene,170,332,'Intermediate [1,1280]',COLOR.q,15);
+ box('q-norm2',qscene,170,360,260,55,COLOR.q,'RMSNorm (Query)');
+ box('q-wqb',qscene,170,435,260,68,COLOR.q,'W_QB [1280,32768]');
+ const qOut=row('q-out',qscene,170,523,COLOR.s,'Q',260);textNode('q-out-dim',qscene,170,570,'[1,32768]',COLOR.s,15);
+ const qReshape=dataNode(node('q-reshape',qscene,g=>{for(let i=0;i<8;i++)el('rect',{x:i*32,y:0,width:28,height:28,rx:3,fill:'currentColor','fill-opacity':.2,stroke:'currentColor'},g);label(g,0,48,'Query [1,64,512]',17,COLOR.s);},{x:170,y:600,color:COLOR.s}),'query-out');
+ wire('q-w1',qscene,'M300 102 V122','q');wire('q-w2',qscene,'M300 177 V197','q');wire('q-w3',qscene,'M300 265 V285','q');
+ wire('q-w4',qscene,'M300 340 V360','q');wire('q-w5',qscene,'M300 415 V435','q');wire('q-w6',qscene,'M300 503 V523','s');
+ wire('q-w7',qscene,'M300 578 V600','s');
 
  // 3. Local KV + SWA (generalized from the original SWA scene)
  const swa=scene('swa'),positions=[0,3968,3969,4000,4050,4094,4095,4096];
@@ -227,44 +230,45 @@
 
  // 4. Global KV Compression (generalized: shows fresh-compute OR reused-from-layer state)
  const comp=scene('compression');
- label(comp,80,55,'这个 Token 自己的贡献',20,COLOR.q);
+ textNode('comp-this-title',comp,80,55,'这个 Token 自己的贡献',COLOR.q,20);
  const compThis=row('comp-this',comp,80,100,COLOR.q,'t',220);
  const compPrev=row('comp-prev',comp,80,145,COLOR.m,'t-1',220);
  box('comp-machine',comp,370,90,300,260,COLOR.g,'Compressor');
- label(comp,520,145,'W_KV / W_gate',16,COLOR.g,'middle');label(comp,520,180,'Softmax 门控 → 加权合并',14,COLOR.m,'middle');label(comp,520,215,'RMSNorm → RoPE',15,COLOR.g,'middle');
+ node('comp-fresh-op',comp,g=>{label(g,0,0,'W_KV / W_gate',16,COLOR.g,'middle');label(g,0,35,'Softmax 门控 → 加权合并',14,COLOR.m,'middle');label(g,0,70,'RMSNorm → RoPE',15,COLOR.g,'middle');},{x:520,y:145,color:COLOR.g});
  const compOut=row('comp-out',comp,730,170,COLOR.g,'g',220);
- label(comp,730,60,'Global KV Cache（多 Token 历史）',19,COLOR.g);
+ textNode('comp-cache-title',comp,730,60,'Global KV Cache（多 Token 历史）',COLOR.g,19);
  for(let i=0;i<4;i++)row('comp-hist-'+i,comp,730,245+i*35,COLOR.g,'g'+i,220);
  const compCache=dataNode(box('comp-cache',comp,720,235,240,165,COLOR.g),'global');
  textNode('comp-cache-dim',comp,730,423,'缓存 [S,512]，S 随步数累积增长',COLOR.g,15);
- wire('comp-w1',comp,'M300 110 H365','q');wire('comp-w2',comp,'M670 170 H720','g');
- const compReused=box('comp-reused',comp,370,150,360,120,COLOR.g,'',true);
- label(comp,550,215,'复用自其它 Layer',18,COLOR.g,'middle');
+ wire('comp-w1',comp,'M300 110 H365','q');wire('comp-w1b',comp,'M300 158 H365','m');wire('comp-w2',comp,'M670 170 H720','g');
+ const compReused=box('comp-reused',comp,370,150,330,120,COLOR.g,'',true);
+ node('comp-reused-label',comp,g=>label(g,0,0,'复用自其它 Layer',18,COLOR.g,'middle'),{x:535,y:215,color:COLOR.g});
  textNode('comp-reused-note',comp,80,460,'',COLOR.m,15);
 
  // 5. Indexer (generalized: fresh Query/Keys/scoring, or inline reused-from-layer state)
  const idx=scene('indexer'),scores=[.28,.92,.43,.81],rank=[3,0,2,1],chosen=[1,3];
- label(idx,65,55,'Indexer Query',20,COLOR.q);
+ textNode('idx-q-title',idx,65,55,'Indexer Query',COLOR.q,20);
  const idxQ=row('idx-q',idx,65,100,COLOR.q,'q',200);
- label(idx,420,55,'Index Keys',20,COLOR.g);
+ textNode('idx-key-title',idx,420,55,'Index Keys',COLOR.g,20);
  for(let i=0;i<4;i++)row('idx-key-'+i,idx,420,100+i*50,COLOR.g,'#'+i,200);
  const idxKeyBox=dataNode(box('idx-key-box',idx,410,90,220,215,COLOR.g,'',true),'indexkeys');
- label(idx,770,55,'Score Vector',20,COLOR.s);
+ textNode('idx-score-title',idx,770,55,'Score Vector',COLOR.s,20);
  for(let i=0;i<4;i++)node('idx-score-'+i,idx,g=>{el('rect',{width:205,height:38,rx:5,fill:'#f2eafa',stroke:COLOR.s},g);el('rect',{x:1,y:30,width:scores[i]*203,height:6,rx:2,fill:COLOR.s},g);label(g,12,24,'#'+i+'   '+scores[i].toFixed(2),17,COLOR.s);},{x:770,y:100+i*50,color:COLOR.s});
  box('idx-dot-area',idx,55,330,290,95,COLOR.q,'');textNode('idx-dot-formula',idx,145,365,'q · kᵀ',COLOR.q,20);textNode('idx-dot-footer',idx,80,405,'→ ReLU → Head 加权',COLOR.q,15);
  box('idx-selection',idx,757,330,235,100,COLOR.s,'',true);
- for(let i=0;i<2;i++)node('idx-pos-'+i,idx,g=>{el('rect',{width:95,height:38,rx:6,fill:'#f2eafa',stroke:COLOR.s},g);label(g,47,25,'#'+chosen[i],19,COLOR.s,'middle');},{x:770,y:100+i*50,color:COLOR.s});
+ for(let i=0;i<2;i++)node('idx-pos-'+i,idx,g=>{el('rect',{width:95,height:38,rx:6,fill:'#f2eafa',stroke:COLOR.s},g);label(g,47,25,'#'+chosen[i],19,COLOR.s,'middle');},{x:780+i*105,y:362,color:COLOR.s});
  const idxTop=dataNode(textNode('idx-topk',idx,770,460,'Top-K 位置索引',COLOR.s,17),'topk');
  const idxReused=box('idx-reused',idx,55,90,950,215,COLOR.g,'',true);
- label(idx,530,200,'Top-K 复用自其它 Layer',19,COLOR.g,'middle');
+ node('idx-reused-label',idx,g=>label(g,0,0,'Top-K 复用自其它 Layer',19,COLOR.g,'middle'),{x:530,y:200,color:COLOR.g});
  textNode('idx-candidate',idx,55,500,'',COLOR.m,13);
- wire('idx-w1',idx,'M265 115 H415','q');wire('idx-w2',idx,'M345 370 H752','s');
+ wire('idx-w1',idx,'M165 127 V325','q');wire('idx-w2',idx,'M520 305 V335 H345','g');
+ wire('idx-w3',idx,'M345 377 H700 V175 H765','s');wire('idx-w4',idx,'M870 288 V325','s');
 
  // 6. Main Attention (generalized gather/score/combine)
  const attn=scene('attention'),weights=[.08,.09,.07,.12,.06,.10,.20,.18],logits=weights.map(w=>Math.log(w/.10));
  label(attn,65,55,'Local + Global KV',20,COLOR.l);
  for(let i=0;i<4;i++)row('attn-local-'+i,attn,65,100+i*34,COLOR.l,'L'+i,180);
- for(let i=0;i<4;i++)row('attn-global-'+i,attn,65,250+i*34,chosen.includes(i-4+4)?COLOR.s:COLOR.g,'G'+i,180);
+ for(let i=0;i<4;i++)row('attn-global-'+i,attn,65,250+i*34,chosen.includes(i)?COLOR.s:COLOR.g,'G'+i,180);
  label(attn,330,55,'KV Read View',19,COLOR.s);
  const attnRead=dataNode(box('attn-read',attn,320,90,200,300,COLOR.s,''),'multi');
  textNode('attn-read-dim',attn,420,410,'≤128+512 行',COLOR.s,14,'middle');
@@ -275,7 +279,8 @@
  textNode('attn-dot',attn,620,460,'QKᵀ/√512 → Softmax + Sink',COLOR.s,16);
  const attnOut=dataNode(row('attn-output',attn,900,250,COLOR.s,'O',220),'attention');
  textNode('attn-output-dim',attn,900,320,'Attention Output [1,64,512]',COLOR.s,16);
- wire('attn-w1',attn,'M250 230 H315','l');wire('attn-w2',attn,'M820 200 H1005 V260 H1125','q');
+ wire('attn-w1',attn,'M250 165 H315','l');wire('attn-w1b',attn,'M250 314 H315','g');
+ wire('attn-w2',attn,'M520 240 H610','s');wire('attn-w3',attn,'M720 127 V200','q');wire('attn-w4',attn,'M850 322 H895 V264','s');
 
  // 7. Output Projection + mHC Post
  const outp=scene('outproj');
@@ -290,17 +295,17 @@
  textNode('out-final-dim',outp,820,300,'[1,5120] → mHC Post',COLOR.hc,15);
  for(let i=0;i<4;i++)row('out-stream-'+i,outp,820,400+i*34,COLOR.hc,'h⁽'+(i+1)+'⁾',230);
  textNode('out-stream-dim',outp,820,560,'回到 4 路 [1,4,5120]',COLOR.hc,15);
- wire('out-w1',outp,'M185 140 V168','s');wire('out-w2',outp,'M185 310 V338','s');wire('out-w3',outp,'M240 450 H460 V420','s');
- wire('out-w4',outp,'M615 420 V455 H750','s');wire('out-w5',outp,'M935 375 H1005 V415','hc');
+ wire('out-w1',outp,'M185 140 V168','s');wire('out-w2',outp,'M185 310 V338','s');wire('out-w3',outp,'M415 463 H475','s');
+ wire('out-w4',outp,'M740 455 H780 V353 H815','s');wire('out-w5',outp,'M935 375 H1005 V415','hc');
 
  // 8. MoE + final hidden state
  const moe=scene('moe');
  label(moe,65,55,'FFN 输入 [1,5120]',20,COLOR.hc);
  const moeIn=row('moe-in',moe,65,100,COLOR.hc,'h',200);
  box('moe-router',moe,65,160,200,65,COLOR.s,'Router');
- const moeScores=row('moe-scores',moe,320,175,COLOR.s,'scores',260,8);textNode('moe-scores-dim',moe,320,230,`[1,${E}]`,COLOR.s,14);
+ const moeScores=row('moe-scores',moe,320,175,COLOR.s,'',260,8);textNode('moe-scores-tag',moe,320,165,'Scores',COLOR.s,13);textNode('moe-scores-dim',moe,320,230,`[1,${E}]`,COLOR.s,14);
  box('moe-topk',moe,320,250,260,55,COLOR.s,`Top-${J} Select`);
- const moeIds=row('moe-ids',moe,640,175,COLOR.s,'ids+w',160,6);textNode('moe-ids-dim',moe,640,230,`[1,${J}]×2`,COLOR.s,13);
+ const moeIds=row('moe-ids',moe,640,175,COLOR.s,'',160,6);textNode('moe-ids-tag',moe,640,165,'IDs + Weights',COLOR.s,13);textNode('moe-ids-dim',moe,640,230,`[1,${J}]×2`,COLOR.s,13);
  label(moe,65,340,`Expert FFN (SwiGLU) × ${J} + 1 Shared`,18,COLOR.s);
  for(let i=0;i<3;i++)box('moe-expert-'+i,moe,65+i*210,375,190,110,COLOR.s,'Expert '+(i<2?i+1:'…'));
  label(moe,65,375+130,'Gate/Up [5120,2304] · Down [2304,5120]',13,COLOR.m);
@@ -309,8 +314,8 @@
  for(let i=0;i<4;i++)row('moe-final-'+i,moe,500,520+i*34,COLOR.hc,'h⁽'+(i+1)+'⁾',230);
  textNode('moe-final-dim',moe,500,500,'mHC Post (FFN) → [1,4,5120]',COLOR.hc,15);
  wire('moe-w1',moe,'M265 192 H315','hc');wire('moe-w2',moe,'M580 202 H635','s');
- wire('moe-w3',moe,'M700 230 V280','s');wire('moe-w4',moe,'M200 485 H200 V 525','s');
- wire('moe-w5',moe,'M325 560 H460','hc');
+ wire('moe-w3',moe,'M700 215 H600 V375','s');wire('moe-w4',moe,'M370 485 V530','s');
+ wire('moe-w5',moe,'M325 557 H495 V533','hc');
 
  // ----------------------------------------------------------------- layout: numeric poses
  const chosenKV=[1,3];
@@ -324,14 +329,16 @@
   for(const n of nodes.values())if(n.el.closest('[data-scene]')?.getAttribute('data-scene')!==name)p.get(n.el.closest('[data-motion-id]')?.getAttribute('data-motion-id'))&&set(n.el.dataset.motionId,{opacity:0});
 
   if(name==='mhc'){
-   const expand=sIdx===6; // stage 7's mHC Post mirrors this scene's layout in reverse
-   for(let i=0;i<4;i++)show('mhc-stream-'+i,!expand);show('mhc-pre-box',!expand);show('mhc-pre-out',!expand&&bIdx>=1);show('mhc-pre-dim',!expand&&bIdx>=1);show('mhc-pre-arrow',!expand&&bIdx>=1);show('mhc-pre-arrow2',!expand&&bIdx>=1);
+   for(let i=0;i<4;i++)show('mhc-stream-'+i,true);show('mhc-pre-box',true);show('mhc-pre-out',bIdx>=1);show('mhc-pre-dim',bIdx>=1);show('mhc-pre-arrow',bIdx>=1);show('mhc-pre-arrow2',bIdx>=1);
   }
   if(name==='query'){
+   // Strictly top-to-bottom reveal: each beat lights up exactly the next box + the one
+   // wire that feeds it, so the chain never shows a connection without its source yet.
    const b=bIdx;
-   show('q-in',true);show('q-norm1',b>=0);show('q-wqa',b>=1);show('q-mid',b>=1);show('q-mid-dim',b>=1);show('q-w1',b>=0);show('q-w2',b>=1);show('q-w3',b>=1);
-   show('q-norm2',b>=2);show('q-wqb',b>=2);show('q-out',b>=2);show('q-out-dim',b>=2);show('q-w4',b>=2);show('q-w5',b>=2);
-   show('q-reshape',b>=3);show('q-w6',b>=2);
+   show('q-in',true);show('q-w1',b>=0);show('q-norm1',b>=0);
+   show('q-w2',b>=1);show('q-wqa',b>=1);show('q-w3',b>=1);show('q-mid',b>=1);show('q-mid-dim',b>=1);
+   show('q-w4',b>=2);show('q-norm2',b>=2);show('q-w5',b>=2);show('q-wqb',b>=2);show('q-w6',b>=2);show('q-out',b>=2);show('q-out-dim',b>=2);
+   show('q-w7',b>=3);show('q-reshape',b>=3);
   }
   if(name==='swa'){
    const b=bIdx;
@@ -340,34 +347,35 @@
   }
   if(name==='compression'){
    const b=bIdx,fresh=info.ratio&&info.owns,reused=info.ratio&&!info.owns;
-   show('comp-this',fresh);show('comp-prev',fresh&&info.ratio===2);show('comp-machine',fresh);show('comp-w1',fresh);
+   show('comp-this-title',fresh);show('comp-this',fresh);show('comp-prev',fresh&&info.ratio===2);show('comp-machine',fresh);show('comp-fresh-op',fresh);show('comp-w1',fresh);show('comp-w1b',fresh&&info.ratio===2);
    show('comp-out',fresh&&b>=1);show('comp-w2',fresh&&b>=1);
    for(let i=0;i<4;i++)show('comp-hist-'+i,fresh&&b>=2&&i<2);
-   show('comp-cache',fresh&&b>=2);show('comp-cache-dim',fresh&&b>=2);
-   show('comp-reused',reused);show('comp-reused-note',reused);
+   show('comp-cache-title',fresh||reused);show('comp-cache',(fresh&&b>=2)||reused);show('comp-cache-dim',(fresh&&b>=2)||reused);
+   show('comp-reused',reused);show('comp-reused-label',reused);show('comp-reused-note',reused);
   }
   if(name==='indexer'){
-   const b=bIdx;
-   if(!info.ratio){/* nothing to show */}
-   else if(info.scores){
-    show('idx-q',b>=0);show('idx-w1',b>=0);
-    for(let i=0;i<4;i++)show('idx-key-'+i,b>=1);show('idx-key-box',b>=1);
-    show('idx-dot-area',b>=2);show('idx-dot-formula',b>=2);show('idx-dot-footer',b>=2);
-    for(let i=0;i<4;i++)set('idx-score-'+i,{opacity:b>=2?1:0,x:b>=3&&chosen.includes(i)?780:770,y:100+(b>=3?rank[i]:i)*50});
-    show('idx-w2',b>=2);
-    show('idx-selection',b>=3);for(let i=0;i<2;i++)show('idx-pos-'+i,b>=3);show('idx-topk',b>=3);
-   }else{
-    show('idx-reused',true);show('idx-topk',true);
-   }
+   // Every node's visibility is set unconditionally in every branch (no implicit
+   // "leave at default opacity 1") -- otherwise the fresh-compute visuals stay stuck
+   // on screen, overlapping the reused-state box, whenever a layer is Reuse/Local-only.
+   const b=bIdx,fresh=!!(info.ratio&&info.scores),reused=!!(info.ratio&&!info.scores);
+   show('idx-q-title',fresh);show('idx-q',fresh&&b>=0);
+   show('idx-key-title',fresh&&b>=1);for(let i=0;i<4;i++)show('idx-key-'+i,fresh&&b>=1);show('idx-key-box',fresh&&b>=1);
+   show('idx-w1',fresh&&b>=2);show('idx-w2',fresh&&b>=2);show('idx-dot-area',fresh&&b>=2);show('idx-dot-formula',fresh&&b>=2);show('idx-dot-footer',fresh&&b>=2);
+   show('idx-score-title',fresh&&b>=2);
+   for(let i=0;i<4;i++)set('idx-score-'+i,{opacity:fresh&&b>=2?1:0,x:fresh&&b>=3&&chosen.includes(i)?780:770,y:100+(fresh&&b>=3?rank[i]:i)*50});
+   show('idx-w3',fresh&&b>=2);
+   show('idx-w4',fresh&&b>=3);show('idx-selection',fresh&&b>=3);for(let i=0;i<2;i++)show('idx-pos-'+i,fresh&&b>=3);
+   show('idx-topk',(fresh&&b>=3)||reused);
+   show('idx-reused',reused);show('idx-reused-label',reused);
   }
   if(name==='attention'){
    const b=bIdx;
    for(let i=0;i<4;i++)show('attn-local-'+i,b>=0);for(let i=0;i<4;i++)show('attn-global-'+i,b>=0);
-   show('attn-read',b>=0);show('attn-read-dim',b>=0);show('attn-w1',b>=0);
-   show('attn-q',true);show('attn-w2',b>=1);
+   show('attn-read',b>=0);show('attn-read-dim',b>=0);show('attn-w1',b>=0);show('attn-w1b',b>=0);
+   show('attn-q',true);show('attn-w2',b>=1);show('attn-w3',b>=1);
    for(let i=0;i<8;i++)set('attn-score-'+i,{opacity:b>=1?1:0,w:b>=2?220*(.28+weights[i]*3):220});
    show('attn-dot',b>=1);
-   show('attn-output',b>=2);show('attn-output-dim',b>=2);
+   show('attn-w4',b>=2);show('attn-output',b>=2);show('attn-output-dim',b>=2);
   }
   if(name==='outproj'){
    const b=bIdx;
@@ -375,14 +383,11 @@
    show('out-woa',b>=1);show('out-flat',b>=1);show('out-flat-dim',b>=1);show('out-wob',b>=1);show('out-w2',b>=0);show('out-w3',b>=1);show('out-w4',b>=1);
    show('out-final',b>=2);show('out-final-dim',b>=2);for(let i=0;i<4;i++)show('out-stream-'+i,b>=2);show('out-stream-dim',b>=2);show('out-w5',b>=2);
   }
-  if(name==='mhc'&&sIdx===6){
-   // mirror: single row (out-final) conceptually feeds back into the 4-stream view
-  }
   if(name==='moe'){
    const b=bIdx;
    show('moe-in',true);show('moe-router',b>=1);show('moe-w1',b>=1);
-   show('moe-scores',b>=1);show('moe-scores-dim',b>=1);show('moe-topk',b>=1);show('moe-w2',b>=1);
-   show('moe-ids',b>=1);show('moe-ids-dim',b>=1);show('moe-w3',b>=1);
+   show('moe-scores',b>=1);show('moe-scores-tag',b>=1);show('moe-scores-dim',b>=1);show('moe-topk',b>=1);show('moe-w2',b>=1);
+   show('moe-ids',b>=1);show('moe-ids-tag',b>=1);show('moe-ids-dim',b>=1);show('moe-w3',b>=1);
    for(let i=0;i<3;i++)show('moe-expert-'+i,b>=2);
    show('moe-sum',b>=3);show('moe-sum-dim',b>=3);show('moe-w4',b>=2);show('moe-w5',b>=3);
    for(let i=0;i<4;i++)show('moe-final-'+i,b>=3);show('moe-final-dim',b>=3);

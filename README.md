@@ -1,14 +1,9 @@
 # LLM Compute Presentation
 
-两个可离线打开的教学网页，以及从架构、参数量、FLOPs 到 Roofline / MFU 的中文讲稿。
+两个可离线打开的教学网页，从架构、参数量、FLOPs 到 Roofline / MFU。
 
 - [DeepSeek 架构交互页](deepseek_v4_1_interactive.html)：参数、前向、局部反向与信息流。
 - [LLM Compute Lab](index.html)：六种 Attention 对比、Roofline、MFU 与演示模式。
-- [V4 演讲稿（speech-writer 口语版）](presentation_script_v4.md)：沿用 V3 计算与演示，增加短句、停顿、重音和行动收尾。
-- [V3 演讲稿（约 18 分钟）](presentation_script_v3.md)：完整 Dense/MoE 算例与六种 Attention 对比，保留口语主线。
-- [12–15 分钟主讲稿](presentation_script_short.md)：小矩阵开场，六段口语讲述与网页演示。
-- [演讲支持附录](presentation_script_appendix.md)：复杂公式、详细结果与统计边界。
-- [原始技术底稿](presentation_script.md)：保留完整五章讲义，供学习和查阅。
 
 下载后可直接双击 HTML；阅读成品不需要安装依赖。仓库包含两套网页的源码、测试、固定版本审计资料和参考图，不依赖原来的 sharing 工作区，也不包含模型权重。
 
@@ -56,25 +51,20 @@ Roofline 默认自动计算并绘图，访存量来自明确的假设模型。�
 
 **阅读边界：**Attention 研究的是单层自回归 Decode；MFU 示例研究的是全模型 Training，二者不能直接混用。各架构有各自的执行路径与统计边界，GDA 完整总量未核验时保持未知。理论 FLOPs 比值、Roofline 理想时间比值与实测速度比值分别解读。
 
-### 两个网页与演讲稿怎样配合？
+### 两个网页如何配合使用？
 
-两个网页的关系是：架构页帮助理解“真实模块如何执行”，Compute Lab 帮助分析“工作量与硬件限制如何共同影响效率”。它们是两个独立教学工具，不会自动把 DeepSeek 全模型的数据传入 Lab。Lab 中的 MLA 等示例也不能直接视为本地 DeepSeek 完整模块的复现。
+两个网页的关系是：架构页帮助理解”真实模块如何执行”，Compute Lab 帮助分析”工作量与硬件限制如何共同影响效率”。它们是两个独立教学工具，不会自动把 DeepSeek 全模型的数据传入 Lab。Lab 中的 MLA 等示例也不能直接视为本地 DeepSeek 完整模块的复现。
 
-建议先按 [主讲稿](presentation_script_short.md) 从小矩阵讲起，用 DeepSeek 架构页展示投影与 MoE，再用 Lab 展示 MHA/GQA、Roofline 和 MFU。复杂公式查 [附录](presentation_script_appendix.md)，完整学习材料仍保留在 [技术底稿](presentation_script.md) 中。现场分享可启用 Lab 演示模式，操作提示与预计时间均写在主讲稿内。
+讲解时可以先用架构页展示投影与 MoE 等真实模块，再用 Lab 展示 MHA/GQA、Roofline 和 MFU 的开销对比；现场分享可启用 Lab 演示模式，将关键图表和结论集中展示。
 
 ## 目录与修改入口
 
-根目录保留网页成品和讲稿，打开即可使用。源码及模块测试集中在 `src/`，截图和浏览器检查记录在各模块的 `qa/`；模型、来源资料和技术报告分别收纳在 `models/`、`references/` 与 `docs/`。
+根目录保留网页成品，打开即可使用。源码及模块测试集中在 `src/`，截图和浏览器检查记录在各模块的 `qa/`；模型、来源资料和技术报告分别收纳在 `models/`、`references/` 与 `docs/`。
 
 ```text
 llm-compute-presentation/
 ├─ index.html                        Compute Lab 网页成品
 ├─ deepseek_v4_1_interactive.html     DeepSeek 网页成品
-├─ presentation_script_v4.md         speech-writer 口语与节奏版
-├─ presentation_script_v3.md         约 18 分钟的 V3 演讲稿
-├─ presentation_script_short.md      12–15 分钟主讲稿
-├─ presentation_script_appendix.md   支持附录
-├─ presentation_script.md            原始技术底稿
 ├─ README.md                         使用与开发导航
 ├─ src/
 │  ├─ compute_lab/                   Lab 模板、计算、交互、构建与测试
